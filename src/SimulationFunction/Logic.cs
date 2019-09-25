@@ -344,11 +344,13 @@ namespace Challenge.LambdaRobotsServer {
             if(endX < 0) {
                 collision = true;
                 delta = (0 - startX) / sinHeading;
+                endX = startX + delta * sinHeading;
                 endY = startY + delta * cosHeading;
                 endDistance = startDistance + delta;
             } else if (endX > _game.BoardWidth) {
                 collision = true;
                 delta = (_game.BoardWidth - startX) / sinHeading;
+                endX = startX + delta * sinHeading;
                 endY = startY + delta * cosHeading;
                 endDistance = startDistance + delta;
             }
@@ -356,11 +358,13 @@ namespace Challenge.LambdaRobotsServer {
                 collision = true;
                 delta = (0 - startY) / cosHeading;
                 endX = startX + delta * sinHeading;
+                endY = startY + delta * cosHeading;
                 endDistance = startDistance + delta;
             } else if(endY > _game.BoardHeight) {
                 collision = true;
-                delta = (_game.BoardHeight) / cosHeading;
+                delta = (_game.BoardHeight - startY) / cosHeading;
                 endX = startX + delta * sinHeading;
+                endY = startY + delta * cosHeading;
                 endDistance = startDistance + delta;
             }
         }

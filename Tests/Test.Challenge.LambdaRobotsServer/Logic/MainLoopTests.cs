@@ -6,7 +6,7 @@ using Xunit;
 
 namespace Test.Challenge.LambdaRobotsServer {
 
-    public class MoveTests {
+    public class MainLoopTests {
 
         //--- Methods ---
         [Fact]
@@ -82,6 +82,31 @@ namespace Test.Challenge.LambdaRobotsServer {
             robot.Speed.Should().Be(10);
         }
 
+        [Fact]
+        public void MoveRobotColliedWithWall() {
+
+            // arrange
+            var robot = NewRobot("1", 500, 500);
+            robot.X = 990;
+            robot.Y = 990;
+            robot.Heading = 30.0;
+            robot.TargetHeading = robot.Heading;
+            robot.Speed = robot.MaxSpeed;
+            robot.TargetSpeed = robot.Speed;
+            var logic = new Logic(NewGame(), new List<Robot> {
+                robot
+            });
+
+            // act
+            logic.MainLoop(new RobotAction[0]);
+
+            // assert
+            robot.X.Should().BeLessThan(1000.0);
+            robot.Y.Should().Be(1000.0);
+            robot.Speed.Should().Be(0.0);
+            robot.Damage.Should().Be(robot.CollisionDamage);
+        }
+
         private Game NewGame() => new Game {
             BoardWidth = 1000.0,
             BoardHeight = 1000.0,
@@ -109,7 +134,7 @@ namespace Test.Challenge.LambdaRobotsServer {
             // robot characteristics
             MaxSpeed = 100.0,
             Acceleration = 10.0,
-            Deceleration = 20.0,
+            Deceleration = -20.0,
             MaxTurnSpeed = 50.0,
             ScannerRange = 600.0,
             MaxDamage = 100.0,
