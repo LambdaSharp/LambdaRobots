@@ -1,0 +1,9 @@
+Module: Challenge.LambdaRobotsServer
+Version: 1.0-DEV
+Description: Lambda-Robots is based on the 90s game P-Robots by David Malmberg
+Items:
+
+  - Function: SimulationFunction
+    Description: Simulate progress of the game board
+    Memory: 256
+    Timeout: 30
