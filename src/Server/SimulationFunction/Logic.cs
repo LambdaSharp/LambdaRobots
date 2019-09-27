@@ -31,6 +31,7 @@ namespace Challenge.LambdaRobotsServer {
     public class Game {
 
         //--- Fields ---
+        public string Id;
         public double BoardWidth;
         public double BoardHeight;
         public double SecondsPerTurn;
@@ -227,9 +228,9 @@ namespace Challenge.LambdaRobotsServer {
                     if(from != null) {
                         ++from.TotalKills;
                     }
-                    AddMessage($"{from.Name ?? "???"} killed {robot.Name}");
+                    AddMessage($"{robot.Name} was killed by {from?.Name ?? "???"}");
                 } else {
-                    AddMessage($"{from.Name ?? "???"} inflicted {damage:N0} damage to {robot.Name}");
+                    AddMessage($"{robot.Name} was damaged {damage:N0} by {from?.Name ?? "???"}");
                 }
                 return true;
             });
@@ -289,25 +290,16 @@ namespace Challenge.LambdaRobotsServer {
                     AddMessage($"{robot.Name} was damaged {robot.CollisionDamage:N0} by wall collision");
                 }
             }
+
+            // check if robot collides with any other robot
             RobotsByDistance(robot.X, robot.Y, (other, distance) => {
                 if((other.Id != robot.Id) && (distance < Game.CollisionRange)) {
-
-                    // damage robot that moved
                     robot.Speed = 0.0;
                     robot.TargetSpeed = 0.0;
                     if(Damage(robot, robot.CollisionDamage)) {
                         AddMessage($"{robot.Name} was destroyed by collision with {other.Name}");
                     } else {
                         AddMessage($"{robot.Name} was damaged {robot.CollisionDamage:N0} by collision with {other.Name}");
-                    }
-
-                    // damage other robot as well
-                    other.Speed = 0.0;
-                    other.TargetSpeed = 0.0;
-                    if(Damage(other, other.CollisionDamage)) {
-                        AddMessage($"{other.Name} was destroyed by collision with {robot.Name}");
-                    } else {
-                        AddMessage($"{other.Name} was damaged {other.CollisionDamage:N0} by collision with {robot.Name}");
                     }
                 }
                 return (robot.State == RobotState.Alive) && (distance < Game.CollisionRange);

@@ -133,9 +133,7 @@ namespace Test.Challenge.LambdaRobotsServer {
         public void MoveRobotColliedWithWall() {
 
             // arrange
-            var robot = NewRobot("Bob", 500, 500);
-            robot.X = 990;
-            robot.Y = 990;
+            var robot = NewRobot("Bob", 990.0, 990.0);
             robot.Heading = 30.0;
             robot.TargetHeading = robot.Heading;
             robot.Speed = robot.MaxSpeed;
@@ -151,7 +149,26 @@ namespace Test.Challenge.LambdaRobotsServer {
             robot.Speed.Should().Be(0.0);
             robot.Damage.Should().Be(robot.CollisionDamage);
             Game.Messages.Count.Should().Be(1);
-            Game.Messages.First().Text.Should().Be("Bob was damaged 2 by wall collision");
+            Game.Messages[0].Text.Should().Be("Bob was damaged 2 by wall collision");
+        }
+
+        [Fact]
+        public void MoveRobotColliedWithOtherRobot() {
+
+            // arrange
+            var bob = NewRobot("Bob", 500.0, 500.0);
+            var dave = NewRobot("Dave", 500.0, 500.0);
+            var logic = NewLogic(bob, dave);
+
+            // act
+            logic.MainLoop(new RobotAction[0]);
+
+            // assert
+            bob.Damage.Should().Be(bob.CollisionDamage);
+            dave.Damage.Should().Be(dave.CollisionDamage);
+            Game.Messages.Count.Should().Be(2);
+            Game.Messages[0].Text.Should().Be("Bob was damaged 2 by collision with Dave");
+            Game.Messages[1].Text.Should().Be("Dave was damaged 2 by collision with Bob");
         }
         #endregion
 
