@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/Tests/Test.Challenge.LambdaRobotsServer/Test.Challenge.LambdaRobotsServer.csproj",
+                "${workspaceFolder}/Tests/Test.Challenge.LambdaRobots.Server/Test.Challenge.LambdaRobots.Server.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/Tests/Test.Challenge.LambdaRobotsServer/Test.Challenge.LambdaRobotsServer.csproj",
+                "${workspaceFolder}/Tests/Test.Challenge.LambdaRobots.Server/Test.Challenge.LambdaRobots.Server.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -32,7 +32,7 @@
             "args": [
                 "watch",
                 "run",
-                "${workspaceFolder}/Tests/Test.Challenge.LambdaRobotsServer/Test.Challenge.LambdaRobotsServer.csproj",
+                "${workspaceFolder}/Tests/Test.Challenge.LambdaRobots.Server/Test.Challenge.LambdaRobots.Server.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
