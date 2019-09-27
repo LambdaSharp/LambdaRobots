@@ -1,9 +1,60 @@
-Module: Challenge.LambdaRobotsServer
+Module: Challenge.LambdaRobots.Server
 Version: 1.0-DEV
 Description: Lambda-Robots is based on the 90s game P-Robots by David Malmberg
 Items:
+  - Resource: GameTable
+    Scope: all
+    Type: AWS::DynamoDB::Table
+    Allow: ReadWrite
+    Scope: all
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
 
-  - Function: SimulationFunction
+        - AttributeName: SK
+          AttributeType: S
+
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+
+        - AttributeName: SK
+          KeyType: RANGE
+
+  - Resource: GameBucket
+    Description: S3 bucket for keeping the game state
+    Type: AWS::S3::Bucket
+    Scope: all
+
+  - Function: ServerFunction
+    Memory: 256
+    Timeout: 30
+    Sources:
+      - WebSocket: $connect
+        Invoke: OpenConnection
+
+      - WebSocket: $disconnect
+        Invoke: CloseConnection
+
+      - WebSocket: join
+        Invoke: JoinGame
+
+      - WebSocket: start
+        Invoke: StartGame
+
+      - WebSocket: stop
+        Invoke: StopGame
+
+      - Api: POST:/scan
+        Invoke: ScanEnemies
+
+  - Function: GameLoopFunction
     Description: Simulate progress of the game board
     Memory: 256
     Timeout: 30
+
+  - Function: Finalizer
+    Memory: 256
+    Timeout: 900

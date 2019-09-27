@@ -24,7 +24,7 @@
 
 using System;
 
-namespace Challenge.LambdaRobotsServer {
+namespace Challenge.LambdaRobots.Server {
 
     public enum RobotState {
         Undefined,

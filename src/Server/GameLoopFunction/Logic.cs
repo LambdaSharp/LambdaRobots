@@ -26,7 +26,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Challenge.LambdaRobotsServer {
+namespace Challenge.LambdaRobots.Server {
 
     public class Game {
 

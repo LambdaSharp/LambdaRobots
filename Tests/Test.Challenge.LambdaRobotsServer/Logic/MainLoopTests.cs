@@ -23,12 +23,11 @@
  */
 
 using System;
-using System.Linq;
-using Challenge.LambdaRobotsServer;
+using Challenge.LambdaRobots.Server;
 using FluentAssertions;
 using Xunit;
 
-namespace Test.Challenge.LambdaRobotsServer {
+namespace Test.Challenge.LambdaRobots.Server {
 
     public class MainLoopTests {
 
