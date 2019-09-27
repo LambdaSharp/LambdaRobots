@@ -30,61 +30,24 @@ namespace Challenge.LambdaRobotsServer {
 
     public class Game {
 
-        //--- Properties ---
+        //--- Fields ---
         public double BoardWidth;
         public double BoardHeight;
         public double SecondsPerTurn;
         public double DirectHitRange;
         public double NearHitRange;
         public double FarHitRange;
-        public List<RobotMissile> Missiles;
+        public double CollisionRange;
+        public List<RobotMissile> Missiles = new List<RobotMissile>();
+        public List<Robot> Robots = new List<Robot>();
+        public List<Message> Messages = new List<Message>();
     }
 
-    public enum RobotState {
-        Undefined,
-        Alive,
-        Dead
-    }
+    public class Message {
 
-    public class Robot {
-
-        //--- Properties ---
-        public string Id;
-
-        // current state
-        public RobotState State;
-        public double X;
-        public double Y;
-        public double Speed;
-        public double Heading;
-        public double Distance;
-        public double Damage;
-        public double Reload;
-        public int MissileFiredCount;
-
-        // target state
-        public double TargetSpeed;
-        public double TargetHeading;
-
-        // robot characteristics
-        public double MaxSpeed;
-        public double Acceleration;
-        public double Deceleration;
-        public double MaxTurnSpeed;
-        public double ScannerRange;
-        public double MaxDamage;
-        public double CollisionDamage;
-        public double DirectHitDamage;
-        public double NearHitDamage;
-        public double FarHitDamage;
-
-        // missile characteristics
-        public double MissileReloadDelay;
-        public double MissileSpeed;
-        public double MissileRange;
-        public double MissileDirectHitDamageBonus;
-        public double MissileNearHitDamageBonus;
-        public double MissileFarHitDamageBonus;
+        //--- Fields ---
+        public DateTime Timestamp;
+        public string Text;
     }
 
     public enum MissileState {
@@ -96,7 +59,7 @@ namespace Challenge.LambdaRobotsServer {
 
     public class RobotMissile {
 
-        //--- Properties ---
+        //--- Fields ---
         public string Id;
         public string RobotId;
 
@@ -104,11 +67,11 @@ namespace Challenge.LambdaRobotsServer {
         public MissileState State;
         public double X;
         public double Y;
-        public double Speed;
-        public double Heading;
         public double Distance;
 
         // missile characteristics
+        public double Speed;
+        public double Heading;
         public double Range;
         public double DirectHitDamageBonus;
         public double NearHitDamageBonus;
@@ -117,12 +80,19 @@ namespace Challenge.LambdaRobotsServer {
 
     public class RobotAction {
 
-        //--- Properties ---
+        //--- Fields ---
         public string RobotId;
         public double? Speed;
         public double? Heading;
         public double? FireMissileHeading;
         public double? FireMissileRange;
+    }
+
+    public interface IDependencyProvider {
+
+        //--- Properties ---
+        DateTime UtcNow { get; }
+        Game Game { get; }
     }
 
     public class Logic {
@@ -132,20 +102,22 @@ namespace Challenge.LambdaRobotsServer {
             => Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 
         //--- Fields ---
-        private Game _game;
-        private IEnumerable<Robot> _robots;
+        private IDependencyProvider _provider;
 
         //--- Constructors ---
-        public Logic(Game game, IEnumerable<Robot> robots) {
-            _game = game ?? throw new ArgumentNullException(nameof(game));
-            _robots = robots ?? throw new ArgumentNullException(nameof(robots));
+        public Logic(IDependencyProvider provider) {
+            _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
+
+        //--- Properties ---
+        public DateTime UtcNow => _provider.UtcNow;
+        public Game Game => _provider.Game;
 
         //--- Methods ---
         public void MainLoop(IEnumerable<RobotAction> actions) {
 
             // update robot states
-            foreach(var robot in _robots.Where(robot => robot.State == RobotState.Alive)) {
+            foreach(var robot in Game.Robots.Where(robot => robot.State == RobotState.Alive)) {
 
                 // apply action if present
                 ApplyRobotAction(robot, actions.FirstOrDefault(a => a.RobotId == robot.Id));
@@ -155,7 +127,7 @@ namespace Challenge.LambdaRobotsServer {
             }
 
             // update missile states
-            foreach(var missile in _game.Missiles.Where(missile => missile.State == MissileState.Flying)) {
+            foreach(var missile in Game.Missiles.Where(missile => missile.State == MissileState.Flying)) {
                 MoveMissile(missile);
 
                 // check if missile has hit something and came to a stop
@@ -163,7 +135,7 @@ namespace Challenge.LambdaRobotsServer {
                     AssessMissileDamage(missile);
                 }
             }
-            _game.Missiles.RemoveAll(missile => missile.State != MissileState.Flying);
+            Game.Missiles.RemoveAll(missile => missile.State != MissileState.Flying);
         }
 
         private void ApplyRobotAction(Robot robot, RobotAction action) {
@@ -172,30 +144,32 @@ namespace Challenge.LambdaRobotsServer {
             }
 
             // update speed and heading
-            robot.TargetSpeed = action.Speed ?? robot.TargetSpeed;
+            robot.TargetSpeed = Math.Min(robot.MaxSpeed, action.Speed ?? robot.TargetSpeed);
             robot.TargetHeading = action.Heading ?? robot.TargetHeading;
 
             // fire missile if requested and possible
-            if((action.FireMissileHeading.HasValue || action.FireMissileRange.HasValue) && (robot.Reload == 0.0)) {
+            if((action.FireMissileHeading.HasValue || action.FireMissileRange.HasValue) && (robot.ReloadDelay == 0.0)) {
 
                 // update robot state
-                ++robot.MissileFiredCount;
-                robot.Reload = robot.MissileReloadDelay;
+                ++robot.TotalMissileFiredCount;
+                robot.ReloadDelay = robot.MissileReloadDelay;
 
                 // add missile
-                _game.Missiles.Add(new RobotMissile {
-                    Id = $"{robot.Id}:{robot.MissileFiredCount}",
+                var missile = new RobotMissile {
+                    Id = $"{robot.Id}:{robot.TotalMissileFiredCount}",
                     RobotId = robot.Id,
                     State = MissileState.Flying,
                     X = robot.X,
                     Y = robot.Y,
                     Speed = robot.MissileSpeed,
                     Heading = action.FireMissileHeading ?? robot.Heading,
-                    Range = Math.Min(robot.MissileRange, action.FireMissileRange ?? robot.MissileRange),
+                    Range = Math.Min(robot.MissileRange, Math.Max(0.0, action.FireMissileRange ?? robot.MissileRange)),
                     DirectHitDamageBonus = robot.MissileDirectHitDamageBonus,
                     NearHitDamageBonus = robot.MissileNearHitDamageBonus,
                     FarHitDamageBonus = robot.MissileFarHitDamageBonus
-                });
+                };
+                Game.Missiles.Add(missile);
+                AddMessage($"{robot.Name} fired missile towards heading {missile.Heading:N0} with range {missile.Range:N0}");
             }
         }
 
@@ -221,16 +195,41 @@ namespace Challenge.LambdaRobotsServer {
 
         private void AssessMissileDamage(RobotMissile missile) {
             RobotsByDistance(missile.X, missile.Y, (robot, distance) => {
-                if(distance <= _game.DirectHitRange) {
-                    robot.Damage += robot.DirectHitDamage + missile.DirectHitDamageBonus;
-                } else if(distance <= _game.NearHitRange) {
-                    robot.Damage += robot.NearHitDamage + missile.NearHitDamageBonus;
-                } else if(distance <= _game.FarHitRange) {
-                    robot.Damage += robot.FarHitDamage + missile.FarHitDamageBonus;
+
+                // compute damage dealt by missile
+                double damage = 0.0;
+                if(distance <= Game.DirectHitRange) {
+                    damage = robot.DirectHitDamage + missile.DirectHitDamageBonus;
+                } else if(distance <= Game.NearHitRange) {
+                    damage = robot.NearHitDamage + missile.NearHitDamageBonus;
+                } else if(distance <= Game.FarHitRange) {
+                    damage = robot.FarHitDamage + missile.FarHitDamageBonus;
                 }
-                if(robot.Damage >= robot.MaxDamage) {
-                    robot.Damage = robot.MaxDamage;
-                    robot.State = RobotState.Dead;
+
+                // check if any damage was dealt
+                if(damage == 0.0) {
+
+                    // stop enumerating more robots since they will be further away
+                    return false;
+                }
+
+                // apply damage to target
+                Damage(robot, damage);
+                // record damage dealt
+                var from = Game.Robots.FirstOrDefault(fromRobot => fromRobot.Id == missile.RobotId);
+                if(from != null) {
+                    from.TotalDamageDealt += damage;
+                    ++from.TotalMissileHitCount;
+                }
+
+                // check if robot was killed
+                if(robot.State == RobotState.Dead) {
+                    if(from != null) {
+                        ++from.TotalKills;
+                    }
+                    AddMessage($"{from.Name ?? "???"} killed {robot.Name}");
+                } else {
+                    AddMessage($"{from.Name ?? "???"} inflicted {damage:N0} damage to {robot.Name}");
                 }
                 return true;
             });
@@ -240,8 +239,8 @@ namespace Challenge.LambdaRobotsServer {
         private void MoveRobot(Robot robot) {
 
             // reduce reload time if any is active
-            if(robot.Reload > 0) {
-                robot.Reload = Math.Max(0, robot.Reload - _game.SecondsPerTurn);
+            if(robot.ReloadDelay > 0) {
+                robot.ReloadDelay = Math.Max(0.0, robot.ReloadDelay - Game.SecondsPerTurn);
             }
 
             // compute new speed
@@ -251,20 +250,18 @@ namespace Challenge.LambdaRobotsServer {
                 robot.TargetSpeed = 0.0;
             }
             if(robot.TargetSpeed > robot.Speed) {
-                robot.Speed = Math.Min(robot.TargetSpeed, robot.Speed + robot.Acceleration * _game.SecondsPerTurn);
+                robot.Speed = Math.Min(robot.TargetSpeed, robot.Speed + robot.Acceleration * Game.SecondsPerTurn);
             } else if(robot.TargetSpeed < robot.Speed) {
-                robot.Speed = Math.Max(robot.TargetSpeed, robot.Speed + robot.Deceleration * _game.SecondsPerTurn);
+                robot.Speed = Math.Max(robot.TargetSpeed, robot.Speed + robot.Deceleration * Game.SecondsPerTurn);
             }
 
             // compute new heading
             if(robot.Heading != robot.TargetHeading) {
-                if(robot.Heading <= robot.MaxTurnSpeed) {
+                if(robot.Speed <= robot.MaxTurnSpeed) {
                     robot.Heading = robot.TargetHeading;
-                    robot.Distance = 0.0;
-
-                    // TODO: do we want to set a new start position?
                 } else {
                     robot.TargetSpeed = 0;
+                    AddMessage($"{robot.Name} stopped by sudden turn");
                 }
             }
 
@@ -273,42 +270,54 @@ namespace Challenge.LambdaRobotsServer {
             Move(
                 robot.X,
                 robot.Y,
-                robot.Distance,
+                robot.TotalTravelDistance,
                 robot.Speed,
                 robot.Heading,
                 double.MaxValue,
                 out robot.X,
                 out robot.Y,
-                out robot.Distance,
+                out robot.TotalTravelDistance,
                 out collision
             );
             if(collision) {
                 robot.Speed = 0.0;
                 robot.TargetSpeed = 0.0;
-                robot.Damage += robot.CollisionDamage;
+                if(Damage(robot, robot.CollisionDamage)) {
+                    AddMessage($"{robot.Name} was destroyed by wall collision");
+                    return;
+                } else {
+                    AddMessage($"{robot.Name} was damaged {robot.CollisionDamage:N0} by wall collision");
+                }
             }
             RobotsByDistance(robot.X, robot.Y, (other, distance) => {
-                if((other.Id != robot.Id) && (distance < 2)) {
+                if((other.Id != robot.Id) && (distance < Game.CollisionRange)) {
 
                     // damage robot that moved
                     robot.Speed = 0.0;
                     robot.TargetSpeed = 0.0;
-                    robot.Damage += robot.CollisionDamage;
-                    if(robot.Damage >= robot.MaxDamage) {
-                        robot.Damage = robot.MaxDamage;
-                        robot.State = RobotState.Dead;
+                    if(Damage(robot, robot.CollisionDamage)) {
+                        AddMessage($"{robot.Name} was destroyed by collision with {other.Name}");
+                    } else {
+                        AddMessage($"{robot.Name} was damaged {robot.CollisionDamage:N0} by collision with {other.Name}");
                     }
 
                     // damage other robot as well
                     other.Speed = 0.0;
                     other.TargetSpeed = 0.0;
-                    other.Damage += robot.CollisionDamage;
-                    if(other.Damage >= robot.MaxDamage) {
-                        other.Damage = robot.MaxDamage;
-                        other.State = RobotState.Dead;
+                    if(Damage(other, other.CollisionDamage)) {
+                        AddMessage($"{other.Name} was destroyed by collision with {robot.Name}");
+                    } else {
+                        AddMessage($"{other.Name} was damaged {other.CollisionDamage:N0} by collision with {robot.Name}");
                     }
                 }
-                return robot.State == RobotState.Alive;
+                return (robot.State == RobotState.Alive) && (distance < Game.CollisionRange);
+            });
+        }
+
+        private void AddMessage(string text) {
+            Game.Messages.Add(new Message {
+                Timestamp = UtcNow,
+                Text = text
             });
         }
 
@@ -327,7 +336,7 @@ namespace Challenge.LambdaRobotsServer {
             collision = false;
 
             // ensure object cannot move beyond its max range
-            endDistance = startDistance + speed * _game.SecondsPerTurn;
+            endDistance = startDistance + speed * Game.SecondsPerTurn;
             if(endDistance > range) {
                 collision = true;
                 endDistance = range;
@@ -347,9 +356,9 @@ namespace Challenge.LambdaRobotsServer {
                 endX = startX + delta * sinHeading;
                 endY = startY + delta * cosHeading;
                 endDistance = startDistance + delta;
-            } else if (endX > _game.BoardWidth) {
+            } else if (endX > Game.BoardWidth) {
                 collision = true;
-                delta = (_game.BoardWidth - startX) / sinHeading;
+                delta = (Game.BoardWidth - startX) / sinHeading;
                 endX = startX + delta * sinHeading;
                 endY = startY + delta * cosHeading;
                 endDistance = startDistance + delta;
@@ -360,9 +369,9 @@ namespace Challenge.LambdaRobotsServer {
                 endX = startX + delta * sinHeading;
                 endY = startY + delta * cosHeading;
                 endDistance = startDistance + delta;
-            } else if(endY > _game.BoardHeight) {
+            } else if(endY > Game.BoardHeight) {
                 collision = true;
-                delta = (_game.BoardHeight - startY) / cosHeading;
+                delta = (Game.BoardHeight - startY) / cosHeading;
                 endX = startX + delta * sinHeading;
                 endY = startY + delta * cosHeading;
                 endDistance = startDistance + delta;
@@ -370,7 +379,7 @@ namespace Challenge.LambdaRobotsServer {
         }
 
         private void RobotsByDistance(double x, double y, Func<Robot, double, bool> callback) {
-            foreach(var tuple in _robots
+            foreach(var robotWithDistance in Game.Robots
                 .Where(robot => robot.State == RobotState.Alive)
                 .Select(robot => new {
                     Robot = robot,
@@ -378,10 +387,21 @@ namespace Challenge.LambdaRobotsServer {
                 })
                 .OrderBy(tuple => tuple.Distance)
             ) {
-                if(!callback(tuple.Robot, tuple.Distance)) {
+                if(!callback(robotWithDistance.Robot, robotWithDistance.Distance)) {
                     break;
                 }
             }
+        }
+
+        private bool Damage(Robot robot, double damage) {
+            robot.Damage += damage;
+            if(robot.Damage >= robot.MaxDamage) {
+                robot.Damage = robot.MaxDamage;
+                robot.State = RobotState.Dead;
+                robot.TimeOfDeath = UtcNow;
+                return true;
+            }
+            return false;
         }
     }
 }
