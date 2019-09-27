@@ -22,20 +22,22 @@
  * SOFTWARE.
  */
 
+using System;
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
+using Amazon.S3;
+using Amazon.S3.Model;
 using LambdaSharp;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
-namespace Challenge.LambdaRobotsServer.SimulationFunction {
+namespace Challenge.LambdaRobotsServer.GameLoopFunction {
 
     public class FunctionRequest {
 
         //--- Properties ---
-
-        // TO-DO: add request fields
+        public string GameId { get; set; }
     }
 
     public class FunctionResponse {
@@ -45,17 +47,35 @@ namespace Challenge.LambdaRobotsServer.SimulationFunction {
         // TO-DO: add response fields
     }
 
-    public class Function : ALambdaFunction<FunctionRequest, FunctionResponse> {
+    public class Function : ALambdaFunction<FunctionRequest, FunctionResponse>, IDependencyProvider {
+
+        //--- Fields ---
+        private string _gameBucketName;
+        private IAmazonS3 _s3Client;
+        private Game _game;
+
+        //--- Properties ---
+        DateTime IDependencyProvider.UtcNow => UtcNow;
+
+        Game IDependencyProvider.Game => _game;
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
 
-            // TO-DO: add function initialization and reading configuration settings
+            // read configuration settings
+            _gameBucketName = config.ReadS3BucketName("GameBucket");
+
+            // initialize clients
+            _s3Client = new AmazonS3Client();
         }
 
         public override async Task<FunctionResponse> ProcessMessageAsync(FunctionRequest request) {
 
-            // TO-DO: add business logic
+            // load game from S3 bucket
+            _game = DeserializeJson<Game>((await _s3Client.GetObjectAsync(new GetObjectRequest {
+                BucketName = _gameBucketName,
+                Key = $"games/game-{request.GameId}.json"
+            })).ResponseStream);
 
             return new FunctionResponse();
         }

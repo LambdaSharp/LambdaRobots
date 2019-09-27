@@ -4,19 +4,20 @@
     <Deterministic>true</Deterministic>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <RootNamespace>Challenge.LambdaRobotsServer.SimulationFunction</RootNamespace>
+    <RootNamespace>Challenge.LambdaRobotsServer.GameLoopFunction</RootNamespace>
     <AWSProjectType>Lambda</AWSProjectType>
     <NoWarn>CS1998</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0"/>
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.5.0"/>
+    <PackageReference Include="AWSSDK.S3" Version="3.3.104.32"/>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\Common\Robot.cs" Link="Robot.cs" />
+    <Compile Include="..\..\Common\Robot.cs" Link="Robot.cs"/>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp" Version="0.7.0.*"/>
-    <ProjectReference Condition="'$(LAMBDASHARP)'!=''" Include="$(LAMBDASHARP)/src/LambdaSharp/LambdaSharp.csproj" />
+    <ProjectReference Condition="'$(LAMBDASHARP)'!=''" Include="$(LAMBDASHARP)/src/LambdaSharp/LambdaSharp.csproj"/>
   </ItemGroup>
 </Project>
