@@ -16,7 +16,6 @@
   <ItemGroup>
     <Compile Include="..\..\src\Common\**"/>
     <Compile Include="..\..\src\Server\Common\Game.cs"/>
-    <Compile Include="..\..\src\Server\Common\GameTable.cs"/>
     <Compile Include="..\..\src\Server\Common\Logic.cs"/>
   </ItemGroup>
 </Project>
