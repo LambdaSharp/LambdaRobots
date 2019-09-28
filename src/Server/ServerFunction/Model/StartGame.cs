@@ -22,42 +22,26 @@
  * SOFTWARE.
  */
 
-namespace Challenge.LambdaRobots.Server.ServerFunction {
+using System.Collections.Generic;
+using Challenge.LambdaRobots.Server.Common;
+using Newtonsoft.Json;
 
-    public class JoinGameRequest {
-
-    }
-
-    public class JoinGameResponse {
-
-    }
+namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
 
     public class StartGameRequest {
 
+        //--- Properties ---
+
+        [JsonRequired]
+        public string GameId { get; set; }
+
+        [JsonRequired]
+        public List<string> RobotArns { get; set; } = new List<string>();
     }
 
     public class StartGameResponse {
 
-    }
-
-    public class StopGameRequest {
-
-    }
-
-    public class StopGameResponse {
-
-    }
-
-    public class ScanEnemiesRequest {
-
-        //--- Properties ---
-        public double Heading { get; set; }
-        public double Resolution { get; set; }
-    }
-
-    public class ScanEnemiesResponse {
-
-        //--- Properties ---
-        public double Distance { get; set; }
+        [JsonRequired]
+        public Game Game { get; set; }
     }
 }

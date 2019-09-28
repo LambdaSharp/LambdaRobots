@@ -25,69 +25,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Challenge.LambdaRobots.Common;
 
-namespace Challenge.LambdaRobots.Server {
-
-    public class Game {
-
-        //--- Fields ---
-        public string Id;
-        public double BoardWidth;
-        public double BoardHeight;
-        public double SecondsPerTurn;
-        public double DirectHitRange;
-        public double NearHitRange;
-        public double FarHitRange;
-        public double CollisionRange;
-        public List<RobotMissile> Missiles = new List<RobotMissile>();
-        public List<Robot> Robots = new List<Robot>();
-        public List<Message> Messages = new List<Message>();
-    }
-
-    public class Message {
-
-        //--- Fields ---
-        public DateTime Timestamp;
-        public string Text;
-    }
-
-    public enum MissileState {
-        Undefined,
-        Flying,
-        Exploding,
-        Destroyed
-    }
-
-    public class RobotMissile {
-
-        //--- Fields ---
-        public string Id;
-        public string RobotId;
-
-        // current state
-        public MissileState State;
-        public double X;
-        public double Y;
-        public double Distance;
-
-        // missile characteristics
-        public double Speed;
-        public double Heading;
-        public double Range;
-        public double DirectHitDamageBonus;
-        public double NearHitDamageBonus;
-        public double FarHitDamageBonus;
-    }
-
-    public class RobotAction {
-
-        //--- Fields ---
-        public string RobotId;
-        public double? Speed;
-        public double? Heading;
-        public double? FireMissileHeading;
-        public double? FireMissileRange;
-    }
+namespace Challenge.LambdaRobots.Server.Common {
 
     public interface IDependencyProvider {
 
@@ -96,11 +36,39 @@ namespace Challenge.LambdaRobots.Server {
         Game Game { get; }
     }
 
+    public class DependencyProvider : IDependencyProvider {
+
+        //--- Fields ---
+        private Game _game;
+        private DateTime _utcNow;
+
+        //--- Constructors ---
+        public DependencyProvider(Game game, DateTime utcNow) {
+            _game = game;
+            _utcNow = utcNow;
+        }
+
+        //--- Properties ---
+        public DateTime UtcNow => _utcNow;
+
+        public Game Game => _game;
+    }
+
     public class Logic {
 
         //--- Class Methods ---
         private static double Distance(double x1, double y1, double x2, double y2)
             => Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+
+        private static double MinMax(double min, double value, double max)
+            => Math.Max(min, Math.Min(max, value));
+
+        private static double NormalizeAngle(double angle) {
+            var result = angle % 360;
+            return (result < -180.0)
+                ? (result + 360.0)
+                : result;
+        }
 
         //--- Fields ---
         private IDependencyProvider _provider;
@@ -139,14 +107,50 @@ namespace Challenge.LambdaRobots.Server {
             Game.Missiles.RemoveAll(missile => missile.State != MissileState.Flying);
         }
 
+        public double? ScanRobots(Robot robot, double heading, double resolution) {
+            double? result = null;
+            resolution = MinMax(0.0, resolution, robot.ScannerResolution);
+            FindRobotsByDistance(robot.X, robot.Y, (other, distance) => {
+
+                // skip ourselves
+                if(other.Id == robot.Id) {
+                    return true;
+                }
+
+                // compute relative position
+                var deltaX = other.X - robot.X;
+                var deltaY = other.Y - robot.Y;
+
+                // check if other robot is beyond scan range
+                if(distance > robot.ScannerRange) {
+
+                    // no need to enumerate more
+                    return false;
+                }
+
+                // check if delta angle is within resolution limit
+                var angle = Math.Atan2(deltaX, deltaY) * 180.0 / Math.PI;
+                if(NormalizeAngle(Math.Abs(heading - angle)) <= resolution) {
+
+                    // found a robot within range and resolution; stop enumerating
+                    result = distance;
+                    return false;
+                }
+
+                // enumerate more
+                return true;
+            });
+            return result;
+        }
+
         private void ApplyRobotAction(Robot robot, RobotAction action) {
             if(action == null) {
                 return;
             }
 
             // update speed and heading
-            robot.TargetSpeed = Math.Min(robot.MaxSpeed, action.Speed ?? robot.TargetSpeed);
-            robot.TargetHeading = action.Heading ?? robot.TargetHeading;
+            robot.TargetSpeed = MinMax(0.0, action.Speed ?? robot.TargetSpeed, robot.MaxSpeed);
+            robot.TargetHeading = NormalizeAngle(action.Heading ?? robot.TargetHeading);
 
             // fire missile if requested and possible
             if((action.FireMissileHeading.HasValue || action.FireMissileRange.HasValue) && (robot.ReloadDelay == 0.0)) {
@@ -163,8 +167,8 @@ namespace Challenge.LambdaRobots.Server {
                     X = robot.X,
                     Y = robot.Y,
                     Speed = robot.MissileSpeed,
-                    Heading = action.FireMissileHeading ?? robot.Heading,
-                    Range = Math.Min(robot.MissileRange, Math.Max(0.0, action.FireMissileRange ?? robot.MissileRange)),
+                    Heading = NormalizeAngle(action.FireMissileHeading ?? robot.Heading),
+                    Range = MinMax(0.0, action.FireMissileRange ?? robot.MissileRange, robot.MissileRange),
                     DirectHitDamageBonus = robot.MissileDirectHitDamageBonus,
                     NearHitDamageBonus = robot.MissileNearHitDamageBonus,
                     FarHitDamageBonus = robot.MissileFarHitDamageBonus
@@ -195,7 +199,7 @@ namespace Challenge.LambdaRobots.Server {
         }
 
         private void AssessMissileDamage(RobotMissile missile) {
-            RobotsByDistance(missile.X, missile.Y, (robot, distance) => {
+            FindRobotsByDistance(missile.X, missile.Y, (robot, distance) => {
 
                 // compute damage dealt by missile
                 double damage = 0.0;
@@ -245,11 +249,6 @@ namespace Challenge.LambdaRobots.Server {
             }
 
             // compute new speed
-            if(robot.TargetSpeed > robot.MaxSpeed) {
-                robot.TargetSpeed = robot.MaxSpeed;
-            } else if(robot.TargetSpeed < 0.0) {
-                robot.TargetSpeed = 0.0;
-            }
             if(robot.TargetSpeed > robot.Speed) {
                 robot.Speed = Math.Min(robot.TargetSpeed, robot.Speed + robot.Acceleration * Game.SecondsPerTurn);
             } else if(robot.TargetSpeed < robot.Speed) {
@@ -292,7 +291,7 @@ namespace Challenge.LambdaRobots.Server {
             }
 
             // check if robot collides with any other robot
-            RobotsByDistance(robot.X, robot.Y, (other, distance) => {
+            FindRobotsByDistance(robot.X, robot.Y, (other, distance) => {
                 if((other.Id != robot.Id) && (distance < Game.CollisionRange)) {
                     robot.Speed = 0.0;
                     robot.TargetSpeed = 0.0;
@@ -370,7 +369,7 @@ namespace Challenge.LambdaRobots.Server {
             }
         }
 
-        private void RobotsByDistance(double x, double y, Func<Robot, double, bool> callback) {
+        private void FindRobotsByDistance(double x, double y, Func<Robot, double, bool> callback) {
             foreach(var robotWithDistance in Game.Robots
                 .Where(robot => robot.State == RobotState.Alive)
                 .Select(robot => new {

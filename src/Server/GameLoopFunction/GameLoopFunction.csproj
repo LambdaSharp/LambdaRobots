@@ -11,10 +11,11 @@
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0"/>
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.5.0"/>
-    <PackageReference Include="AWSSDK.S3" Version="3.3.104.32"/>
+    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.101.71"/>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\Common\Robot.cs" Link="Robot.cs"/>
+    <Compile Include="..\..\Common\**"/>
+    <Compile Include="..\Common\**"/>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp" Version="0.7.0.*"/>

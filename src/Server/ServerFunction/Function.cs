@@ -23,9 +23,13 @@
  */
 
 using System;
+using System.Linq;
 using System.Threading.Tasks;
+using Amazon.DynamoDBv2;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using Challenge.LambdaRobots.Server.Common;
+using Challenge.LambdaRobots.Server.ServerFunction.Model;
 using LambdaSharp;
 using LambdaSharp.ApiGateway;
 
@@ -36,51 +40,90 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
 
     public class Function : ALambdaApiGatewayFunction {
 
+        //--- Fields ---
+        private GameTable _table;
+
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
-
-            // TO-DO: add function initialization and reading configuration settings
+            _table = new GameTable(
+                config.ReadDynamoDBTableName("GameTable"),
+                new AmazonDynamoDBClient()
+            );
         }
 
         public async Task OpenConnectionAsync(APIGatewayProxyRequest request, string username = null) {
             LogInfo($"Connected: {request.RequestContext.ConnectionId}");
-            // CurrentUser = new ConnectionUser {
-            //     ConnectionId = request.RequestContext.ConnectionId,
-            //     UserName = username ?? $"Anonymous-{RandomString(6)}"
-            // };
-            // await _table.PutRowAsync(CurrentUser);
         }
 
         public async Task CloseConnectionAsync(APIGatewayProxyRequest request) {
             LogInfo($"Disconnected: {request.RequestContext.ConnectionId}");
-            // CurrentUser = await _table.GetRowAsync<ConnectionUser>(CurrentRequest.RequestContext.ConnectionId);
-            // if(CurrentUser != null) {
-            //     await _table.DeleteRowAsync(CurrentUser.ConnectionId);
-            // }
+
+            // TODO: enumerate all games and delete connection
         }
 
         public async Task<JoinGameResponse> JoinGameAsync(JoinGameRequest request) {
 
-            // TO-DO: add business logic for API Gateway resource endpoint
-            return new JoinGameResponse { };
+            // check if the game ID exists
+            var gameRecord = await _table.GetAsync<GameRecord>(request.GameId);
+            if(gameRecord == null) {
+                throw AbortNotFound($"could not find a game session with ID={request.GameId ?? "<NULL>"}");
+            }
+
+            // register connection with game session
+            var connection = new GameSessionRecord {
+                PK = request.GameId,
+                ConnectionId = CurrentRequest.RequestContext.ConnectionId
+            };
+            await _table.PutAsync(connection);
+            return new JoinGameResponse {
+                Game = gameRecord.Game
+            };
         }
 
         public async Task<StartGameResponse> StartGameAsync(StartGameRequest request) {
+            var game = new Game {
+                BoardWidth = 1000.0,
+                BoardHeight = 1000.0,
+                SecondsPerTurn = 1.0,
+                DirectHitRange = 5.0,
+                NearHitRange = 20.0,
+                FarHitRange = 40.0,
+                CollisionRange = 2.0
+            };
 
-            // TO-DO: add business logic for API Gateway resource endpoint
-            return new StartGameResponse { };
+            // TODO:
+            //  - store a game session
+            //  - add robot with random positions and minimal distance from each other
+            //  - kick of game step function
+            throw Abort(CreateResponse(500, "Not Implemented"));
         }
 
         public async Task<StopGameResponse> StopGameAsync(StopGameRequest request) {
 
-            // TO-DO: add business logic for API Gateway resource endpoint
-            return new StopGameResponse { };
+            // TODO:
+            //  - delete game step function
+            throw Abort(CreateResponse(500, "Not Implemented"));
         }
 
         public async Task<ScanEnemiesResponse> ScanEnemiesAsync(ScanEnemiesRequest request) {
 
-            // TO-DO: add business logic for API Gateway resource endpoint
-            return new ScanEnemiesResponse { };
+            // check if the game ID exists
+            var gameRecord = await _table.GetAsync<GameRecord>(request.GameId);
+            if(gameRecord == null) {
+                throw AbortNotFound($"could not find a game session with ID={request.GameId ?? "<NULL>"}");
+            }
+
+            // find nearest enemy within scan resolution
+            var logic = new Logic(new DependencyProvider(gameRecord.Game, DateTime.UtcNow));
+            var robot = gameRecord.Game.Robots.FirstOrDefault(r => r.Id == request.RobotId);
+            if(robot == null) {
+                throw AbortNotFound($"Could not find a robot with ID={request.RobotId}");
+            }
+            var distanceFound = logic.ScanRobots(robot, request.Heading, request.Resolution);
+            return new ScanEnemiesResponse {
+                Found = distanceFound.HasValue,
+                Distance = distanceFound.GetValueOrDefault()
+            };
         }
     }
 }

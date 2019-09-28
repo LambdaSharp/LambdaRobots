@@ -23,32 +23,14 @@
  */
 
 using System;
-using Challenge.LambdaRobots.Server;
+using Challenge.LambdaRobots.Common;
+using Challenge.LambdaRobots.Server.Common;
 using FluentAssertions;
 using Xunit;
 
 namespace Test.Challenge.LambdaRobots.Server {
 
     public class MainLoopTests {
-
-        //--- Types ---
-        private class DependencyProvider : IDependencyProvider {
-
-            //--- Fields ---
-            private Game _game;
-            private DateTime _utcNow;
-
-            //--- Constructors ---
-            public DependencyProvider(Game game, DateTime utcNow) {
-                _game = game;
-                _utcNow = utcNow;
-            }
-
-            //--- Properties ---
-            public DateTime UtcNow => _utcNow;
-
-            public Game Game => _game;
-        }
 
         //--- Fields ---
         private IDependencyProvider _provider;
@@ -58,7 +40,7 @@ namespace Test.Challenge.LambdaRobots.Server {
 
         //--- Methods ---
 
-        #region Movement Tests
+        #region *** Movement Tests ***
         [Fact]
         public void MoveRobotNorthForOneTurn() {
 
@@ -127,7 +109,7 @@ namespace Test.Challenge.LambdaRobots.Server {
         }
         #endregion
 
-        #region Collision Tests
+        #region *** Collision Tests ***
         [Fact]
         public void MoveRobotColliedWithWall() {
 
@@ -171,6 +153,54 @@ namespace Test.Challenge.LambdaRobots.Server {
         }
         #endregion
 
+        #region *** Scan Tests ***
+        [Fact]
+        public void ScanRobotInRange() {
+
+            // arrange
+            var bob = NewRobot("Bob", 500.0, 500.0);
+            var dave = NewRobot("Dave", 600.0, 600.0);
+            var logic = NewLogic(bob, dave);
+
+            // act
+            var distance = logic.ScanRobots(bob, 45.0, 10.0);
+
+            // assert
+            distance.Should().NotBe(null);
+            distance.Should().BeInRange(140.0, 142.0);
+        }
+
+        [Fact]
+        public void ScanRobotOutOfRange() {
+
+            // arrange
+            var bob = NewRobot("Bob", 100.0, 100.0);
+            var dave = NewRobot("Dave", 800.0, 800.0);
+            var logic = NewLogic(bob, dave);
+
+            // act
+            var distance = logic.ScanRobots(bob, 45.0, 10.0);
+
+            // assert
+            distance.Should().Be(null);
+        }
+
+        [Fact]
+        public void ScanRobotOutOfResolution() {
+
+            // arrange
+            var bob = NewRobot("Bob", 500.0, 500.0);
+            var dave = NewRobot("Dave", 600.0, 500.0);
+            var logic = NewLogic(bob, dave);
+
+            // act
+            var distance = logic.ScanRobots(bob, 45.0, 10.0);
+
+            // assert
+            distance.Should().Be(null);
+        }
+        #endregion
+
         private Game NewGame() => new Game {
             BoardWidth = 1000.0,
             BoardHeight = 1000.0,
@@ -202,6 +232,7 @@ namespace Test.Challenge.LambdaRobots.Server {
             Deceleration = -20.0,
             MaxTurnSpeed = 50.0,
             ScannerRange = 600.0,
+            ScannerResolution = 10.0,
             MaxDamage = 100.0,
             CollisionDamage = 2.0,
             DirectHitDamage = 8.0,

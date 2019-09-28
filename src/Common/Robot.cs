@@ -24,7 +24,7 @@
 
 using System;
 
-namespace Challenge.LambdaRobots.Server {
+namespace Challenge.LambdaRobots.Common {
 
     public enum RobotState {
         Undefined,
@@ -66,6 +66,7 @@ namespace Challenge.LambdaRobots.Server {
         public double Deceleration;
         public double MaxTurnSpeed;
         public double ScannerRange;
+        public double ScannerResolution;
         public double MaxDamage;
         public double CollisionDamage;
         public double DirectHitDamage;

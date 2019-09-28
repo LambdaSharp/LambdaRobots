@@ -14,7 +14,9 @@
     <PackageReference Include="FluentAssertions" Version="5.6.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\src\Server\GameLoopFunction\Logic.cs" Link="Logics.cs" />
-    <Compile Include="..\..\src\Common\Robot.cs" Link="Robot.cs" />
+    <Compile Include="..\..\src\Common\**"/>
+    <Compile Include="..\..\src\Server\Common\Game.cs"/>
+    <Compile Include="..\..\src\Server\Common\GameTable.cs"/>
+    <Compile Include="..\..\src\Server\Common\Logic.cs"/>
   </ItemGroup>
 </Project>

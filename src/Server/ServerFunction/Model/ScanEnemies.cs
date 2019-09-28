@@ -1,4 +1,4 @@
-/*
+﻿/*
  * MIT License
  *
  * Copyright (c) 2019 LambdaSharp
@@ -22,51 +22,24 @@
  * SOFTWARE.
  */
 
-using System;
-using System.Threading.Tasks;
-using Amazon.Lambda.Core;
 using Challenge.LambdaRobots.Server.Common;
-using LambdaSharp;
+using Newtonsoft.Json;
 
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
+namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
 
-namespace Challenge.LambdaRobots.Server.GameLoopFunction {
-
-    public class FunctionRequest {
+    public class ScanEnemiesRequest {
 
         //--- Properties ---
         public string GameId { get; set; }
+        public string RobotId { get; set; }
+        public double Heading { get; set; }
+        public double Resolution { get; set; }
     }
 
-    public class FunctionResponse {
+    public class ScanEnemiesResponse {
 
         //--- Properties ---
-
-        // TO-DO: add response fields
-    }
-
-    public class Function : ALambdaFunction<FunctionRequest, FunctionResponse>, IDependencyProvider {
-
-        //--- Fields ---
-        private string _gameBucketName;
-        private Game _game;
-
-        //--- Properties ---
-        DateTime IDependencyProvider.UtcNow => UtcNow;
-
-        Game IDependencyProvider.Game => _game;
-
-        //--- Methods ---
-        public override async Task InitializeAsync(LambdaConfig config) {
-
-            // TODO: initialize
-        }
-
-        public override async Task<FunctionResponse> ProcessMessageAsync(FunctionRequest request) {
-
-            // TODO: respond
-            throw new NotImplementedException();
-        }
+        public bool Found { get; set; }
+        public double Distance { get; set; }
     }
 }
