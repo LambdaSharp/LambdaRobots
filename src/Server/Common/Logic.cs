@@ -217,7 +217,7 @@ namespace Challenge.LambdaRobots.Server.Common {
 
                 // add missile
                 var missile = new RobotMissile {
-                    Id = $"{robot.Id}:{robot.TotalMissileFiredCount}",
+                    Id = $"{robot.Id}:M{robot.TotalMissileFiredCount}",
                     RobotId = robot.Id,
                     State = MissileState.Flying,
                     X = robot.X,

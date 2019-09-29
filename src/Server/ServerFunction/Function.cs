@@ -113,8 +113,9 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
                 game.Robots.Add(new Robot {
 
                     // robot state
-                    Id = robotArn,
+                    Id = $"{game.Id}:R{game.Robots.Count}",
                     Name = name,
+                    LambdaArn = robotArn,
                     State = RobotState.Alive,
                     X = 0.0,
                     Y = 0.0,

@@ -45,6 +45,13 @@ namespace Challenge.LambdaRobots.Server.GameLoopFunction {
 
         //--- Properties ---
         public string GameId { get; set; }
+        public Robot Robot { get; set; }
+    }
+
+    public class RobotLambdaResponse {
+
+        //--- Properties ---
+        public RobotAction RobotAction { get; set; }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -89,63 +96,82 @@ namespace Challenge.LambdaRobots.Server.GameLoopFunction {
             try {
 
                 // get game state
-                var gameRecord = await _table.GetAsync<GameRecord>(request.GameId);
-                if(gameRecord == null) {
+                LogInfo($"loading game state for ID={request.GameId}");
+                var game = (await _table.GetAsync<GameRecord>(request.GameId))?.Game;
+                if(game == null) {
                     throw new ApplicationException($"game ID={request.GameId} not found");
                 }
-                var logic = new Logic(new DependencyProvider(gameRecord.Game, DateTime.UtcNow, _random));
+                var logic = new Logic(new DependencyProvider(game, DateTime.UtcNow, _random));
 
-                // invoke all robot to get their actions
-                var payload = new RobotLambdaRequest {
-                    GameId = gameRecord.Game.Id
-                };
-                var timeout = TimeSpan.FromSeconds(gameRecord.Game.RobotTimeoutSeconds);
-                var robotActions = await Task.WhenAll(gameRecord.Game.Robots.Select(robot => Invoke(robot.Id, payload, timeout)));
-                logic.MainLoop(robotActions);
+                // start turn
+                ++game.TotalTurns;
+                LogInfo($"start turn {game.TotalTurns} (max: {game.MaxTurns}): invoking {game.Robots.Count(robot => robot.State == RobotState.Alive)} robots (total: {game.Robots.Count})");
+                var messageCount = game.Messages.Count;
 
-                // update game state
-                ++gameRecord.Game.TotalTurns;
-                await _table.UpdateAsync(gameRecord.Game);
+                // invoke all robots to get their actions
+                var robotResponses = await Task.WhenAll(game.Robots.Where(robot => robot.State == RobotState.Alive).Select(robot => Invoke(game, robot)));
+                logic.MainLoop(robotResponses.Select(response => response.RobotAction).Where(action => action != null).ToList());
+
+                // show new messages
+                for(var i = messageCount; i < game.Messages.Count; ++i) {
+                    LogInfo($"game message {i + 1}: {game.Messages[i].Text}");
+                }
+
+                // end turn
+                var robotsAlive = game.Robots.Count(robot => robot.State == RobotState.Alive);
+                LogInfo($"end turn {game.TotalTurns} (max: {game.MaxTurns}): {robotsAlive} robots alive");
+                await _table.UpdateAsync(game);
 
                 // check if game has not reached its max turns and if more than one robot is still alive
                 return new FunctionResponse {
-                    State = (
-                            (gameRecord.Game.TotalTurns < gameRecord.Game.MaxTurns)
-                            && (gameRecord.Game.Robots.Count(robot => robot.State == RobotState.Alive) > 1)
-                        )
+                    State = ((game.TotalTurns < game.MaxTurns) && (robotsAlive > 1))
                         ? GameLoopState.Continue
                         : GameLoopState.Finished
                 };
             } catch(Exception e) {
-                LogError(e);
+                LogError(e, "error during game loop");
                 return new FunctionResponse {
                     State = GameLoopState.Error
                 };
             }
 
             // local functions
-            async Task<RobotAction> Invoke(string lambdaArn, RobotLambdaRequest payload, TimeSpan timeout) {
+            async Task<RobotLambdaResponse> Invoke(Game game, Robot robot) {
                 var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-                var invocationTask = _lambdaClient.InvokeAsync(new InvokeRequest {
-                    Payload = SerializeJson(payload),
-                    FunctionName = lambdaArn,
-                    InvocationType = InvocationType.RequestResponse
-                });
+                try {
+                    var invocationTask = _lambdaClient.InvokeAsync(new InvokeRequest {
+                        Payload = SerializeJson(new RobotLambdaRequest {
+                            GameId = game.Id,
+                            Robot = robot
+                        }),
+                        FunctionName = robot.LambdaArn,
+                        InvocationType = InvocationType.RequestResponse
+                    });
 
-                // check if lambda response within time limit
-                RobotAction result;
-                if(await Task.WhenAny(invocationTask, Task.Delay(timeout)) == invocationTask) {
+                    // check if lambda responds within time limit
+                    if(await Task.WhenAny(invocationTask, Task.Delay(TimeSpan.FromSeconds(game.RobotTimeoutSeconds))) != invocationTask) {
+                        LogInfo($"robot {robot.Id} invocation timed out after {stopwatch.Elapsed.TotalSeconds:N2}s");
+
+                        // kill the robot
+                        robot.State = RobotState.Dead;
+                        return new RobotLambdaResponse();
+                    }
                     var response = Encoding.UTF8.GetString(invocationTask.Result.Payload.ToArray());
-                    result = DeserializeJson<RobotAction>(response);
-                    LogInfo($"robot {lambdaArn} responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
-                } else {
-                    result = new RobotAction();
-                    LogInfo($"robot {lambdaArn} invocation timed out after {stopwatch.Elapsed.TotalSeconds:N2}s");
-                }
+                    var result = DeserializeJson<RobotLambdaResponse>(response);
+                    LogInfo($"robot {robot.Id} responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
 
-                // always set the robot id (no cheating!)
-                result.RobotId = lambdaArn;
-                return result;
+                    // always set the robot id (no cheating!)
+                    if(result.RobotAction != null) {
+                        result.RobotAction.RobotId = robot.Id;
+                    }
+                    return result;
+                } catch(Exception e) {
+                    LogErrorAsWarning(e, $"invocation for robot {robot.Id} failed (arn: {robot.LambdaArn})");
+
+                    // kill the robot
+                    robot.State = RobotState.Dead;
+                    return new RobotLambdaResponse();
+                }
             }
         }
     }

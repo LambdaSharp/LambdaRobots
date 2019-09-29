@@ -40,6 +40,7 @@ namespace Challenge.LambdaRobots.Common {
         //--- Fields ---
         public string Id;
         public string Name;
+        public string LambdaArn;
 
         // current state
         public RobotState State;
