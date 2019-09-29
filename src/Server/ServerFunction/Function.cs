@@ -96,7 +96,10 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
                 NearHitRange = 20.0,
                 FarHitRange = 40.0,
                 CollisionRange = 2.0,
-                MinRobotStartDistance = 100.0
+                MinRobotStartDistance = 100.0,
+                RobotTimeoutSeconds = 10.0,
+                TotalTurns = 0,
+                MaxTurns = 300
             };
             var logic = new Logic(new DependencyProvider(game, DateTime.UtcNow, _random));
 

@@ -23,9 +23,12 @@
  */
 
 using System;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Challenge.LambdaRobots.Common {
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum RobotState {
         Undefined,
         Alive,

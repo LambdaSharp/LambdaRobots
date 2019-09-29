@@ -152,7 +152,8 @@ namespace Challenge.LambdaRobots.Server.Common {
 
         public void Reset() {
 
-            // clear data-structures
+            // reset game state
+            Game.TotalTurns = 0;
             Game.Missiles.Clear();
             Game.Messages.Clear();
             foreach(var robot in Game.Robots) {

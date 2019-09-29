@@ -20,11 +20,6 @@ Items:
         - AttributeName: SK
           KeyType: RANGE
 
-  - Resource: GameBucket
-    Description: S3 bucket for keeping the game state
-    Type: AWS::S3::Bucket
-    Scope: all
-
   - Function: ServerFunction
     Memory: 256
     Timeout: 30
@@ -46,6 +41,38 @@ Items:
     Description: Simulate progress of the game board
     Memory: 256
     Timeout: 30
+
+  - Resource: GameStateMachineRole
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal:
+              Service:
+                - !Sub states.${AWS::Region}.amazonaws.com
+            Action: sts:AssumeRole
+      Path: "/"
+      Policies:
+        - PolicyName: StatesExecutionPolicy
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action:
+                  - lambda:InvokeFunction
+                Resource: "*"
+
+  - Resource: GameStateMachine
+    Type: AWS::StepFunctions::StateMachine
+    Properties:
+      DefinitionString: !Sub [ !Include GameStateMachine.json ]
+      RoleArn: !GetAtt GameStateMachineRole.Arn
+
+  - Resource: InvokeLambdasPermission
+    Allow: lambda:InvokeFunction
+    Value: "*"
 
   - Function: Finalizer
     Memory: 256

@@ -90,6 +90,14 @@ namespace Challenge.LambdaRobots.Server.Common {
             });
         }
 
+        public async Task UpdateAsync<T>(T record) {
+            await _table.PutItemAsync(Document.FromJson(JsonConvert.SerializeObject(record)), new PutItemOperationConfig {
+                ConditionalExpression = new Expression {
+                    ExpressionStatement = "attribute_exists(PK)"
+                }
+            });
+        }
+
         public Task CreateOrUpdateAsync<T>(T record) => _table.PutItemAsync(Document.FromJson(JsonConvert.SerializeObject(record)));
 
         public Task<T> GetAsync<T>(string pk) where T : IGameTableSingletonRecord, new()

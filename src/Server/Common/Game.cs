@@ -25,6 +25,8 @@
 using System;
 using System.Collections.Generic;
 using Challenge.LambdaRobots.Common;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace Challenge.LambdaRobots.Server.Common {
 
@@ -32,6 +34,14 @@ namespace Challenge.LambdaRobots.Server.Common {
 
         //--- Fields ---
         public string Id;
+
+        // current state
+        public int TotalTurns;
+        public List<RobotMissile> Missiles = new List<RobotMissile>();
+        public List<Robot> Robots = new List<Robot>();
+        public List<Message> Messages = new List<Message>();
+
+        // game characteristics
         public double BoardWidth;
         public double BoardHeight;
         public double SecondsPerTurn;
@@ -40,9 +50,8 @@ namespace Challenge.LambdaRobots.Server.Common {
         public double FarHitRange;
         public double CollisionRange;
         public double MinRobotStartDistance;
-        public List<RobotMissile> Missiles = new List<RobotMissile>();
-        public List<Robot> Robots = new List<Robot>();
-        public List<Message> Messages = new List<Message>();
+        public double RobotTimeoutSeconds;
+        public int MaxTurns;
     }
 
     public class Message {
@@ -52,6 +61,7 @@ namespace Challenge.LambdaRobots.Server.Common {
         public string Text;
     }
 
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum MissileState {
         Undefined,
         Flying,
