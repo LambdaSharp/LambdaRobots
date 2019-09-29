@@ -34,6 +34,9 @@ namespace Challenge.LambdaRobots.Server.Common {
         //--- Properties ---
         DateTime UtcNow { get; }
         Game Game { get; }
+
+        //--- Methods ---
+        double NextRandomDouble();
     }
 
     public class DependencyProvider : IDependencyProvider {
@@ -41,17 +44,21 @@ namespace Challenge.LambdaRobots.Server.Common {
         //--- Fields ---
         private Game _game;
         private DateTime _utcNow;
+        private Random _random;
 
         //--- Constructors ---
-        public DependencyProvider(Game game, DateTime utcNow) {
-            _game = game;
+        public DependencyProvider(Game game, DateTime utcNow, Random random) {
+            _game = game ?? throw new ArgumentNullException(nameof(game));
             _utcNow = utcNow;
+            _random = random ?? throw new ArgumentNullException(nameof(random));
         }
 
         //--- Properties ---
         public DateTime UtcNow => _utcNow;
-
         public Game Game => _game;
+
+        //--- Methods ---
+        public double NextRandomDouble() => _random.NextDouble();
     }
 
     public class Logic {
@@ -142,6 +149,54 @@ namespace Challenge.LambdaRobots.Server.Common {
             });
             return result;
         }
+
+        public void Reset() {
+
+            // clear data-structures
+            Game.Missiles.Clear();
+            Game.Messages.Clear();
+            foreach(var robot in Game.Robots) {
+                robot.ReloadDelay = 0.0;
+                robot.Speed = 0.0;
+                robot.State = RobotState.Alive;
+                robot.TargetHeading = 0.0;
+                robot.TargetSpeed = 0.0;
+                robot.TimeOfDeath = null;
+                robot.TotalDamageDealt = 0.0;
+                robot.TotalKills = 0;
+                robot.TotalMissileFiredCount = 0;
+                robot.TotalMissileHitCount = 0;
+                robot.TotalScanCount = 0;
+                robot.TotalTravelDistance = 0.0;
+            }
+
+            // place robots on playfield
+            var marginWidth = Game.BoardWidth * 0.1;
+            var marginHeight = Game.BoardHeight * 0.1;
+            var attempts = 0;
+        again:
+            if(attempts >= 10) {
+                throw new ApplicationException($"unable to place all robots with minimum separation of {Game.MinRobotStartDistance:N2}");
+            }
+
+            // assign random locations to all robots
+            foreach(var robot in Game.Robots) {
+                robot.X = marginWidth + _provider.NextRandomDouble() * (Game.BoardWidth - 2.0 * marginWidth);
+                robot.Y = marginHeight + _provider.NextRandomDouble() * (Game.BoardHeight - 2.0 * marginHeight);
+            }
+
+            // verify that none of the robots are too close to each other
+            for(var i = 0; i < Game.Robots.Count; ++i) {
+                for(var j = i + 1; j < Game.Robots.Count; ++j) {
+                    var distance = Distance(Game.Robots[i].X, Game.Robots[i].Y, Game.Robots[j].X, Game.Robots[j].Y);
+                    if(distance < Game.MinRobotStartDistance) {
+                        ++attempts;
+                        goto again;
+                    }
+                }
+            }
+        }
+
 
         private void ApplyRobotAction(Robot robot, RobotAction action) {
             if(action == null) {

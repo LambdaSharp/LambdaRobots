@@ -28,6 +28,7 @@ using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using Challenge.LambdaRobots.Common;
 using Challenge.LambdaRobots.Server.Common;
 using Challenge.LambdaRobots.Server.ServerFunction.Model;
 using LambdaSharp;
@@ -39,6 +40,9 @@ using LambdaSharp.ApiGateway;
 namespace Challenge.LambdaRobots.Server.ServerFunction {
 
     public class Function : ALambdaApiGatewayFunction {
+
+        //--- Class Fields ---
+        private static Random _random = new Random();
 
         //--- Fields ---
         private GameTable _table;
@@ -74,26 +78,83 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
                 PK = request.GameId,
                 ConnectionId = CurrentRequest.RequestContext.ConnectionId
             };
-            await _table.PutAsync(connection);
+            await _table.CreateOrUpdateAsync(connection);
             return new JoinGameResponse {
                 Game = gameRecord.Game
             };
         }
 
         public async Task<StartGameResponse> StartGameAsync(StartGameRequest request) {
+
+            // create a new game
             var game = new Game {
+                Id = _random.Next(10000).ToString("00000"),
                 BoardWidth = 1000.0,
                 BoardHeight = 1000.0,
                 SecondsPerTurn = 1.0,
                 DirectHitRange = 5.0,
                 NearHitRange = 20.0,
                 FarHitRange = 40.0,
-                CollisionRange = 2.0
+                CollisionRange = 2.0,
+                MinRobotStartDistance = 100.0
             };
+            var logic = new Logic(new DependencyProvider(game, DateTime.UtcNow, _random));
+
+            // add robots
+            foreach(var robotArn in request.RobotArns) {
+
+                // TODO:
+                // - invoke robot ARN to validate robot
+                // - get robot name
+                var name = "<TODO>";
+                game.Robots.Add(new Robot {
+
+                    // robot state
+                    Id = robotArn,
+                    Name = name,
+                    State = RobotState.Alive,
+                    X = 0.0,
+                    Y = 0.0,
+                    Speed = 0.0,
+                    Heading = 0.0,
+                    TotalTravelDistance = 0.0,
+                    Damage = 0.0,
+                    ReloadDelay = 0.0,
+                    TotalMissileFiredCount = 0,
+
+                    // robot characteristics
+                    MaxSpeed = 100.0,
+                    Acceleration = 10.0,
+                    Deceleration = -20.0,
+                    MaxTurnSpeed = 50.0,
+                    ScannerRange = 600.0,
+                    ScannerResolution = 10.0,
+                    MaxDamage = 100.0,
+                    CollisionDamage = 2.0,
+                    DirectHitDamage = 8.0,
+                    NearHitDamage = 4.0,
+                    FarHitDamage = 2.0,
+
+                    // missile characteristics
+                    MissileReloadDelay = 2.0,
+                    MissileSpeed = 50.0,
+                    MissileRange = 700.0,
+                    MissileDirectHitDamageBonus = 3.0,
+                    MissileNearHitDamageBonus = 2.1,
+                    MissileFarHitDamageBonus = 1.0
+                });
+            }
+
+            // reset game
+            logic.Reset();
+
+            // create game record
+            await _table.CreateAsync(new GameRecord {
+                PK = game.Id,
+                Game = game
+            });
 
             // TODO:
-            //  - store a game session
-            //  - add robot with random positions and minimal distance from each other
             //  - kick of game step function
             throw Abort(CreateResponse(500, "Not Implemented"));
         }
@@ -114,10 +175,10 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             }
 
             // find nearest enemy within scan resolution
-            var logic = new Logic(new DependencyProvider(gameRecord.Game, DateTime.UtcNow));
+            var logic = new Logic(new DependencyProvider(gameRecord.Game, DateTime.UtcNow, _random));
             var robot = gameRecord.Game.Robots.FirstOrDefault(r => r.Id == request.RobotId);
             if(robot == null) {
-                throw AbortNotFound($"Could not find a robot with ID={request.RobotId}");
+                throw AbortNotFound($"could not find a robot with ID={request.RobotId}");
             }
             var distanceFound = logic.ScanRobots(robot, request.Heading, request.Resolution);
             return new ScanEnemiesResponse {

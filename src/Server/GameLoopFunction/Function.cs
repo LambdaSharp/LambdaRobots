@@ -48,14 +48,12 @@ namespace Challenge.LambdaRobots.Server.GameLoopFunction {
 
     public class Function : ALambdaFunction<FunctionRequest, FunctionResponse>, IDependencyProvider {
 
+        //--- Class Fields ---
+        private static Random _random = new Random();
+
         //--- Fields ---
         private string _gameBucketName;
         private Game _game;
-
-        //--- Properties ---
-        DateTime IDependencyProvider.UtcNow => UtcNow;
-
-        Game IDependencyProvider.Game => _game;
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
@@ -68,5 +66,10 @@ namespace Challenge.LambdaRobots.Server.GameLoopFunction {
             // TODO: respond
             throw new NotImplementedException();
         }
+
+        //--- IDependencyProvider Members ---
+        DateTime IDependencyProvider.UtcNow => UtcNow;
+        Game IDependencyProvider.Game => _game;
+        double IDependencyProvider.NextRandomDouble() => _random.NextDouble();
     }
 }

@@ -39,6 +39,7 @@ namespace Challenge.LambdaRobots.Server.Common {
         public double NearHitRange;
         public double FarHitRange;
         public double CollisionRange;
+        public double MinRobotStartDistance;
         public List<RobotMissile> Missiles = new List<RobotMissile>();
         public List<Robot> Robots = new List<Robot>();
         public List<Message> Messages = new List<Message>();

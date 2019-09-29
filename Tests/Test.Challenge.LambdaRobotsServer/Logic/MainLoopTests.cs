@@ -202,13 +202,15 @@ namespace Test.Challenge.LambdaRobots.Server {
         #endregion
 
         private Game NewGame() => new Game {
+            Id = "Test",
             BoardWidth = 1000.0,
             BoardHeight = 1000.0,
             SecondsPerTurn = 1.0,
             DirectHitRange = 5.0,
             NearHitRange = 20.0,
             FarHitRange = 40.0,
-            CollisionRange = 2.0
+            CollisionRange = 2.0,
+            MinRobotStartDistance = 100.0
         };
 
         private Robot NewRobot(string id, double x, double y) => new Robot {
@@ -251,7 +253,7 @@ namespace Test.Challenge.LambdaRobots.Server {
         private Logic NewLogic(params Robot[] robots) {
             var game = NewGame();
             game.Robots.AddRange(robots);
-            _provider = new DependencyProvider(game, new DateTime(2019, 09, 27, 14, 30, 0));
+            _provider = new DependencyProvider(game, new DateTime(2019, 09, 27, 14, 30, 0), new Random());
             return new Logic(_provider);
         }
     }

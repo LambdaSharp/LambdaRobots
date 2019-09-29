@@ -28,7 +28,6 @@ using System.Linq;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
-using Challenge.LambdaRobots.Common;
 using Newtonsoft.Json;
 
 namespace Challenge.LambdaRobots.Server.Common {
@@ -83,7 +82,15 @@ namespace Challenge.LambdaRobots.Server.Common {
         }
 
         //--- Methods ---
-        public Task PutAsync<T>(T record) => _table.PutItemAsync(Document.FromJson(JsonConvert.SerializeObject(record)));
+        public async Task CreateAsync<T>(T record) {
+            await _table.PutItemAsync(Document.FromJson(JsonConvert.SerializeObject(record)), new PutItemOperationConfig {
+                ConditionalExpression = new Expression {
+                    ExpressionStatement = "attribute_not_exists(PK)"
+                }
+            });
+        }
+
+        public Task CreateOrUpdateAsync<T>(T record) => _table.PutItemAsync(Document.FromJson(JsonConvert.SerializeObject(record)));
 
         public Task<T> GetAsync<T>(string pk) where T : IGameTableSingletonRecord, new()
             => GetAsync<T>(pk, new T().SK);
