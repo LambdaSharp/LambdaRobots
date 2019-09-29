@@ -1,0 +1,3623 @@
+
+
+
+
+
+
+
+
+
+
+                                      P-ROBOTS
+
+
+                            A Game For PASCAL Programmers
+
+
+                                     Version 4.0
+
+
+                                         By
+
+
+                                   David Malmberg
+
+
+
+
+
+
+
+                                   Distributed by
+
+                                      Softworks
+                                  829 Fifteenth Street
+                            Hermosa Beach, California 90254
+
+
+                                    _______
+                               ____|__     |               (tm)
+                            --|       |    |------------------- 
+                              |   ____|__  |  Association of 
+                              |  |       |_|  Shareware 
+                              |__|   o   |    Professionals 
+                            -----|   |   |--------------------- 
+                                 |___|___|    MEMBER
+
+
+                       Copyrighted 1993 -- All Rights Reserved
+                                  By David Malmberg
+
+
+
+
+
+JUST WHAT IS P-ROBOTS?
+
+P-ROBOTS ("pee-robots") is a game based on computer programming in PASCAL.
+The object of the game is to design and program a "robot" that can triumph
+over similar robots designed and programmed by others in a real-time battle
+of wits and flying missiles.  You control your robot by writing a procedure
+in PASCAL to specify your robot's behavior and strategy in its efforts to
+vanquish up to three other robots in a battle to the death.  A variety of
+pre-defined P-ROBOTS PASCAL functions and procedures allow your robot to
+track its position on the battlefield, monitor its health or damage
+condition, and calculate the distance and angle to opponents from its
+current battlefield position.  Each robot is equipped with a cannon to fire
+missiles, and a motorized drive mechanism to either close in for the kill
+of a hapless opponent or flee from a fierce foe. Optionally, robots may be
+equipped with bombs, a repair kit, different types of armor and warheads, a
+deflection shield, and/or a cloaking device.
+
+P-ROBOTS is an excellent way for the novice programmer to sharpen his/her
+PASCAL skills and have fun at the same time.  However, P-ROBOTS does assumes
+that the robot designer/programmer already knows the fundamentals of
+programming in PASCAL.  For the experienced programmer, P-ROBOTS offers a
+chance to see just how well you program in a programming environment where
+"bad" code can lead to graphic and ignoble defeat and "brilliant" code can
+bring triumph and glory.
+
+In addition to being enjoyed in thousands of homes, P-ROBOTS has been
+successfully used in a number of classroom settings -- from high school PASCAL
+programming classes to graduate level courses in Artificial Intelligence.  "The
+competitive environment that P-ROBOTS creates has really sparked my students'
+desire to learn.  Our weekly robot contests are great fun and enjoyed by all --
+including me," said one high school PASCAL teacher.  Another teacher has
+challenged his PASCAL students by offering a unique reward: any student who can
+design and program a robot that can beat the teacher's robot consistently, does
+not have to take the final exam.
+
+Version 4.0 of P-ROBOTS has a number of significant improvements over prior
+versions including an optional "Integrated Development Environment" or IDE,
+that can be used to create, edit and test (i.e., compile) your robots.  When
+you test/compile a robot using the IDE, the compiler will identify any errors
+you have in your robot source code by positioning the cursor within the editor
+where the error occurred within your source code -- so you can very easily make
+the appropriate correction(s).  The IDE can also be used to set up
+"tournaments" of robots, select various match options (such as animation speed,
+number of obstacles, unlimited fuel, etc.), and conduct the tournament
+according to the robots and options you have selected.
+
+P-ROBOTS can be run with as little as 384K of memory and a monochrome or CGA
+monitor.  However, if your system has more memory and a better monitor (EGA or
+VGA), P-ROBOTS has been designed to take advantage of your hardware's greater
+capability.
+
+
+
+                                          1
+
+
+
+
+
+TABLE OF CONTENTS
+
+
+JUST WHAT IS P-ROBOTS?  . . . . . . . . . . . . . . . . . . . . . . . . . .   1
+
+TABLE OF CONTENTS . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   2
+
+P-ROBOTS REGISTRATION/ORDER FORM  . . . . . . . . . . . . . . . . . . . . .   4
+
+LICENSE TERMS (Shareware Rules) . . . . . . . . . . . . . . . . . . . . . .   5
+
+DISTRIBUTION OF P-ROBOTS BY DISK VENDORS  . . . . . . . . . . . . . . . . .   6
+
+P-ROBOTS PRODUCT/TECHNICAL SUPPORT  . . . . . . . . . . . . . . . . . . . .   7
+
+ACKNOWLEDGEMENTS  . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   8
+
+INTRODUCTION  . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .   9
+
+HARDWARE AND SOFTWARE REQUIREMENTS  . . . . . . . . . . . . . . . . . . . .   9
+
+FILES ON THE DISK . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  10
+
+GETTING STARTED . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  10
+
+INVOKING A CONTEST  . . . . . . . . . . . . . . . . . . . . . . . . . . . .  12
+
+USING THE "INTEGRATED DEVELOPMENT ENVIRONMENT"  . . . . . . . . . . . . . .  13
+
+CONTROLLING YOUR ROBOT'S MOVEMENT . . . . . . . . . . . . . . . . . . . . .  15
+
+ATTACKING OTHER ROBOTS  . . . . . . . . . . . . . . . . . . . . . . . . . .  16
+
+OTHER SPECIAL P-ROBOTS FUNCTIONS AND PROCEDURES . . . . . . . . . . . . . .  18
+     TIME . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  18
+     DISTANCE . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  18
+     ANGLE_TO . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  18
+     RANDOM . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  19
+     TRIG FUNCTIONS . . . . . . . . . . . . . . . . . . . . . . . . . . . .  19
+
+INFLICTING DAMAGE . . . . . . . . . . . . . . . . . . . . . . . . . . . . .  19
+
+PUTTING IT ALL TOGETHER . . . . . . . . . . . . . . . . . . . . . . . . . .  20
+
+ROBOT PROGRAMMING RULES . . . . . . . . . . . . . . . . . . . . . . . . . .  23
+
+ADVANCED P-ROBOT FEATURES . . . . . . . . . . . . . . . . . . . . . . . . .  24
+     CONTROLLING THE ANIMATION SPEED  . . . . . . . . . . . . . . . . . . .  24
+     PROTECTIVE SHIELDS AND CLOAKING  . . . . . . . . . . . . . . . . . . .  25
+     FUEL CONSTRAINTS . . . . . . . . . . . . . . . . . . . . . . . . . . .  26
+
+                                          2
+
+
+
+
+     RUNNING OUT OF FUEL  . . . . . . . . . . . . . . . . . . . . . . . . .  27
+     AN EXAMPLE USING A SHIELD AND FUEL . . . . . . . . . . . . . . . . . .  27
+     OTHER OPTIONS  . . . . . . . . . . . . . . . . . . . . . . . . . . . .  29
+          RADAR RANGE OPTIONS . . . . . . . . . . . . . . . . . . . . . . .  30
+          FUEL OPTIONS  . . . . . . . . . . . . . . . . . . . . . . . . . .  30
+          ENGINE SIZE AND SPEED OPTIONS . . . . . . . . . . . . . . . . . .  31
+          ARMOR OPTIONS . . . . . . . . . . . . . . . . . . . . . . . . . .  31
+          MISSILE WARHEAD OPTIONS . . . . . . . . . . . . . . . . . . . . .  32
+          ELECTRONIC BOMB OPTIONS . . . . . . . . . . . . . . . . . . . . .  33
+          SHIELDING OPTIONS . . . . . . . . . . . . . . . . . . . . . . . .  34
+          CLOAKING OPTIONS  . . . . . . . . . . . . . . . . . . . . . . . .  34
+          REPAIRING OPTIONS . . . . . . . . . . . . . . . . . . . . . . . .  35
+          AN EXAMPLE USING CLOAKING . . . . . . . . . . . . . . . . . . . .  35
+          AN EXAMPLE USING BOMBS AND CLOAKING . . . . . . . . . . . . . . .  38
+          ROBOT TEAMS . . . . . . . . . . . . . . . . . . . . . . . . . . .  42
+          AN EXAMPLE OF A ROBOT TEAM  . . . . . . . . . . . . . . . . . . .  43
+          OBSTRUCTIONS ON THE BATTLEFIELD . . . . . . . . . . . . . . . . .  46
+          AN EXAMPLE DEALING WITH OBSTRUCTIONS  . . . . . . . . . . . . . .  47
+
+APPENDIX I: COMPILER ERRORS . . . . . . . . . . . . . . . . . . . . . . . .  52
+
+APPENDIX II: RUN-TIME ERRORS  . . . . . . . . . . . . . . . . . . . . . . .  55
+
+APPENDIX III: COMMON PROBLEMS . . . . . . . . . . . . . . . . . . . . . . .  57
+
+APPENDIX IV: THE P-ROBOTS PASCAL LANGUAGE . . . . . . . . . . . . . . . . .  58
+
+APPENDIX V: A BLATANT "PLUG" FOR ANOTHER SOFTWORKS PRODUCT  . . . . . . . .  62
+
+APPENDIX VI: ABOUT THE AUTHOR . . . . . . . . . . . . . . . . . . . . . . .  65
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                          3
+
+
+
+
+   P-ROBOTS REGISTRATION/ORDER FORM
+
+
+**** Good News **** Good News **** Good News **** Good News **** Good News ****
+
+P-ROBOTS IS NOW "FREEWARE"
+
+P-ROBOTS is now "Freeware."  This means that the author, David Malmberg, still
+retains the copyright to P-ROBOTS and all of its related files, such as the
+documentation and the IDE.  However, you or any other user may use P-ROBOTS
+without paying any royalty or Shareware fees.
+
+So enjoy!!
+
+Now, the PASCAL source code to P-ROBOTS is also provided as part of the
+"Freeware" package.  You should feel free to experiment with the source code
+and to build your own expanded/enhanced versions of P-ROBOTS or to build other
+PASCAL compiler applications using the P-ROBOTS "compiler engine."  All I ask
+is that if you develop an interesting extension/enhancement to P-ROBOTS,
+please send me a copy at the following address:
+
+    David Malmberg
+    829 Fifteenth Street
+    Hermosa Beach, CA  90254
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                          4
+
+
+
+
+
+LICENSE TERMS (Shareware Rules)
+
+
+**** Good News **** Good News **** Good News **** Good News **** Good News ****
+
+P-ROBOTS IS NOW "FREEWARE"
+
+P-ROBOTS is now "Freeware."  This means that the author, David Malmberg, still
+retains the copyright to P-ROBOTS and all of its related files, such as the
+documentation and the IDE.  However, you or any other user may use P-ROBOTS
+without paying any royalty or Shareware fees.
+
+So enjoy!!
+
+Now, the PASCAL source code to P-ROBOTS is also provided as part of the
+"Freeware" package.  You should feel free to experiment with the source code
+and to build your own expanded/enhanced versions of P-ROBOTS or to build other
+PASCAL compiler applications using the P-ROBOTS "compiler engine."  All I ask
+is that if you develop an interesting extension/enhancement to P-ROBOTS,
+please send me a copy at the following address:
+
+    David Malmberg
+    829 Fifteenth Street
+    Hermosa Beach, CA  90254
+
+
+                                          5
+
+
+
+
+DISTRIBUTION OF P-ROBOTS BY DISK VENDORS
+
+
+Distributors of "public domain" or user-supported software libraries must
+obtain written permission to distribute copies of P-ROBOTS and related robot
+game files.  No one may use P-ROBOTS as a promotion for any commercial venture
+or as an enticement for the user to pay for any program, product, or service
+unless they have received the express written permission of the program's
+author.
+
+In order to distribute P-ROBOTS, a dealer or disk vendor must comply with the
+following conditions:
+
+     (1)  You must obtain written permission from Softworks to distribute
+          P-ROBOTS.  If you receive no reply, write again: our silence does NOT
+          constitute permission, and you may not distribute "pending" receipt
+          of permission.
+
+     (2)  A fee of not more than $7 may be charged for each disk sold.
+          P-ROBOTS may not be included on any disk sold for more than $7,
+          including CD-ROM or optical disks, without express written permission
+          from Softworks.
+
+     (3)  Vendors may not modify or delete ANY files on the disk.  Vendors may
+          add a "GO" program, and/or a reasonable number of small text files
+          designed to assist or provide a service to the user, but these added
+          files must be easily identifiable and end-users must be allowed to
+          delete the added files.
+
+     (4)  Vendors must make a reasonable effort to distribute only the most
+          recent versions of P-ROBOTS.  All vendors who have requested and
+          received written permission to distribute P-ROBOTS will be notified
+          of updates as they are released.
+
+     (5)  All disk vendors must comply with any and all vendor guidelines or
+          vendor requirements set forth by the Association of Shareware
+          Professionals (ASP); for more information about ASP, contact its
+          chairman, Jim Button, at Buttonware in Seattle.  Violation of any ASP
+          guideline or requirement automatically revokes permission to
+          distribute P-ROBOTS.
+
+
+
+                                          6
+
+
+
+
+P-ROBOTS PRODUCT/TECHNICAL SUPPORT
+
+Since, P-ROBOTS is now "Freeware" -- no technical support will be furnished!
+
+Softworks will NOT fix P-ROBOTS bugs, and will NOT help users by answering
+technical and other P-ROBOTS related questions.
+
+You are on your own.  If your copy of P-ROBOTS breaks, you own both pieces!
+
+
+
+
+
+
+
+                                          7
+
+
+
+
+ACKNOWLEDGEMENTS
+
+
+P-ROBOTS owes a great deal to many people and to several previous programs.
+
+The P-Code PASCAL compiler that was used in P-ROBOTS has a long history.  It
+was originally developed and published in 1976 by Nicklaus Wirth, the "father"
+of PASCAL.  In 1982, M. Ben-Ari developed and published a book describing how
+to make the compiler capable of multi-tasking.  Over the years, this compiler
+has been converted to many, many different computers and to many different
+dialects of PASCAL.  In 1986, Charles Schoening converted the compiler to Turbo
+Pascal version 2.0 on the IBM and released his version to the public domain.  I
+have enhanced and converted the compiler to the most recent releases of Turbo
+Pascal, as well as, to Microsoft's QuickPascal.  This version was then adapted
+to be the compiler "engine" for P-ROBOTS.
+
+The inspiration for P-ROBOTS and the initial design of the program came from a
+similar program called C-ROBOTS by Tom Poindexter, which was first published in
+1985.  As might be expected from the name, C-ROBOTS allows the programmer to
+design and program his/her robots in the C language, rather than PASCAL.  If
+you are interested in C-ROBOTS, Tom is selling it as Shareware for a $20
+registration fee.  The registration fee entitles you to the latest version of
+the program, a large collection of excellent robots, and the source code for
+the C-ROBOTS (written in C -- of course).  C-ROBOTS can be ordered from Tom at
+the following address:
+
+             Tom Poindexter
+             6864 Amherst Court
+             Highlands Ranch, CO
+                            80126
+
+C-ROBOTS can NOT be ordered from Softworks; it must be ordered from Tom
+directly at the above address.
+
+In addition, I would especially like to thank Professor B.J. Gleason of Upsala
+College and his students.   P-ROBOTS has benefited greatly from their
+suggestions.  Professor Gleason and his students also donated some truly
+awesome Robots that are included on the current P-ROBOTS disk.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                          8
+
+
+
+
+INTRODUCTION
+
+P-ROBOTS is a game based on computer programming in PASCAL.  The object of the
+game is to design and program a "robot" that can triumph over similar robots
+designed and programmed by others in a real-time battle of wits and flying
+missiles.  You control your robot by writing a procedure in PASCAL to specify
+your robot's behavior and strategy in its efforts to vanquish up to three other
+robots in a battle to the death.  A variety of pre-defined P-ROBOTS PASCAL
+functions and procedures allow your robot to track its position on the
+battlefield, monitor its health or damage condition, and calculate the distance
+and angle to opponents from its current battlefield position.  Each robot is
+equipped with a cannon to fire missiles, and a motorized drive mechanism to
+either close in for the kill of a hapless opponent or flee from a fierce foe.
+Optionally, robots may be equipped with bombs, a repair kit, different types of
+armor and warheads, a deflection shield, and/or a cloaking device.
+
+P-ROBOTS assumes that the robot designer already knows the fundamentals of
+programming in PASCAL.  Using P-ROBOTS, PASCAL skills sharpen as good code
+guides your robot to victory over the competition.  An individual can challenge
+the stable of provided robots.  Groups or classes can have contests among
+member-created robots. Going through the manual will get you started using P-
+Robots and designing your own robot.  There are helpful appendices you will
+want to consult that summarize the P-Robot Pascal Language, help with error
+diagnosis, and list common problems.
+
+Version 4.0 of P-ROBOTS has a number of significant improvements over prior
+versions including an optional "Integrated Development Environment" or IDE that
+can be used to create, edit and test (i.e., compile) your robots.  When you
+test/compile a robot using the IDE, the compiler will identify any errors you
+have in your robot source code by positioning the cursor within the editor
+where the error occurred within your source code -- so you can very easily make
+the appropriate correction(s).  The IDE can also be used to set up
+"tournaments" of robots, select various match options (such as animation speed,
+number of obstacles, unlimited fuel, etc.), and conduct the tournament
+according to the robots and options you have selected.
+
+
+HARDWARE AND SOFTWARE REQUIREMENTS
+
+If you intend to run P-ROBOTS on an IBM or compatible computer, you will need
+at least 384K of memory and DOS 2.1 or later.  Either a color or monochrome
+monitor may be used.  If you are using a color monitor, P-ROBOTS will
+automatically detect it and use different colors for each robot.  If you are
+using a monochrome monitor, P-ROBOTS will display your robots accordingly.  If
+you have an EGA or VGA monitor, P-Robots will automatically detect that and use
+these enhanced screen capabilities.
+
+If you are using P-ROBOTS' "Integrated Development Environment" or IDE, you
+will need at least 512k of memory and a hard disk with at least 512K of free
+disk space.  The IDE will use EMS or XMS memory if available for its "swap"
+file -- otherwise, the IDE will put its "swap" file on hard disk.
+
+                                          9
+
+
+
+
+FILES ON THE DISK
+
+You should have the following files on your P-ROBOTS disk:
+
+          P-ROBOTS.EXE   The is the main program that is executed whenever you
+                         hold  a P-ROBOTS contest.
+
+          P-ROBOTS.DOC   This file contains the documentation for P-ROBOTS.  It
+                         is a text file and can be printed by giving the
+                         command at the DOS prompt: TYPE P-ROBOTS.DOC > PRN
+
+          PR-DEMO.BAT    This is a file that gives a demonstration of a typical
+                         P-ROBOTS contest between three robots.
+
+          ????????.PR         These are other PASCAL source code files for
+                              other robots.  All P-ROBOTS robots MUST have .PR
+                              file extensions.  Without this .PR extension,
+                              P-ROBOTS will not compile the robot and enter it
+                              in any robot contests.
+
+If you are using P-ROBOTS' "Integrated Development Environment" or IDE, you
+need the following additional files on your hard disk (on the same directory
+where the above files are kept):
+
+          IDE.BAT        The batch file used to invoke the P-ROBOTS'
+                         "Integrated Development Environment."
+
+          PR-SHELL.EXE   The "shell" program with a built-in full-screen editor
+                         and a test compiler that can be used to develop and
+                         test your robots.  This program is called by IDE.BAT.
+
+          POPDOS.EXE     A really "nifty" utility program that can be called by
+                         hitting the <Alt><F10> key combination to invoke DOS
+                         from within another program.   See POPDOS.DOC for
+                         details.  POPDOS is loaded by IDE.BAT and is used to
+                         run P-ROBOTS from within the "Integrated Development
+                         Environment."
+
+          P-ROBOTS.PCX   A graphic title screen for the IDE which will be
+                         displayed if you have an EGA or VGA monitor.
+
+          *.HLP          Various help files accessed by hitting <F1> from
+                         within the IDE.
+
+
+GETTING STARTED
+
+To see a typical P-ROBOTS contest, just execute the batch file PR-DEMO.  What
+you will see will be the PASCAL source code for three robots being read from
+the disk and compiled by P-ROBOTS.  After being compiled successfully (without
+any errors), you will then see a battle between these three robots.  The battle
+
+                                         10
+
+
+
+
+will last between one and four minutes and you will be able to see the
+individual robots move around the battlefield, fire their missiles and get hit
+when the missiles explode too near them on the screen.  The screen and the
+battlefield will look something like the following:
+
+
+          (x=0,y=999)                        (x=999,y=999)
+
+              +------------------------------------+ 1  CHASER F 1156
+              |                                    |  D% 015   Sc 218
+              |                               1    |  Sp 000   Hd 090
+              |                          \^/       |  X= 902   Y= 890
+           ^  |     (missile exploding) <-#->      | ------------------
+           |  |                          /v\       | 2  M66    F  982
+              |                                    |  D% 050   Sc 275
+           Y  |              +        (missiles    |  Sp 100   Hd 180
+              |                     +   flying)    |  X=  89   Y= 534
+           a  |                                    | ------------------
+           x  |   2                                | 3  NINJA  F 1192
+           i  |                                    |  D% 000   Sc 045
+           s  |                                    |  Sp 000   Hd 000
+              |                 3                  |  X= 423   Y= 350
+              |                /                   | ------------------
+              |          (robots)                  |
+              |                                    |
+              |                                    |
+              |                                    |
+              |                                    |
+              |                                    | CPU
+              +------------------------------------+ Cycles:     34512
+
+          (x=0,y=0)           X axis -->     (x=999,y=0)
+
+
+The battlefield is 1000 meters by 1000 meters with the coordinates 0,0 in the
+lower left hand corner of the screen.  The border of the battlefield has a
+"fence" or "wall" around it which will cause the robots damage if they run into
+it.  Hitting a border of the battlefield will also cause your robot to come
+crashing to a halt.  On the battlefield, each robot is represented by a number
+from 1 to 4.  (There can be at most four robots in any one contest.)  Flying
+missiles will be represented on the screen by + symbols, and explosions by a
+flurry of lines and corners -- as can be seen above.
+
+Beside the battlefield are several "status" areas where information about each
+robot is displayed.  The number that precedes the robot's name is its symbol on
+the screen.  For example, the number 2 represents the robot M66 in the above
+display.  To the right of the robot's name (and just to the right of the "F")
+is the robot's current number of "jiggers" of fuel.  The "D%" field shows the
+percentage of damage that the robot has incurred so far.  When the damage
+percentage gets to 100% the robot dies.  The "Sc" field shows the direction in
+degrees (from 0 to 359) that the robot's scanner is currently pointed.  The
+
+                                         11
+
+
+
+
+scanner is used to detect the presence of enemy robots and to aim missiles at
+them.  The "Sp" field show the robot's current speed.  A speed of zero means
+the robot is standing still and the maximum speed is normally 100.  The "Hd"
+field show the robot's current heading, i.e., the direction it is moving.  Like
+the scanner field, the heading is shown in degrees from 0 to 359.  The "X=" and
+"Y=" fields show the robot's current X and Y coordinates on the battlefield,
+respectively.  The  X-axis runs from 0 on the left to 999 on the right side of
+the battlefield.  The Y-axis runs from 0 at the bottom on the screen to 999 at
+the top.
+
+All angles/directions in P-ROBOTS are calculated in degrees from 0 to 359 using
+the traditional angle directions you undoubted learned in Geometry.  Due east
+is zero degrees, north is 90 degrees, etc.:
+
+              135    90   45
+                  \  |  /
+                   \ | /
+             180 --- x --- 0
+                   / | \
+                  /  |  \
+              225   270   315
+
+
+INVOKING A CONTEST
+
+Sooner or later, you are going to get tired just watching the DEMO match and
+will want to see contests between other robots -- perhaps even your own robot
+creations.  There are two types of contests: single games or matches.  In
+single game mode, the game is played with animated "graphics" where the
+progress of the battle can be watched on the screen.  Match play is when you
+want to run a series of contests (maybe as many as 100) between the same group
+of robots to see what the winning percentages are for each contestant.  Match
+play does not display the actual battles, but just shows the summary of wins
+and loses as each individual game is played.  Match play is ideal for playing
+overnight.
+
+If you want to stop a P-ROBOTS game (either single game or match), just hit
+Control-Break.
+
+To run a single game, at the DOS prompt give the command:
+
+             P-ROBOTS Robot1 Robot2 .. Robot3
+
+For example, to run a single game among the robots NINJA, HOTSHOT, WIMP and
+BLASTER you would enter the command:
+
+             P-ROBOTS NINJA HOTSHOT WIMP BLASTER
+
+Or to run a single game between HOTSHOT and WIMP you would enter the command:
+
+             P-ROBOTS HOTSHOT WIMP
+
+                                         12
+
+
+
+
+It is also possible to test your robot against a "default" robot, named TARGET,
+that is built into the P-ROBOTS program.  TARGET just sits in the center of the
+battlefield waiting to get shot at.  However, TARGET does shoot back -- so be
+warned that beating TARGET is not a totally trivial exercise.  TARGET is an
+excellent opponent for testing new robots.  For example, to test a robot named
+FRED against TARGET, just give the command:
+
+             P-ROBOTS FRED
+
+To invoke a series of contests, i.e., match play, append a "/MNNN" behind the
+normal single play command, where NNN represents the number of games you wish
+to play in the match.  "/M50" would cause 50 games to be played in the match
+and "/M100" would cause 100 games to be played.  To initiate a 20 game match
+among HOTSHOT, WIMP and BLASTER you would enter the command:
+
+             P-ROBOTS NINJA HOTSHOT WIMP BLASTER /M20
+
+Or to run a series of 10 games between HOTSHOT and WIMP you would enter the
+command:
+
+             P-ROBOTS HOTSHOT WIMP /M10
+
+IMPORTANT NOTE: The actual files on the disk containing the source code for the
+various robots MUST have a .PR file extension.  However, when the game is
+invoked, the use of this extension is optional.
+
+
+USING THE "INTEGRATED DEVELOPMENT ENVIRONMENT"
+
+An optional feature of Version 4.0 of P-ROBOTS is an "Integrated Development
+Environment" or IDE that can be used to create, edit and test (i.e., compile)
+your robots.  When you test/compile a robot using the IDE, the compiler will
+identify any errors you have in your source code by positioning the cursor
+within the editor where the error occurred within your source code -- so you
+can very easily make the appropriate correction(s).  The IDE can also be used
+to set up "tournaments" of robots, select various match options (such as
+animation speed, number of obstacles, unlimited fuel, etc.), and conduct the
+tournament according to the robots and options you have selected.  The
+"Integrated Development Environment" is invoked by giving the command IDE from
+the DOS prompt.  In order to use the IDE you must have at least 512K of memory
+and a hard disk with at least 512K of free disk space to store the IDE's "swap"
+files.
+
+The IDE has an easy-to-use menu-driven interface.  The menu options include the
+following:
+
+     File - Various operations on Robot files (Load, Save, Print, etc.),
+     specifically:
+
+          New - Create a new robot
+          Open - Open an existing robot file
+
+                                         13
+
+
+
+          Close - Close current robot file (without saving)
+          Save As - Save current robot file under a different name
+          Print - Print current file on LPT1, LPT2, LPT3 or PRN printer
+          About - Information about P-Robots, specifically:
+
+               Credits - Display credits for P-Robots
+               Print Order Form - Print the P-Robots Order Form on your printer
+
+     Edit - Robot source file and Robot option (.CFG) file, specifically:
+
+          Edit Robot - Edit current robot program using a full-screen editor
+          Edit Configuration - Edit current robots options (i.e., .CFG
+          options), including:
+
+               Radar - Change Radar points in .CFG file
+               Fuel - Change Fuel points in .CFG file
+               Engine - Change Engine points in .CFG file
+               Armor - Change Armor points in .CFG files
+               Warheads - Change Warheads points in .CFG files
+               Bombs - Change Bombs points in .CFG files
+               Shielding - Change Shielding points in .CFG files
+               Cloaking - Change Cloaking points in .CFG file
+               Repairing - Change Repairing points in .CFG file
+               Save .CFG Options - Save current robot options in .CFG file
+
+          Test Compile - Test (by compiling) the current Robot
+
+     Tournament - Conduct a Tournament battle of several robots, including
+     these choices:
+
+          Select Robots - Select up to 4 Robots to battle one another
+          Battle Options - Select options (display speed, unlimited fuel, etc.)
+          for battle, including:
+
+               Speed - Select display Speed option
+               Match Play - Select Match Play (and number of matches to play)
+               Obstructions - Select Obstruction Play (and enter the number of
+               obstructions)
+               Unlimited Fuel - Select Unlimited Fuel option
+
+          Fight - Start battle of selected robots
+
+     Demo -  Conduct a demonstration robot battle
+
+     Calculator - An easy-to-use calculator
+
+     Quit - the P-Robot Program Shell and return to DOS
+
+While using the IDE, you can always get HELP by hitting the F1 key.
+
+
+                                         14
+
+
+
+
+CONTROLLING YOUR ROBOT'S MOVEMENT
+
+To move your robot in P-ROBOTS you must use the special procedure "Drive" that
+is built into the P-ROBOTS version of the PASCAL language.  (See Appendix IV
+for a summary of all built-in P-ROBOTS functions and procedures.)  The Drive
+procedure would be used in your program as:
+
+             Drive(degree,speed);
+
+This would cause your robot to move in the direction specified by "degree" and
+at the speed indicated by the second parameter, "speed".  The direction will be
+forced by the Drive procedure to be between 0 and 359 (i.e., degree := degree
+MOD 360;) and the speed will be restricted to between 0 and the maximum of the
+built-in P-ROBOTS CONST MaxSpeed (which is typically 100).  Calling the Drive
+procedure with a speed of zero, will cause your robot to stop.
+
+For example:
+
+             Drive(90, MaxSpeed);  (* drive north at top speed *)
+             Drive(heading,0);     (* slow down and stop *)
+
+In an attempt to simulate some degree of reality, a robot's speed does not
+change instantly, but rather has to go through periods of acceleration and
+deceleration.  For example, to stop a robot traveling at a speed of 100 will
+take between 100 and 200 meters.  Conversely, to get up to a speed of 100 from
+a standing stop will also take between 100 and 200 meters.
+
+Also, your robot will not be able to "turn on a dime".  You must be moving at a
+speed of 50 or less to change directions.  Attempting to turn while going over
+50 will cause your robot's drive motor to "over heat" and your robot will just
+coast to a stop on its current heading.
+
+To monitor the status of your movement on the battlefield, the P-ROBOTS version
+of PASCAL has several special built-in functions.
+
+The built-in "Speed" function returns the current speed of your robot (from 0
+to MaxSpeed).  Remember that the value returned by Speed may not always be the
+same as the last parameter used in the last call to Drive, because of
+acceleration, deceleration and collisions.
+
+An example of how the Speed function might be used is as follows:
+
+        Drive(270, MaxSpeed);  (* start driving, due south *)
+         ; ; ;                 (* other instructions *)
+        IF Speed = 0           (* check if stopped, i.e., current speed = 0 *)
+            THEN Drive(90,20); (* Probably, ran into the south border *)
+                               (* Go north at speed of 20 *)
+
+The built-in "Loc_X" and "Loc_Y" functions return your robots X and Y
+coordinates on the battlefield, respectively.  The following shows how these
+functions might be used:
+
+                                         15
+
+
+
+
+       Drive(45,50);   (* start driving in north-easterly direction *)
+       WHILE (Loc_X < 900) AND (Loc_Y < 900) DO Drive(45,50);
+            (* i.e., just keep driving until we are close to a border *)
+       Drive(45,0);    (* slow down and stop *)
+
+
+ATTACKING OTHER ROBOTS
+
+The main offensive weapons available to your robot are its scanner and its
+cannon.  Both of these weapons are controlled by using special built-in
+capabilities of the P-ROBOTS PASCAL language.
+
+The scanner is an "electronic eye" that enables your robot to look for enemy
+robots in any chosen direction from 0 to 359 degrees.  The scanner has a
+maximum resolution of +/- 10 degrees.  This allows your robot to quickly scan
+the battlefield at a low resolution, then use finer resolution to pinpoint a
+foe's precise position.  The scanner would be accessed by a reference to the
+"Scan" function, as follows:
+
+             Scan(degree,resolution)
+
+This function invokes the robot's scanner, at the specified degree and
+resolution.  This function returns an integer value of 0 if no enemy robots are
+within the scan range or a integer value (greater than 0) representing the
+distance to the nearest robot in the scan area.  The value passed as the
+parameter "degree" will be forced to be in the range 0 to 359.  Likewise, the
+"resolution" will be forced to be in the range of +/- 10 degrees.  The number
+returned will range from 0 (if nothing is within scanner range) to a maximum of
+"MaxRadarRange".  MaxRadarRange will be determined by the options selected for
+the robot.  Robot options will be described later.
+
+Some examples:
+
+       Enemy := Scan(180,10); (* scans the area from 170 to 190 degrees *)
+       Dist_To_Foe := Scan(180,2); (* scans the area from 178 to 182 degrees *)
+       Target_Range := Scan(90,0); (* scan 90 degrees, with no variance *)
+
+Once an enemy robot is found with the scanner, you would use your robot's
+cannon to fire a missile at the enemy.  This is done by using P-ROBOTS special
+"Cannon" procedure:
+
+             Cannon(degree,range);
+
+This will fire a missile in the direction specified by the parameter "degree"
+and for a distance specified by the value of "range".  Your robot's cannon has
+a maximum range of MaxRadarRange (default is 700) meters.  There are an
+unlimited number of missiles -- so you need not worry about running out.
+However, it will take some time to reload between firing missiles; so that, the
+number of missiles in the air at any one time to limited to two.  The cannon is
+mounted on an independent turret, and therefore can fire in any direction,
+regardless of the robot's current movement direction.
+
+                                         16
+
+
+
+
+For example, the following "chunk" of code will cause your robot to constantly
+scan for enemies and blast away at them as long as they are in sight.  When
+they are no longer in sight (or in range), the scanner will move to the next 20
+degree segment of the circle:
+
+       Angle := 0; (* initialize to east *)
+       REPEAT
+         Enemy_Range := Scan(Angle,10); (* Get range to target -- if any *)     
+         WHILE (Enemy_Range > 40) AND (Enemy_Range <= MaxRadarRange) DO
+           BEGIN (* Enemy in sight and in range *)
+             Cannon(Angle,Enemy_Range); (* Blast it! *)
+             Enemy_Range := Scan(Angle,10); (* Still there? *)
+           END;
+           Angle := Angle + 20; (* move search to next segment *)
+        UNTIL Dead or Winner;
+
+The "Dead" and the "Winner" in the UNTIL statement are special pre-defined
+Boolean functions in P-ROBOTS.  Dead will have a value of FALSE while your
+robot is still alive (i.e., its damage is less than 100%) and TRUE when it
+finally dies.  Similarly, Winner will be TRUE if your robot is the last
+survivor of the battle and FALSE otherwise.
+
+If your robot utilized the basic "Sitting Duck" strategy given above, its
+opponents would undoubtedly make short work of it.  To make the strategy a
+little smarter, we need some way to determine if we are under attack.
+Fortunately (and not surprisingly), P-ROBOTS has another special function that
+can assist us -- the "Damage" function.  Whenever you use this function in your
+code, it will return an integer value of your robot's current damage
+percentage.  If this value changes, then we know the robot is under attack and
+it probably should run for safety.
+
+As an example, let's see how the Damage function could be used to make the
+above code a little smarter:
+
+        Old_Damage := Damage; (* Get initial value of damage *) 
+        Angle := 0; (* initialize to east *)
+        REPEAT    
+          Enemy_Range := Scan(Angle,10); (* Get range to target -- if any *)
+          WHILE (Enemy_Range > 40) AND (Enemy_Range <= MaxRadarRange) DO
+            BEGIN (* Enemy in sight and in range *)
+              Cannon(Angle,Enemy_Range); (* Blast it! *)
+              Enemy_Range := Scan(Angle,10); (* Still there? *)      
+            END;
+          Angle := Angle + 20; (* move search to next segment *)
+          IF Damage > Old_Damage THEN
+            BEGIN (* Under attack *)
+              Old_Damage := Damage; (* Get latest Damage value *)
+              Move; (* Get out of here!! *)
+            END;
+        UNTIL Dead or Winner;
+
+
+                                         17
+
+
+
+
+The "Move" reference above would call a separate procedure that would move the
+robot to another position on the battlefield where it will hopefully be safer.
+This procedure will be given a little later as another example.
+
+
+OTHER SPECIAL P-ROBOTS FUNCTIONS AND PROCEDURES
+
+
+TIME
+
+The built-in Time function returns the current time as measured by the
+P-ROBOTS' CPU cycles.  By using this function, you should be able to calculate
+the speed of your enemies.  The value returned by this function is restricted
+to being in the range 0 to 32767 and when it gets to 32767 it starts again at
+zero.  An example of how you might get this value is as follows:
+
+             Start_Time := Time;
+
+
+DISTANCE
+
+Since your robot will frequently find it useful to be able to calculate
+distances from one point on the battlefield to another, P-ROBOTS provides a
+built-in function to do it:
+
+             Distance(X1,Y1,X2,Y2)
+
+would return the integer distance from the point X1,Y1 to the point X2,Y2.
+
+
+ANGLE_TO
+
+The Angle_To function will return the angle to a point on the battlefield from
+your robot's current position.  The value returned will be an integer in
+degrees from 0 to 359.  As an example of how both the Distance and Angle_To
+functions might be used, consider the following procedure that will move your
+robot to the point X,Y on the battlefield:
+
+     PROCEDURE GoTo(X, Y : Integer);(* Go to location X,Y on playing field. *)
+       VAR
+         Heading  : Integer;
+     BEGIN       (* Find the heading we need to get to the desired spot. *)
+       Heading := Angle_To(X, Y);
+
+       (* Keep traveling at top speed until we are within 150 meters. *)
+       WHILE (Distance(Loc_X, Loc_Y, X, Y) > 150) DO Drive(Heading, MaxSpeed);
+
+       (* Cut speed, and creep the rest of the way. *)
+       WHILE (Distance(Loc_X, Loc_Y, X, Y) > 20) DO Drive(Heading, 20);
+
+       (* Stop driving, should coast to a stop. *)
+
+                                         18
+
+
+
+
+       Drive(Heading, 0); (* i.e., Stop *)
+     END; (* GoTo(X,Y) *)
+
+
+RANDOM
+
+The function Random(limit) returns a random integer between 0 and limit.  As an
+example, the following procedure will cause your robot to move to a random spot
+on the battlefield:
+
+       PROCEDURE Move; (* Move to a random spot on the playing field. *)
+         VAR
+           x, y       : Integer;
+       BEGIN
+         x := Random(900) + 50;
+         y := Random(900) + 50;
+         GoTo(x, y);
+       END; (* Move *)
+
+Notice that the Move procedure makes use of the GoTo(X,Y) procedure developed
+in the previous example.
+
+
+TRIG FUNCTIONS
+
+P-ROBOTS has several standard Trig functions that will be of value to a clever
+robot, specifically:
+
+             Sin(degree)
+
+will return the real value of the Sin of an angle of degree where degree is an
+integer from 0 to 359.
+
+             Cos(degree)
+
+will return the real value of the Cos of an angle of degree where degree is an
+integer from 0 to 359.
+
+             ArcTan(ratio)
+
+will the angle in integer degrees that has a Tan of ratio.
+
+
+INFLICTING DAMAGE
+
+Your robot can be damaged by only two things: collisions and explosions.  The
+"normal" level of damage is given by the following table:
+
+     2%  --    A collision with another robot (both robots in a collision
+               receive damage) or one of the battlefield walls.  A collision
+               also causes the robot to stop cold, i.e., its speed is reduced
+
+                                         19
+
+
+
+               instantly to 0.
+
+     3%  --    A missile explodes within a 40 meter radius.
+
+     5%  --    A missile explodes within a 20 meter radius.
+
+     10% --    A missile explodes within a 5 meter radius.
+
+The actual damage is determined by the options (Armor, Shielding, etc.) for the
+robot being attacked as well as by the options of the attacking robots (Missile
+type, Bombs, etc).  The values given above are the defaults for "normally"
+equipped robots.  The impact of the options on the damage will be discussed
+later.
+
+Damage is inflicted on ALL robots within these distances.  That means that if
+one of your own missiles explodes within 40 meters of your robot, it causes
+damage.  Using sloppy programming logic, it is possible for your robot to
+commit suicide by firing missiles too close to itself.  For example, your robot
+would not last long with this code:
+
+                  Drive(Angle, 50);
+                  WHILE (Loc_X < 999) DO Cannon(Angle,Scan(Angle,10));
+
+Damage is cumulative, and cannot be repaired.  However, a robot does not loose
+any mobility, fire potential, etc. at high damage levels.  In other words, a
+robot at 99% damage performs equally as well as a robot with no damage.
+However, when the damage level gets to 100% your robot is dead and it is out of
+the current competition.
+
+
+PUTTING IT ALL TOGETHER
+
+Here is a complete sample robot named HotShot:
+
+     PROCEDURE HotShot;
+     {
+      Author: David Malmberg
+
+      Strategy:  Stay in one place.  Find a foe.  Take a shot.
+      Keep improving aim and shooting until foe is lost from sights.
+      Then move sights (scanning) to adjacent target area.  If
+      hit, then move to another random position on playing field.
+      If the Robot scans two complete circles (720 degrees) without
+      finding a foe in shooting range, move to another spot on the
+      field.  (This will avoid "stand-offs" where opponents stay
+      just out of range of one another.)
+
+      This Robot should be VERY effective against foes which
+      are stopped or are moving slowly.  It will be less effective
+      against Robots traveling at high speeds.
+     }
+
+                                         20
+
+
+
+
+     VAR { HotShot "Global" variables }
+
+       Angle, { Scanning angle }
+       Last_Damage, { Robot's Last damage value }
+       Range, { Range/Distance to foe }
+       Sweep, { "Sweep count" -- when = 36, Robot has scanned 720 degrees }
+       Delta          : Integer; { Scanning arc }
+
+
+     PROCEDURE Aim(VAR Ang : Integer; VAR Arc : Integer);
+   {
+    Improve aim by doing a binary search of the target area,
+    i.e., divide the target area in two equal pieces and redefine
+    the target area to be the piece where the foe is found.
+    If the foe is not found, expand the search area to the
+    maximum arc of plus or minus 10 degrees.
+   }
+       BEGIN
+         Arc := Arc DIV 2; { Divide search area in two. }
+         IF scan(Ang-Arc, Arc) <> 0 { Check piece "below" target angle. }
+           THEN Ang := Ang-Arc { If foe found, redefine target angle. }
+           ELSE IF scan(Ang+Arc, Arc) <> 0 { Check piece "above" target angle.}
+             THEN Ang := Ang+Arc { If foe found, redefine target angle. }
+             ELSE Arc := 10;
+         { Foe not found in either piece, expand search area to maximum arc. }
+       END; {Aim}
+
+
+     PROCEDURE BlastThem;
+       BEGIN
+         Angle := 10;
+         REPEAT
+           Delta := 10; { Start with widest scanning arc. }
+           Range := scan(Angle, Delta);
+           WHILE (Range > 40) AND (ObjectScanned = Enemy)
+             AND (Range < MaxMissileRange) DO
+           { Must be far enough away to avoid self-damage. }
+             BEGIN
+               Aim(Angle, Delta); { Improve aim. }
+               Cannon(Angle, Range); { Fire!! }
+               Range := scan(Angle, Delta); { Is foe still in sights? }
+             END;
+           Angle := Angle+20; { Look in adjacent target area. }
+         UNTIL Angle > 360;
+       END;
+
+
+
+
+
+
+                                         21
+
+
+
+
+     PROCEDURE GOTO(x, y : Integer);
+         { Go to location X,Y on playing field. }
+       VAR Heading    : Integer;
+       BEGIN
+         { Find the heading we need to get to the desired spot. }
+         Heading := Angle_To(x, y);
+
+         { Keep traveling at top speed until we are within 150 meters }
+         WHILE (distance(loc_x, loc_y, x, y) > 150) DO
+           BEGIN
+             Drive(Heading, MaxSpeed);
+             BlastThem;
+           END;
+
+         { Cut speed, and creep the rest of the way. }
+         WHILE (distance(loc_x, loc_y, x, y) > 20) DO
+           BEGIN
+             Drive(Heading, 20);
+             BlastThem;
+           END;
+
+         { Stop driving, should coast to a stop. }
+         Drive(Heading, 0); {i.e., Stop}
+       END; {GoTo(X,Y)}
+
+
+     FUNCTION Hurt  : Boolean;
+         { Checks if Robot has incurred any new damage. }
+       VAR Curr_Damage : Integer;
+         Answer         : Boolean;
+       BEGIN
+         Curr_Damage := damage;
+         Answer := (Curr_Damage > Last_Damage);
+         Last_Damage := Curr_Damage;
+         Hurt := Answer;
+       END; {Hurt}
+
+
+     PROCEDURE Move;
+         { Move to a random spot on the playing field. }
+       VAR x, y       : Integer;
+       BEGIN
+         Sweep := 0; { Reset Sweep counter to zero. }
+         x := Random(900)+50;
+         y := Random(900)+50;
+         GOTO(x, y);
+       END; {Move}
+
+
+
+
+
+                                         22
+
+
+
+     BEGIN {HotShot Main}
+       Angle := Angle_To(500, 500);
+       { Start scanning for foes in center of field. }
+       Sweep := 0; { Initialize Sweep counter to zero. }
+       REPEAT { Until Dead or Winner }
+         Delta := 10; { Start with widest scanning arc. }
+         Range := scan(Angle, Delta);
+         WHILE (Range > 40) AND (Range < 700) DO
+           { Must be far enough away to avoid self-damage. }
+           BEGIN
+             Sweep := 0; { Found foe, so reset Sweep to zero }
+             Aim(Angle, Delta); { Improve aim. }
+             cannon(Angle, Range); { Fire!! }
+             Range := scan(Angle, Delta); { Is foe still in sights? }
+           END;
+         Angle := Angle+20; { Look in adjacent target area. }
+         Sweep := Sweep+1;
+         IF Hurt OR (Sweep = 36) THEN Move;
+         { If hit or have scanned two full circles, move elsewhere. }
+       UNTIL Dead OR Winner;
+     END; (* HotShot Main *)
+
+
+ROBOT PROGRAMMING RULES
+
+There are several things in the above example that you should think of as rules
+that your robots should ALWAYS observe.
+
+     1.   Your robot should be in a "self-contained" PROCEDURE with the
+          following basic structure:
+
+                   PROCEDURE RoboName;
+
+                     {"Global" Variables}
+
+                     FUNCTION A;
+                        ....
+                     PROCEDURE B;
+                        ....
+                     FUNCTION Z;
+
+                   BEGIN {RoboName Main}
+                        ....
+                   END; {RoboName Main}
+
+          Failure to follow this basic structure will cause the P-ROBOTS
+          program and your robot to both meet a fiery death.  Notice that your
+          robot procedure ends with a ";" -- not a "."
+
+
+
+
+                                         23
+
+
+
+
+     2.   A robot should have its PROCEDURE named exactly the same name as the
+          file with the code for the robot (except for the .PR extension);
+          i.e., the HotShot robot procedure should be in a  file named
+          HOTSHOT.PR.  Again, failure to follow this rule will cause your robot
+          program to crash.
+
+     3.   In the "main" routine for your robot, you need to have some kind of
+          "infinite" loop that is repeated endlessly.  In the sample robot,
+          HOTSHOT, this loop is the REPEAT ... UNTIL structure:
+
+                  REPEAT (* Until Dead or Winner *)
+                    ....
+                  UNTIL Dead OR Winner;
+
+          Another "infinite" loop that would works equally well is:
+
+                  WHILE (NOT Dead) AND (NOT Winner) DO
+                    BEGIN
+                      ....
+                    END;
+
+     4.   Your robot source code should be very well documented with comments.
+
+
+ADVANCED P-ROBOT FEATURES
+
+All of the robot programming ground rules and robot-specific language presented
+up to this point correspond to features found in C-ROBOTS by Tom Poindexter --
+which was the inspiration for P-ROBOTS.  After  P-ROBOTS had been released for
+several months, users began to make suggestions for improvements and new
+features.  In the current version 4.0, I have tried to incorporate the best
+suggestions.  Specifically, version 4.0 adds the following improvements and new
+features:
+
+             *    Animation Speed Options
+             *    Protective Shields and Cloaking
+             *    Fuel Constraints
+             *    Options for Radar Range, Engine Size, Armor, Missile types,
+                  Bombs and Repairing
+             *    Robot Teams
+             *    Obstructions on the Battlefield
+
+NOTE: All of these new features are optional.  Your old (Versions 1.0 -- 3.0)
+robots can still be used just as they have always been used.
+
+
+CONTROLLING THE ANIMATION SPEED
+
+Since not all computers operate at the same speed, it is very desirable to be
+able to control the animation speed of the robot contest.  This can be done by
+using another command line parameter, the "/SN" parameter, where N can be
+
+                                         24
+
+
+
+
+either 1, 2, 3 ... up to 10.  A value of 1 corresponds to the slowest animation
+speed and 10 is the fastest.  The normal default setting is 7 which will
+normally look fine on a 80286 or 80386 computer.  If you are using a 486
+machine, you will probably want to use one of the slower animation speeds.  For
+example, to run a single game among the robots: NINJA, HOTSHOT, WIMP and
+BLASTER at a moderately slow animation speed (i.e., a speed of 3) you would
+enter the command:
+
+             P-ROBOTS NINJA HOTSHOT WIMP BLASTER /S3
+
+If you are playing a series of contests (i.e., match play), you should not slow
+down the speed since these games are not displayed/animated anyway.
+
+
+PROTECTIVE SHIELDS AND CLOAKING
+
+In version 4.0 of P-ROBOTS, your robot can use a protective Shield by using the
+command "RaiseShield".  When your robot's Shield is up, your robot will not
+incur any damage from collisions or missile explosions.  The Shield may be
+lowered by using the command "LowerShield".  The status of your robot's Shield
+can be determined by using the built-in Boolean function, "ShieldRaised" which
+will return a value of TRUE or FALSE based on your robot's shield condition.
+For example, you might want to use the following statement in a robot program:
+
+             IF NOT ShieldRaised THEN RaiseShield;
+
+You may also check to see if your robot has a Shield option by using the built-
+in Boolean Function "HaveShield".
+
+NOTE: Unlike the Starship Enterprise, your robot has only one Shield (i.e.,
+singular) not multiple Shields (plural).  If you use "Shields" (plural) in your
+robot programs, you will get a compiler error for an "Unknown Identifier".
+
+In version 4.0 of P-ROBOTS, your robot can also use a protective "Cloak" by
+using the command "RaiseCloak".  When your robot's Cloak is up, your robot will
+be invisible to other robot's scanners/radars (except if they are equipped with
+an "Anti-Cloaking" Device).  The Cloak may be lowered by using the command
+"LowerCloak".  You may also check to see if your robot has a Cloak option by
+using the built-in Boolean Function "HaveCloak".
+
+If your robot has its cloak raised, this fact will be shown by having your
+robot "blink" on the screen.  At the same time, the robots name on the status
+panel will also blink.  When you lower the cloak, the blink will stop.
+
+Of course, there must be a "catch" to using a Shield or a Cloak -- or there
+would not be any real challenge to a robot contest.  The catch is that Shields
+and Cloaks use scarce fuel resources as explained in the following section.
+
+
+
+
+
+                                         25
+
+
+
+
+FUEL CONSTRAINTS
+
+Many people have commented that P-ROBOTS (and C-ROBOTS before it) seemed to
+favor robots that used "brute force" rather than "raw cunning" -- i.e., all
+other things being equal, robots that fired often seem to beat robots that
+fired accurately.  In an effort to create a more level playing field for smart
+robots, I have added fuel constraints to P-ROBOTS.  Under these constraints,
+robots that fire indiscriminately will waste valuable fuel and will ultimately
+run out of fuel and find themselves defenseless and at the mercy of their wiser
+and more fuel efficient opponents.
+
+When having a robot battle that has fuel constraints, each robot normally
+begins the contest with 1250 "jiggers" of fuel.  Then, during the contest, fuel
+is normally used up at the following rates:
+
+             *  Firing a missile takes 3 jiggers
+             *  Traveling 100 meters takes 6 jiggers
+             *  Having a shield up for 1000 CPU cycles takes 6 jiggers
+             *  Having a cloak up for 1000 CPU cycles takes 5 jiggers
+
+These fuel usage rates are the "default" values.  Your robots specific usage
+rates will depend upon the options you have selected for your robots.  The
+details will be explained in the next few sections.
+
+In addition, if your robot's Shield is up, whenever your robot would have
+incurred damage from a missile or a collision, it uses twice the number of
+jiggers of fuel to absorb the damage as it would have incurred in damage had
+its Shield been down.  For example, when your robot's Shield is up, absorbing a
+direct missile hit uses 20 jiggers of fuel (normally); absorbing the impact of
+a collision with another robot uses 4 jiggers of fuel (normally), etc.  So, it
+is prudent for your robot to take care to avoid missiles and collisions even if
+its Shield is raised.
+
+The number of jiggers of each robot's fuel is displayed continuously next to
+the robot's name on the screen.  This value may be accessed from within a robot
+program by using the built-in function "Fuel".  For example, you might want to
+use the following logic in a robot program to begin a special "End-Game"
+strategy when your fuel gets low:
+
+             IF Fuel < 200 THEN End_Game;
+
+There are several other built-in P-ROBOTS functions that may be useful when you
+have fuel constraints.  Specifically, "LimitedFuel" will return a TRUE or FALSE
+based upon whether the contest your robot is playing in has fuel constraints or
+not.  The built-in function "Meters" is like an Odometer on a car -- only it
+returns the number of meters your robot has traveled since the beginning of the
+contest.  For example, you might wish to use the following command in your
+robot's program to invoke your "End-Game" strategy:
+
+             IF LimitedFuel
+                THEN IF (Meters > 20000) OR (Fuel < 200) THEN End_Game;
+
+                                         26
+
+
+
+
+To have a robot contest without fuel constraints, you should use a "/U" command
+line parameter when you invoke your contest.  For example, to run a single game
+among the robots: NINJA, WIMP and BLASTER without fuel constraints, you would
+enter the following command at the DOS prompt:
+
+             P-ROBOTS NINJA WIMP BLASTER /U
+
+If you wish to have a series of 50 matches without fuel constraints among the
+same group of robots, you would add a "/M50" parameter to the command as
+follows:
+
+             P-ROBOTS NINJA WIMP BLASTER /U /M50
+
+
+RUNNING OUT OF FUEL
+
+When your robot runs out of fuel it does everything you might expect: it stops
+cold and can no longer move; it can no longer fire its cannon; and it can no
+longer maintain a raised shield.  In other words, it is totally and absolutely
+defenseless.  Other robots which still have fuel will make quick work of any
+robot that is unfortunate enough to become a sitting duck by running out of
+fuel.  If all of the robots in the game run out of fuel, the game is over and
+the robot with the least damage (i.e., the strongest of the survivors) is
+declared the winner.
+
+
+AN EXAMPLE USING A SHIELD AND FUEL
+
+Here is an example of how the previous example robot, HOTSHOT, might be
+modified to use its Shield and consider Fuel constraints:
+
+
+     PROCEDURE HotShot2;
+     {
+      Author: David Malmberg
+
+      Strategy:  Stay in one place.  Find a foe.  Take a shot.
+      Keep improving aim and shooting until foe is lost from sights.
+      Then move sights (scanning) to adjacent target area.
+      If the Robot scans a complete circle (360 degrees) without
+      finding a foe in shooting range, move to another spot on the
+      field.  (This will avoid "stand-offs" where opponents stay
+      just out of range of one another.)  RaiseShield when standing
+      still and lower them when moving.
+
+      When damage gets to 70 (or more) or fuel (if using fuel) gets
+      below 200 adopt an "End-Game" strategy of moving to the lower
+      left corner, lower shield, and continue to scan and shoot in
+      the corner's 90 degree range.
+
+      This Robot should be VERY effective against foes which
+
+                                         27
+
+
+
+
+      are slow and/or tend to stay in one place.}
+
+     PROCEDURE GOTO(x, y : Integer);
+         { Go to location X,Y on playing field. }
+       VAR Heading    : Integer;
+       BEGIN
+         { Find the heading we need to get to the desired spot. }
+         Heading := Angle_To(x, y);
+
+         { Keep traveling at top speed until we are within 150 meters }
+         WHILE (distance(loc_x, loc_y, x, y) > 150) DO
+           BEGIN
+             Drive(Heading, MaxSpeed);
+             BlastThem;
+           END;
+
+         { Cut speed, and creep the rest of the way. }
+         WHILE (distance(loc_x, loc_y, x, y) > 20) DO
+           BEGIN
+             Drive(Heading, 20);
+             BlastThem;
+           END;
+
+         { Stop driving, should coast to a stop. }
+         Drive(Heading, 0); {i.e., Stop}
+       END; {GoTo(X,Y)}
+
+     PROCEDURE Move;
+         { Move to a random spot on the playing field. }
+       VAR x, y       : Integer;
+       BEGIN
+         Sweep := 0; { Reset Sweep counter to zero. }
+         x := Random(900)+50;
+         y := Random(900)+50;
+         GOTO(x, y);
+       END; {Move}
+
+
+     PROCEDURE End_Game;
+     BEGIN {End_Game}
+       GoTo(0,0); {Lower Left Corner}
+       Angle := 10; {Sweep arc from 0 to 90 degrees only}
+       REPEAT
+         Delta := 10; { Start with widest scanning arc. }
+         Range := scan(Angle, Delta);
+         WHILE (Range > 40) AND (Range < MaxRadarRange) DO
+           { Must be far enough away to avoid self-damage. }
+           BEGIN
+             Aim(Angle, Delta); { Improve aim. }
+             cannon(Angle, Range); { Fire!! }
+             Range := scan(Angle, Delta); { Is foe still in sights? }
+
+                                         28
+
+
+
+
+           END;
+         Angle := Angle+20; { Look in adjacent target area. }
+         IF Angle > 90 THEN Angle := 10;
+       UNTIL Dead OR Winner;
+     END; {End_Game}
+
+
+     BEGIN {HotShot2 Main}
+       RaiseShield;
+       Angle := 0;
+       GoTo(500, 500); { Move to center of field. }
+       Sweep := 0; { Initialize Sweep counter to zero. }
+       REPEAT { Until Dead or Winner }
+         Delta := 10; { Start with widest scanning arc. }
+         Range := scan(Angle, Delta);
+         WHILE (Range > 40) AND (Range < MaxRadarRange) DO
+           { Must be far enough away to avoid self-damage. }
+           BEGIN
+             Sweep := 0; { Found foe, so reset Sweep to zero }
+             Aim(Angle, Delta); { Improve aim. }
+             cannon(Angle, Range); { Fire!! }
+             Range := scan(Angle, Delta); { Is foe still in sights? }
+           END;
+         Angle := Angle+20; { Look in adjacent target area. }
+         Sweep := Sweep+1;
+         IF Sweep >= 18 THEN
+           BEGIN { If robot has scanned a full circle, move elsewhere. }
+             LowerShield; {Don't need shield (as much) when moving}
+             Move;
+           END;
+
+         RaiseShield; {Standing still so use shield}
+
+         {"End" game strategy}
+         IF (Fuel < 200) OR (Damage > 70) THEN End_Game;
+
+       UNTIL Dead OR Winner;
+
+     END; {HotShot2 Main}
+
+
+OTHER OPTIONS
+
+One of the best suggestions that I received from previous users of P-ROBOTS was
+the idea of allowing robots with different configurations and/or options.  This
+capability has been added to version 4.0.  Specifically, with the latest
+version of P-ROBOTS, it is possible to allocate a total of 10 "configuration
+points" to select among options for : Radar Range, Fuel Capacity, Engine Size
+and Speed, Armor, Missile Warheads, Electronic Bombs, Shielding, Cloaking, and
+Repairing.  These configuration points are specified in a separate .CFG file
+for your robot.  For example, if your robot is named BOMBER, then you would
+
+                                         29
+
+
+
+
+create a separate BOMBER.CFG file that contained something like the following
+lines:
+
+        {Option Points must total 10 points!!}
+        Radar := 2;          {Maximum range for robot's scanner -- 600 meters}
+        Fuel := 2;           {Maximum fuel for robot's -- 1250 "jiggers"}
+        Engine := 2;         {Type of engine for robot -- Standard engine}
+        Armor := 1;          {Type of Armor for robot -- Medium armor}
+        Warheads := 1;       {Type of Missile for robot -- Normal warheads}
+        Bombs := 0;          {Determines the number of Bombs for robot -- no
+        bombs}
+        Shielding := 2;      {Default -- Robot has Shielding}
+        Cloaking := 0;       {Default -- Robot has NO Cloaking}
+        Repairing := 0;      {Default -- Robot has NO Repair Kit}
+
+Incidently, the above option values are the normal defaults.  Specifically, if
+you do not specify different options in a separate .CFG file, your robot will
+have the above options.  These defaults were chosen to be consistent with both
+C-ROBOTS and version 1.0 of P-ROBOTS -- so your "old" robots do not need a
+separate .CFG file (except, of course, if you want to change their
+configuration to something new).
+
+Each of these options will be discussed in separate sections below.
+
+
+RADAR RANGE OPTIONS
+
+You can allocate from 0 to 5 points for differently equipped radars as follows:
+
+     0 points -- Radar range is limited to 200 meters
+     1 points -- Radar range is limited to 400 meters
+     2 points -- Radar range is limited to 600 meters  <-- Default value
+     3 points -- Radar range is limited to 800 meters
+     4 points -- Radar range is limited to 1000 meters
+     5 points -- Radar range is limited to 1200 meters -- with Anti-Cloaking
+
+If you allocate 5 points (out of your total possible of 10) to your radar, you
+will get a "bonus" Anti-Cloaking Device that will enable your robot to
+scan/detect enemy robots even if they are Cloaked.
+
+Your robot's maximum radar range is specified within your robot program by the
+built-in P-ROBOTS function MaxRadarRange.
+
+
+FUEL OPTIONS
+
+You can allocate from 0 to 5 points for different "gas tanks" and fuel capacity
+as follows:
+
+
+
+
+                                         30
+
+
+
+
+        0 points -- Fuel capacity is 750 "jiggers"
+        1 points -- Fuel capacity is 1000 "jiggers"
+        2 points -- Fuel capacity is 1250 "jiggers"  <-- Default value
+        3 points -- Fuel capacity is 1500 "jiggers"
+        4 points -- Fuel capacity is 1750 "jiggers"
+        5 points -- Fuel capacity is 2000 "jiggers"
+
+Your robot's current fuel level is specified within your robot program by the
+built-in P-ROBOTS function Fuel.
+
+
+ENGINE SIZE AND SPEED OPTIONS
+
+You can allocate from 0 to 4 points for different robot engines as follows:
+
+        0 points -- Economy engine -- maximum speed of 60
+        1 points -- Compact engine -- maximum speed of 80
+        2 points -- Standard engine -- maximum speed of 100  <-- Default value
+        3 points -- Large engine -- maximum speed of 120
+        4 points -- Extra-Large engine -- maximum speed of 140
+
+Bigger engines not only go faster, but they burn fuel faster.  Specifically,
+below are the number of "jiggers" of fuel that each type of engine uses to
+travel 100 meters:
+
+        Economy engine -- 4 "jiggers"
+        Compact engine -- 5 "jiggers"
+        Standard engine -- 6 "jiggers"  <-- Default value
+        Large engine -- 7 "jiggers"
+        Extra-Large engine -- 8 "jiggers"
+
+Your robot's engine type can be determined within your robot program by the
+built-in P-ROBOTS function Engine which will return one of the built-in P-
+ROBOTS CONST values: Economy, Compact, Standard, Large, or ExtraLarge.
+
+Your robot's maximum speed is specified within your robot program by the built-
+in P-ROBOTS function MaxSpeed.
+
+
+ARMOR OPTIONS
+
+You can allocate from 0 to 2 points for different armor options as follows:
+
+        0 points -- Light armor
+        1 points -- Medium armor  <-- Default value
+        2 points -- Heavy armor
+
+As might be expected, heavier armor provides greater protection against damage
+from collisions and missile explosions as given by the following table:
+
+
+
+                                         31
+
+
+
+
+                                                  DAMAGE PERCENT
+                                     ----------------------------------------
+                                     Light Armor   Medium Armor   Heavy Armor
+                                     -----------   ------------   -----------
+        Explosion within 5 meters       16              8             4
+        Explosion within 20 meters       8              4             2
+        Explosion within 40 meters       4              2             1
+        Collision                        3              2             1
+
+For example, with light armor a robot would suffer 8 units (i.e., percent) of
+damage if a missile exploded within 20 meters of the robot -- versus only 2
+units of damage if the same robot were equipped with heavy armor.
+
+However, not surprisingly, there are trade-offs with heavier armor.
+Specifically, the type of armor has the following effect on the maximum speed
+of the robot:
+
+                 MAXIMUM SPEED ADJUSTMENT
+        ----------------------------------------
+        Light Armor   Medium Armor   Heavy Armor
+        -----------   ------------   -----------
+           + 25         none or 0       - 25
+
+
+For example, a robot with an extra-large engine that would normally have a
+maximum speed of 140 would be slowed down to a maximum speed of 115 if it were
+equipped with heavy armor (i.e., 140 - 25).  Conversely, the same robot would
+have a maximum speed of 165 if it were equipped with light armor (i.e., 140 +
+25).
+
+Your robot's maximum speed is specified within your robot program by the built-
+in P-ROBOTS function MaxSpeed.  Your robot's armor type can be determined
+within your robot program by using the built-in P-ROBOTS function Armor which
+will return one of the built-in P-ROBOTS CONST values: Light, Medium, or Heavy.
+
+
+MISSILE WARHEAD OPTIONS
+
+You can allocate from 0 to 2 points for different missile warheads as follows:
+
+        0 points -- "Wimp" warheads
+        1 points -- "Normal" warheads  <-- Default value
+        2 points -- "Premium" warheads
+
+Naturally, different types of warheads have different missile ranges:
+
+             MAXIMUM MISSILE RANGE
+        -----------------------------
+        "Wimp"   "Normal"   "Premium"
+        ------   --------   ---------
+          350      700        1500
+
+                                         32
+
+
+
+
+
+Not unexpectedly, different types of warheads also cause different levels of
+damage -- depending upon the kind of armor the robot being attacked has.
+Specifically, the following units (percent) of damage are added to the damage
+normally incurred:
+
+                                         ADDITIONAL DAMAGE DUE TO WARHEAD
+                                     ----------------------------------------
+                                       "Wimp"        "Normal"      "Premium"
+                                     -----------   ------------   -----------
+        Explosion within 5 meters       0              3             6
+        Explosion within 20 meters      0              2             4
+        Explosion within 40 meters      0              1             2
+
+
+For example, a robot with light armor would suffer 12 units (i.e., 8 + 4) of
+damage if a "premium" missile exploded within 20 meters of it -- versus 8 units
+(i.e., 8 +0) of damage if it was hit with a "wimp" missile.
+
+Your robot's maximum missile range is specified within your robot program by
+the built-in P-ROBOTS function MaxMissileRange.  Your robot's warhead type can
+be determined within your robot program by the built-in P-ROBOTS function
+Warheads which will return one of the built-in P-ROBOTS CONST values: Wimp,
+Normal, or Premium.
+
+
+ELECTRONIC BOMB OPTIONS
+
+You can allocate from 0 to 5 points for electronic bombs as follows:
+
+        0 points -- Robot is equipped with 0 bombs  <-- Default value
+        1 points -- Robot is equipped with 3 bombs
+        2 points -- Robot is equipped with 6 bombs
+        3 points -- Robot is equipped with 9 bombs
+        4 points -- Robot is equipped with 12 bombs
+        5 points -- Robot is equipped with 15 bombs
+
+These bombs attack the robot's electronics.  As a result, shields, cloaks and
+armor offer no defense against these bombs.  The amount of damage incurred by a
+robot within the 300 meter range of one of these electronic bombs is given by
+following formula:
+
+        Damage points = 75 - (Distance from explosion)/4
+
+For example, a direct hit (i.e., the distance from the explosion is zero)
+causes 75 (i.e., 75 - 0/4) units of damage.  At 100 meters, a robot would incur
+50 (i.e., 75 - 100/4) units of damage from an electronic bomb.  No damage is
+caused if the robot is more than 300 meters away from the bomb explosion.
+
+NOTE:  Like missile explosions, electronic bombs cause damage to all robots in
+the explosion area -- whether they are friend or foe.
+
+                                         33
+
+
+
+
+Your robot's number of bombs (currently left) can be determined within your
+robot program by the built-in P-ROBOTS function BombsLeft.  Bombs are placed at
+the robot's current location by invoking the built-in P-ROBOTS procedure
+PlaceBomb.  Once a bomb has been placed, the bomb will be shown on the screen
+as a blinking "male" symbol, i.e., a small circle with a curved "fuse" sticking
+out of it.  Bombs are exploded at the bomb's location (where previously placed
+using PlaceBomb) by invoking the built-in P-ROBOTS procedure Detonate.
+Warning:  Be sure to have your robot over 300 meters away from its bomb when
+you Detonate the bomb.
+
+
+SHIELDING OPTIONS
+
+You can allocate from 0 or 2 points for Shielding as follows:
+
+        0 points -- Robot has no shielding capability
+        2 points -- Robot is with a Shield  <-- Default value
+
+NOTE:  The above is not a "typo" -- it takes 2 points to get a Shield!
+
+Keeping the Shield up uses fuel.  The amount of fuel used (per 1000 CPU cycles)
+depends on the type of armor the robot has, as follows:
+
+        FUEL USED FOR SHIELD PER 1000 CPU CYCLES
+        ----------------------------------------
+        Light Armor   Medium Armor   Heavy Armor
+        -----------   ------------   -----------
+             3             6              9
+
+Your robot should raise (or lower) its Shield by invoking the built-in P-ROBOTS
+procedure RaiseShield (or LowerShield).  Whether or not your robot has a Shield
+can be determined by using the built-in Boolean function HaveShield.
+
+
+CLOAKING OPTIONS
+
+You can allocate from 0 or 5 points for Cloaking as follows:
+
+        0 points -- Robot has no Cloak  <-- Default value
+        5 points -- Robot is equipped with a Cloak
+
+NOTE:  The above is not a "typo" -- it takes 5 points to get equipped with a
+Cloak!
+
+Like Shields, Cloaks use fuel.  Specifically, cloaking uses 5 "jiggers" of fuel
+per 1000 CPU cycles -- regardless of the kind of armor the robot has.
+
+When a robot has it Cloak raised, it is "invisible" to other robot's radar
+scanners (except in the case of a robot equipped with an "Anti-Cloaking"
+device).  However, unlike shielding, a Cloak will not protect a robot from
+damage.
+
+                                         34
+
+
+
+
+Your robot should raise (or lower) its Cloak by invoking the built-in P-ROBOTS
+procedure RaiseCloak (or LowerCloak).  Whether or not your robot has a Cloak
+can be determined by using the built-in Boolean function HaveCloak.
+
+If your robot has its cloak raised, this fact will shown by having your robot
+"blink" on the screen.  At the same time, the robots name on the status panel
+will also blink.  When you lower the cloak, the blink will stop.
+
+
+REPAIRING OPTIONS
+
+You can allocate from 0 or 2 points for Repairing as follows:
+
+        0 points -- Robot has no capability to repair itself  <-- Default value
+        2 points -- Robot can repair itself
+
+NOTE:  The above is not a "typo" -- it takes 2 points to get a Repair "Kit!"
+
+In order to make repairs, the robot must be stopped (i.e., its speed must be
+zero) and its repair "kit" must be activated.  While making repairs, the robot
+reduces damage by converting fuel.  Specifically, it takes 4 "jiggers" of fuel
+to reduce the robot's damage by 1 point.  It also takes time to make these
+repairs -- each 1 unit of damage being repaired takes 100 CPU cycles.
+
+Your robot should make (or stop) Repairs to itself by invoking the built-in P-
+ROBOTS procedure MakeRepairs (or StopRepairs).  Whether or not your robot has a
+Repair "Kit" can be determined by using the built-in Boolean function
+HaveRepairKit.
+
+
+AN EXAMPLE USING CLOAKING
+
+Here is an example of a robot that uses Cloaking, named (aptly enough) Stealth
+Fighter.
+
+
+     PROCEDURE SFighter;  {Stealth Fighter}
+     {
+      Author: David Malmberg
+
+      Strategy:  Move slowly around the field -- bouncing off of walls,
+      obstructions, and other robots -- as necessary.  If you find a foe,
+      take a shot and keep improving aim and shooting until foe is
+      lost from sights.  Then move sights (scanning) to adjacent target
+      area.
+
+      When robot incurs damage, raise cloak and move away.  Keep cloak
+      raised until robot has not had any damage for at least 3000 cycles.
+     }
+
+
+
+                                         35
+
+
+
+
+   (* Below are the SFighter options as specified in the SFIGHTER.CFG file
+
+   REMEMBER THIS IS A SEPARATE FILE THAT YOU MUST CREATE!!!
+
+   Radar := 2;          {Maximum range for robot's scanner -- 600 meters}
+   Fuel := 2;           {Maximum fuel for robot -- 1250 jiggers}
+   Engine := 0;         {Type of engine for robot -- Economy}
+   Armor := 0;          {Type of Armor for robot -- Light}
+   Warheads := 1;       {Type of Missile for robot -- Normal - 700 meter range}
+   Bombs := 0;          {Determines the number of Bombs for robot}
+   Shielding := 0;      {Default -- Robot has Shielding}
+   Cloaking := 5;       {Default -- Robot has Cloaking}
+   Repairing := 0;      {Default -- Robot has NO Repair Kit}
+
+   *)
+
+     VAR { SFighter "Global" variables }
+
+       Angle, { Scanning angle }
+       Range, { Scanning range to foe -- hopefully! }
+       Last_Damage, { Robot's Last damage value }
+       D_Speed, { Robot's desired speed }
+       D_Heading, { Robot's desired heading }
+       LastTime, { Last Time cycles were measured }
+       Delta          : Integer; { Scanning arc }
+
+
+     PROCEDURE Bounce;
+         { If stopped, then move away at an angle.  Designed to allow
+           robot to "bounce" off of walls, obstructions and other robots. }
+       BEGIN
+         IF Speed = 0
+           THEN BEGIN
+             D_Heading := D_Heading + 120; { Bounce off at an angle }
+             Drive(D_Heading, D_Speed);
+           END;
+       END; {Bounce}
+
+
+     FUNCTION Hurt  : Boolean;
+         { Checks if Robot has incurred any new damage. }
+       VAR Curr_Damage : Integer;
+         Answer         : Boolean;
+       BEGIN
+         Curr_Damage := damage;
+         Answer := (Curr_Damage > Last_Damage);
+         Last_Damage := Curr_Damage;
+         IF Answer THEN LastTime := Time;
+         Hurt := Answer;
+       END; {Hurt}
+     
+
+                                         36
+
+
+
+     PROCEDURE Aim(VAR Ang : Integer; VAR Arc : Integer);
+   {Improve aim by doing a binary search of the target area;
+    i.e., divide the target area in two equal pieces and redefine
+    the target area to be the piece where the foe is found.
+    If the foe is not found, expand the search area to the
+    maximum arc of plus or minus 10 degrees.}
+       BEGIN
+         Arc := Arc DIV 2; { Divide search area in two. }
+         IF scan(Ang-Arc, Arc) <> 0 { Check piece "below" target angle. }
+           THEN Ang := Ang-Arc { If foe found, redefine target angle. }
+           ELSE IF scan(Ang+Arc, Arc) <> 0 { Check piece "above" target angle.}
+             THEN Ang := Ang+Arc { If foe found, redefine target angle. }
+             ELSE Arc := 10;
+         { Foe not found in either piece, expand search area to maximum arc. }
+       END; {Aim}
+
+     BEGIN {SFighter Main}
+       Angle := Angle_To(500, 500);
+       D_Heading := Angle;
+       D_Speed := 50;
+       { Start scanning for foes and moving to center of field. }
+       LowerCloak; { Start off with Cloak DOWN! }
+       LastTime := Time;
+       REPEAT { Until Dead or Winner }
+         Bounce; { If stopped, move off at angle }
+         IF Fuel < 250 THEN LowerCloak;
+         IF NOT Hurt {If not hurt and no damage for 3000 cycles}
+           THEN IF (Time > (LastTime + 3000))
+             THEN BEGIN {Safe to lower cloak and slow down}
+               LowerCloak;
+               D_Speed := 50;
+             END;
+         Delta := 10; { Start with widest scanning arc. }
+         Range := scan(Angle, Delta);
+         WHILE (Range > 40) AND (ObjectScanned = Enemy) DO
+           { Must be far enough away to avoid self-damage. }
+           BEGIN
+             Aim(Angle, Delta); { Improve aim. }
+             Cannon(Angle, Range); { Fire!! }
+             Range := scan(Angle, Delta); { Is foe still in sights? }
+           END;
+         Angle := Angle+20; { Look in adjacent target area. }
+         IF Hurt THEN { Raise cloak and flee! }
+           BEGIN
+             IF Fuel > 250 THEN RaiseCloak;
+             D_Heading := Angle + 180; { Run away from foe! }
+             D_Speed := MaxSpeed;
+             Drive(D_Heading, D_Speed);
+           END;
+       UNTIL Dead OR Winner;
+     END; {SFighter Main}
+
+                                         37
+
+
+
+
+
+AN EXAMPLE USING BOMBS AND CLOAKING
+
+Here is an example of a robot that uses Electronic Bombs and Cloaking, named
+(again aptly) Stealth Bomber.
+
+     PROCEDURE SBomber;  {Stealth Bomber}
+     {
+      Author: David Malmberg
+
+      Strategy:  Place bombs in the middle of the field then go to a random
+      corner with cloak raised.  Scan for an enemy near the bomb.  If you
+      spot one, then detonate the bomb and begin again with another bomb.
+
+      If you see an enemy in missile range (but not near the bomb) blast 'em.
+     }
+
+   (* Below are the SBomber options as specified in the SBOMBER.CFG file
+
+   REMEMBER THIS IS A SEPARATE FILE THAT YOU MUST CREATE!!!
+
+      Radar := 3;
+      Fuel := 0;
+      Engine := 0;
+      Armor := 0;
+      Warheads := 1;
+      Bombs := 1;
+      Shielding := 0;
+      Cloaking := 5;
+      Repairing := 0;
+   *)
+
+     CONST
+       NW_Corner = 1;
+       NE_Corner = 2;
+       SW_Corner = 3;
+       SE_Corner = 4;
+
+     VAR { SBomber "Global" variables }
+
+       Angle, { Scanning angle }
+       Last_Damage, { Robot's Last damage value }
+       D_Speed, { Robot's desired speed }
+       D_Heading, { Robot's desired heading }
+       BombX, BombY, {Bomb's Co-ordinates}
+       BombAngle, BombRange, {Angle and Distance from current corner to Bomb}
+       LastTime, { Last Time cycles were measured }
+       Delta          : Integer; { Scanning arc }
+
+       CornerX : ARRAY[1..4] OF Integer; {X coordinate of Corners}
+       CornerY : ARRAY[1..4] OF Integer; {Y coordinate of Corners}
+
+                                         38
+
+
+
+
+       StartAngle : ARRAY[1..4] OF Integer; {Starting scanning angles}
+
+       Corner, { Current Corner }
+       Range   { Range/Distance to foe }  : Integer;
+       BombHasExploded : Boolean;
+
+     PROCEDURE Initialize;
+       BEGIN
+         CornerX[NW_Corner] := 10;
+         CornerY[NW_Corner] := 990;
+         StartAngle[NW_Corner] := 270;
+
+         CornerX[NE_Corner] := 990;
+         CornerY[NE_Corner] := 990;
+         StartAngle[NE_Corner] := 180;
+
+         CornerX[SW_Corner] := 10;
+         CornerY[SW_Corner] := 10;
+         StartAngle[SW_Corner] := 0;
+
+         CornerX[SE_Corner] := 990;
+         CornerY[SE_Corner] := 10;
+         StartAngle[SE_Corner] := 90;
+       END; {Initialize}
+
+     PROCEDURE Aim(VAR Ang : Integer; VAR Arc : Integer);
+   {
+    Improve aim by doing a binary search of the target area;
+    i.e., divide the target area in two equal pieces and redefine
+    the target area to be the piece where the foe is found.
+    If the foe is not found, expand the search area to the
+    maximum arc of plus or minus 10 degrees.
+   }
+       BEGIN
+         Arc := Arc DIV 2; { Divide search area in two. }
+         IF scan(Ang-Arc, Arc) <> 0 { Check piece "below" target angle. }
+           THEN Ang := Ang-Arc { If foe found, redefine target angle. }
+           ELSE IF scan(Ang+Arc, Arc) <> 0 { Check piece "above" target angle.}
+             THEN Ang := Ang+Arc { If foe found, redefine target angle. }
+             ELSE Arc := 10;
+         { Foe not found in either piece, expand search area to maximum arc. }
+       END; {Aim}
+
+     PROCEDURE BlastThem;
+       BEGIN
+         Angle := 10;
+         REPEAT
+           Delta := 10; { Start with widest scanning arc. }
+           Range := scan(Angle, Delta);
+           WHILE (Range > 40) AND (ObjectScanned = Enemy)
+             AND (Range < MaxMissileRange) DO
+
+                                         39
+
+
+
+
+           { Must be far enough away to avoid self-damage. }
+             BEGIN
+               Aim(Angle, Delta); { Improve aim. }
+               Cannon(Angle, Range); { Fire!! }
+               Range := scan(Angle, Delta); { Is foe still in sights? }
+             END;
+           Angle := Angle+20; { Look in adjacent target area. }
+         UNTIL Angle > 360;
+       END;
+
+
+     PROCEDURE GOTO(x, y : Integer);
+         { Go to location X,Y on playing field. }
+       VAR Heading    : Integer;
+       BEGIN
+         LowerCloak; {Less need for Cloak while moving}
+
+         { Find the heading we need to get to the desired spot. }
+         Heading := Angle_To(x, y);
+
+         { Keep traveling at top speed until we are within 150 meters }
+         WHILE (distance(loc_x, loc_y, x, y) > 150) DO
+           BEGIN
+             Drive(Heading, MaxSpeed);
+             BlastThem;
+           END;
+
+         { Cut speed, and creep the rest of the way. }
+         WHILE (distance(loc_x, loc_y, x, y) > 20) DO
+           BEGIN
+             Drive(Heading, 20);
+             BlastThem;
+           END;
+
+         { Stop driving, should coast to a stop. }
+         Drive(Heading, 0); {i.e., Stop}
+         RaiseCloak; {Need Cloak while stopped}
+       END; {GoTo(X,Y)}
+
+
+     FUNCTION Hurt  : Boolean;
+         { Checks if Robot has incurred at least 5 points of new damage. }
+       VAR Curr_Damage : Integer;
+         Answer         : Boolean;
+       BEGIN
+         Curr_Damage := damage;
+         Answer := (Curr_Damage > (Last_Damage + 4));
+         Last_Damage := Curr_Damage;
+         IF Answer THEN LastTime := Time;
+         Hurt := Answer;
+       END; {Hurt}
+
+                                         40
+
+
+
+
+   PROCEDURE PlaceTheBomb;
+     BEGIN {PlaceTheBomb}
+       BombHasExploded := FALSE;
+       GoTo(500,500);
+       BombX := Loc_X;
+       BombY := Loc_Y;
+       PlaceBomb;
+     END; {PlaceTheBomb}
+
+
+   FUNCTION EnemyNearBomb : Boolean;
+   CONST PlusMinus = 200;
+   VAR EnemyDistance : Integer;
+       Answer : Boolean;
+     BEGIN
+       Answer := FALSE;
+       EnemyDistance := Scan(BombAngle, 10);
+       IF ObjectScanned <> Enemy THEN EnemyDistance := 0;
+       IF EnemyDistance > 0
+          THEN Answer := (EnemyDistance > (BombRange - PlusMinus))
+                            AND (EnemyDistance < (BombRange + PlusMinus));
+       EnemyNearBomb := Answer;
+     END; {EnemyNearBomb}
+
+
+   PROCEDURE Do_Corner;
+     BEGIN {Do_Corner}
+       Angle := StartAngle[Corner] + 10; {Starting angle for scanning}
+       REPEAT
+         IF EnemyNearBomb
+           THEN BEGIN
+             Detonate;
+             BombHasExploded := TRUE;
+           END;
+         Range := scan(Angle, Delta);
+         WHILE (Range > 40) AND (Range < MaxRadarRange) DO
+           { Must be far enough away to avoid self-damage. }
+           BEGIN
+             IF ObjectScanned = Enemy THEN cannon(Angle, Range); { Fire!! }
+             Range := scan(Angle, Delta); { Is foe still in sights? }
+           END;
+         Angle := Angle + 20; { Look in adjacent target area. }
+         IF (Angle > (StartAngle[Corner] + 90))
+           THEN Angle := StartAngle[Corner] + 10;
+       UNTIL BombHasExploded;
+     END; {Do_Corner}
+
+
+
+
+
+
+                                         41
+
+
+
+     BEGIN {SBomber Main}
+       RaiseCloak;
+       Initialize;
+       Delta := 10; { The widest possible scanning arc. }
+       LastTime := Time;
+       REPEAT { Until Dead or Winner }
+         PlaceTheBomb;
+         Corner := Random(3) + 1; {Pick a corner}
+         GoTo(CornerX[Corner], CornerY[Corner]);
+         { Move to selected corner. }
+         BombAngle := Angle_To(BombX, BombY);
+         BombRange := Distance(Loc_X, Loc_Y, BombX, BombY);
+         { Determine relative location from corner to Bomb }
+         Do_Corner;
+         IF Hurt THEN
+            IF Fuel > 250
+              THEN RaiseCloak { Raise cloak and flee! }
+              ELSE LowerCloak;
+       UNTIL Dead OR Winner;
+     END; {SBomber Main}
+
+
+ROBOT TEAMS
+
+One of the most intriguing suggestions that I received from previous users of
+P-ROBOTS was the idea of allowing two robots to act as members of the same team
+and to communicate with each other during the course of the battle.  This
+option has been included in the current version of P-ROBOTS.
+
+NOTE: For consistency and better understanding, if your robot is a member of a
+two robot team, the other team member is referred to as your robot's "Ally".
+Similarly, within your Ally's robot program, your robot would be referred to as
+its Ally.
+
+Robot teams may use the following special built-in P-ROBOTS functions:
+
+          AllyLoc_X -- returns the current X coordinate of your Ally
+
+          AllyLoc_Y -- returns the current Y coordinate of your Ally
+
+          AllyDamage -- returns your Ally's current Damage level
+
+          AllySpeed -- returns your Ally's current Speed
+
+          AllyHeading -- returns your Ally's current Heading
+
+          AllyMeters -- returns your Ally's current Meters
+
+          AllyFuel -- returns your Ally's current Fuel level
+
+
+
+                                         42
+
+
+
+          AllyShieldRaised -- returns TRUE or FALSE depending upon whether your
+          Ally's shield is raised or not
+
+          AllyDead -- returns TRUE or FALSE depending upon whether your Ally is
+          Dead or not
+
+          AllyAlive -- returns TRUE or FALSE depending upon whether your Ally
+          is Alive or not
+
+In addition to using these built-in functions to learn about your Ally's
+status, it is also possible for robots to exchange information by accessing the
+"global" array COMM[1..20].  All robots may access this array and both retrieve
+and store values to any of its 20 elements.  Be warned however, that stuffing
+"garbage" into COMM's elements to sabotage the communication between opposing
+team members is NOT considered to be fair play!!
+
+One other piece of information is necessary in order for two robots to work
+together effectively as a team -- there must be some way to tell if a robot is
+friend or foe.  The way this is done is to define a special function called
+"ObjectScanned" which is reset whenever your robot scans the battlefield.  The
+value returned by ObjectScanned will be one of four specially defined
+values/constants:  Nothing, Ally, Enemy or Obstruction.  For example, to make
+sure that you only fire your cannon at enemy robots when you are part of a
+team, you might want to use statements like the following:
+
+             Dist := Scan(Angle, Delta);
+             IF ObjectScanned = Enemy THEN Cannon(Angle, Dist); {Blast 'Em!!}
+
+To tell the P-ROBOTS compiler that you have an Ally and are part of a team, you
+need to include a statement within your robot's program that looks like:
+
+             TeamAlly = "Blaster";
+
+This statement tells the P-ROBOTS compiler that your Ally is named "Blaster".
+To work correctly, the robot "Blaster" must have a similar statement within its
+program that identifies your robot's name as its Ally.
+
+
+AN EXAMPLE OF A ROBOT TEAM
+
+Here is an example of one member of a robot team.  Notice, that this robot and
+its Ally (named "TagTeam2") communicate by passing information through COMM[10]
+and COMM[11].
+
+
+     PROCEDURE TagTeam1;
+
+     TeamAlly = "TagTeam2";
+
+
+
+
+                                         43
+
+
+
+
+  {
+   Author: David Malmberg
+
+   Strategy: Go to a random corner, raise shield, and blast away at any
+             robot in range.  Improve aim after every successful scan. If the
+             robot scans 20 times unsuccessfully, move to another random
+             corner.  Lower shields when moving; raise them when stopped.
+
+             This robot can act individually or as part of a team with another
+             robot that follows an identical strategy, i.e., TagTeam2.  If
+             operating as a team, the two robots communicate their corners
+             to each other by setting COMM[10] to TagTeam1's corner and
+             COMM[11] to TagTeam2's corner.  They try to always pick different
+             random corners.
+
+             WARNING: This Robot has not been designed to deal with
+             Obstructions effectively.
+  }
+
+     CONST
+       NW_Corner = 1;
+       NE_Corner = 2;
+       SW_Corner = 3;
+       SE_Corner = 4;
+
+     VAR { TagTeam1 "Global" variables }
+
+       CornerX : ARRAY[1..4] OF Integer; {X coordinate of Corners}
+       CornerY : ARRAY[1..4] OF Integer; {Y coordinate of Corners}
+       StartAngle : ARRAY[1..4] OF Integer; {Starting scanning angles}
+
+       Corner, { Current Corner }
+       Times,  { Number of times robot as scanned without success for enemy }
+       Angle,  { Scanning angle }
+       Delta,  { Scanning angle width }
+       Range   { Range/Distance to foe }  : Integer;
+
+
+     PROCEDURE Initialize;
+       BEGIN
+         CornerX[NW_Corner] := 10;
+         CornerY[NW_Corner] := 990;
+         StartAngle[NW_Corner] := 270;
+
+         CornerX[NE_Corner] := 990;
+         CornerY[NE_Corner] := 990;
+         StartAngle[NE_Corner] := 180;
+
+         CornerX[SW_Corner] := 10;
+         CornerY[SW_Corner] := 10;
+         StartAngle[SW_Corner] := 0;
+
+                                         44
+
+
+
+         CornerX[SE_Corner] := 990;
+         CornerY[SE_Corner] := 10;
+         StartAngle[SE_Corner] := 90;
+       END; {Initialize}
+
+
+     PROCEDURE GOTO(x, y : Integer);
+         { Go to location X,Y on playing field. }
+       VAR Heading    : Integer;
+       BEGIN
+         LowerShield; {Moving target is hard to hit - so lower shield}
+
+         { Find the heading we need to get to the desired spot. }
+         Heading := Angle_To(x, y);
+
+         { Keep traveling at top speed until we are within 150 meters }
+         WHILE (distance(loc_x,loc_y,x,y) > 150) DO Drive(Heading, MaxSpeed);
+
+         { Cut speed, and creep the rest of the way. }
+         WHILE (distance(loc_x, loc_y, x, y) > 20) DO Drive(Heading, 20);
+
+         { Stop driving, should coast to a stop. }
+         Drive(Heading, 0); {i.e., Stop}
+
+         RaiseShield; {Still target is easy to hit - so raise shield}
+       END; {GoTo(X,Y)}
+
+
+     PROCEDURE Aim(VAR Ang : Integer; VAR Arc : Integer);
+   {
+    Improve aim by doing a binary search of the target area;
+     i.e., divide the target area in two equal pieces and redefine
+    the target area to be the piece where the foe is found.
+    If the foe is not found, expand the search area to the
+    maximum arc of plus or minus 10 degrees.
+   }
+
+       BEGIN
+         Times := 0; { Found enemy -- so set unsuccessful scan count to zero )
+         Arc := Arc DIV 2; { Divide search area in two. }
+         IF scan(Ang-Arc, Arc) <> 0 { Check piece "below" target angle. }
+         THEN Ang := Ang-Arc { If foe found, redefine target angle. }
+         ELSE IF scan(Ang+Arc, Arc) <> 0 { Check piece "above" target angle. }
+         THEN Ang := Ang+Arc { If foe found, redefine target angle. }
+         ELSE Arc := 10;
+         { Foe not found in either piece, expand search area to maximum arc. }
+       END; {Aim}
+
+
+
+
+
+                                         45
+
+
+
+
+   PROCEDURE Do_Corner;
+     BEGIN {Do_Corner}
+       Times := 0; {Count of unsuccessful scans}
+       Angle := StartAngle[Corner] + 10; {Starting angle for scanning}
+       REPEAT
+         Delta := 10; { Start with widest scanning arc. }
+         Range := scan(Angle, Delta);
+         WHILE (Range > 40) AND (Range < MaxMissileRange) DO
+           { Must be far enough away to avoid self-damage. }
+           BEGIN
+             Aim(Angle, Delta); { Improve aim. }
+             IF ObjectScanned = Enemy THEN cannon(Angle, Range); { Fire!! }
+             Range := scan(Angle, Delta); { Is foe still in sights? }
+           END;
+         Angle := Angle + 20; { Look in adjacent target area. }
+         IF (Angle > (StartAngle[Corner] + 90))
+           THEN Angle := StartAngle[Corner] + 10;
+         Times := Times + 1;
+       UNTIL Times > 20; { Leave after 20 unsuccessful scans }
+     END; {Do_Corner}
+
+
+     BEGIN {TagTeam1 Main}
+       Initialize;
+       COMM[11] := 0; {Set Ally's corner (if any) to zero}
+       COMM[10] := 0; {Communicate My corner to Ally}
+       REPEAT
+         REPEAT
+           Corner := Random(3) + 1; {Pick a corner}
+         UNTIL Corner <> COMM[11]; {Need different corner than Ally}
+         COMM[10] := Corner; {Communicate My corner to Ally (if any)}
+         GoTo(CornerX[Corner], CornerY[Corner]);
+         { Move to selected corner. }
+         Do_Corner;
+       UNTIL Dead OR Winner;
+
+     END; {TagTeam1 Main}
+
+
+OBSTRUCTIONS ON THE BATTLEFIELD
+
+Another new feature included in version 4.0 of P-ROBOTS is the possibility of
+randomly placed Obstructions on the battlefield.  This option is selected by
+using the "/ON" command line parameter, where N can be 1, 2 up to 5 --
+corresponding to 1, 2 up to 5 Obstructions.  Each Obstruction will be a
+randomly sized and placed rectangle.
+
+Be warned however, that using Obstructions in your battles will slow down the
+speed of the battle.  The logic required for P-ROBOTS to deal with Obstructions
+is fairly extensive and very computationally intense.  So the more Obstructions
+your battle has, the slower it will run.
+
+                                         46
+
+
+
+
+If your robot runs into one of these Obstructions, it will be stopped cold and
+incur Damage (if its Shield is down) -- just as if it ran into one of the
+battlefield walls.  A scanner will not be able to see beyond an Obstruction;
+nor will it be possible to shoot a missile past an Obstruction.  Therefore, it
+will be possible for a robot to "hide" from enemy scanners and missile by
+"hugging" the walls of an Obstruction.  More often than not, a scanner will
+only "see" the Obstruction and not the robot.
+
+Obstructions add a whole new dimension to the possible problems and
+opportunities that a robot may face!!
+
+Your robot will be able to determine where the Obstructions are by scanning and
+then checking the value returned by the function "ObjectScanned".  For example,
+you might use the following Boolean function to determine if the direction your
+robot is traveling (denoted below by the variable "Heading") is clear of
+Obstructions for the next 100 meters:
+
+             FUNCTION ClearAhead : Boolean;
+             BEGIN
+               ClearAhead := (Scan(Heading,2) > 100)
+                              OR (ObjectScanned <> Obstruction);
+             END; {ClearAhead}
+
+
+AN EXAMPLE DEALING WITH OBSTRUCTIONS
+
+Below is our old friend, HOTSHOT, adapted to deal with the problem of
+Obstructions by using logic to move around them.  Notice, that we can no longer
+use the same routine we have been using to go to a point X, Y on the
+battlefield -- because that point might be inside an Obstruction or in a direct
+line beyond an obstruction -- in which case our robot would commit suicide by
+repeatedly "banging its head" against the wall of the Obstruction.  To see how
+this problem is overcome, see the Procedure "Ramble" in the listing.
+
+
+     PROCEDURE HotShot3;
+     {
+      Author: David Malmberg
+
+      Strategy:  Stay in one place.  Find a foe.  Take a shot.
+      Keep improving aim and shooting until foe is lost from sights.
+      Then move sights (scanning) to adjacent target area.
+      If the Robot scans a complete circle (360 degrees) without
+      finding a foe in shooting range, move to another spot on the
+      field.  (This will avoid "stand-offs" where opponents stay
+      just out of range of one another.)  RaiseShield when standing
+      still and lower them when moving.
+
+      When damage gets to 70 (or more) or fuel (if using fuel) gets
+      below 200 adopt an "End-Game" strategy of moving to the lower
+      left corner, lower shield, and continue to scan and shoot in
+
+                                         47
+
+
+
+
+      the corner's 90 degree range.
+
+      This Robot should be VERY effective against foes which
+      are stopped or are moving slowly.  It will be less effective
+      against Robots traveling at high speeds.
+
+      This Robot has been designed to utilize Fuel (if it is available)
+      to power its Shield.  It has also been designed to deal with
+      Obstructions (if any) by moving around them.
+     }
+
+
+     VAR { HotShot3 "Global" variables }
+
+       Angle, { Scanning angle }
+       Last_Damage, { Robot's Last damage value }
+       Range, { Range/Distance to foe }
+       Sweep, { "Sweep count" -- when = 18, Robot has scanned 360 degrees }
+       Delta          : Integer; { Scanning arc }
+
+
+     PROCEDURE Aim(VAR Ang : Integer; VAR Arc : Integer);
+   {
+    Improve aim by doing a binary search of the target area;
+    i.e., divide the target area in two equal pieces and redefine
+    the target area to be the piece where the foe is found.
+    If the foe is not found, expand the search area to the
+    maximum arc of plus or minus 10 degrees.
+   }
+       BEGIN
+         Arc := Arc DIV 2; { Divide search area in two. }
+         IF scan(Ang-Arc, Arc) <> 0 { Check piece "below" target angle. }
+           THEN Ang := Ang-Arc { If foe found, redefine target angle. }
+           ELSE IF scan(Ang+Arc, Arc) <> 0 { Check piece "above" target angle.}
+             THEN Ang := Ang+Arc { If foe found, redefine target angle. }
+             ELSE Arc := 10;
+         { Foe not found in either piece, expand search area to maximum arc. }
+       END; {Aim}
+
+
+     PROCEDURE BlastThem;
+       BEGIN
+         Angle := 10;
+         REPEAT
+           Delta := 10; { Start with widest scanning arc. }
+           Range := scan(Angle, Delta);
+           WHILE (Range > 40) AND (ObjectScanned = Enemy)
+             AND (Range < MaxMissileRange) DO
+           { Must be far enough away to avoid self-damage. }
+             BEGIN
+               Aim(Angle, Delta); { Improve aim. }
+
+                                         48
+
+
+
+               Cannon(Angle, Range); { Fire!! }
+               Range := scan(Angle, Delta); { Is foe still in sights? }
+             END;
+           Angle := Angle+20; { Look in adjacent target area. }
+         UNTIL Angle > 360;
+       END;
+
+
+     PROCEDURE GOTO(x, y : Integer);
+         { Go to location X,Y on playing field. }
+       VAR Heading    : Integer;
+       BEGIN
+         { WARNING:  If the point X,Y is inside an Obstruction then }
+         { executing this routine will cause the Robot to commit }
+         { suicide by repeatedly running into the wall of the Obstruction. }
+         { First, find the heading we need to get to the desired spot. }
+         Heading := Angle_To(x, y);
+
+         { Keep traveling at top speed until we are within 150 meters }
+         WHILE (distance(loc_x, loc_y, x, y) > 150) DO
+           BEGIN
+             Drive(Heading, MaxSpeed);
+             BlastThem;
+           END;
+
+         { Cut speed, and creep the rest of the way. }
+         WHILE (distance(loc_x, loc_y, x, y) > 20) DO
+           BEGIN
+             Drive(Heading, 20);
+             BlastThem;
+           END;
+
+         { Stop driving, should coast to a stop. }
+         Drive(Heading, 0); {i.e., Stop}
+       END; {GoTo(X,Y)}
+
+
+     PROCEDURE Ramble(X, Y : Integer);
+         { Move to X, Y (if possible) on the playing field }
+         { by avoiding Obstructions - if any.              }
+       VAR Heading, Tries, Dist : Integer;
+       BEGIN
+         Tries := 0;
+         Heading := Angle_To(X, Y);
+         Drive(Heading, 100); {Start off at maximum speed}
+         Dist := Scan(Heading, 5);
+         REPEAT
+           IF ObjectScanned = Obstruction
+             THEN BEGIN
+               REPEAT
+                 Heading := Heading + 10;
+
+                                         49
+
+
+
+                 Dist := Scan(Heading, 5);
+               UNTIL ObjectScanned <> Obstruction;
+               Drive(Heading, 50); {Minimum speed to turn freely}
+             END;
+           Heading := Angle_To(X, Y);
+           Dist := Scan(Heading, 5);
+           Tries := Tries + 1;
+         UNTIL (ObjectScanned <> Obstruction) OR (Tries > 20);
+         IF (ObjectScanned <> Obstruction) THEN GOTO(X,Y);
+       END; {Ramble}
+
+
+     PROCEDURE Move;
+         { Move to a random spot on the playing field. }
+       VAR x, y       : Integer;
+       BEGIN
+         Sweep := 0; { Reset Sweep counter to zero. }
+         x := Random(900)+50;
+         y := Random(900)+50;
+         Ramble(x, y);
+       END; {Move}
+
+
+     PROCEDURE End_Game;
+     BEGIN {End_Game}
+       Ramble(0,0); {Lower Left Corner}
+       Angle := 10; {Sweep arc from 0 to 90 degrees only}
+       REPEAT
+         Delta := 10; { Start with widest scanning arc. }
+         Range := scan(Angle, Delta);
+         WHILE (Range > 40) AND (Range < 700) AND (ObjectScanned = Enemy)
+           DO { Must be far enough away to avoid self-damage. }
+           BEGIN
+             Aim(Angle, Delta); { Improve aim. }
+             IF ObjectScanned = Enemy
+               THEN cannon(Angle, Range); { Fire!! }
+             Range := scan(Angle, Delta); { Is foe still in sights? }
+           END;
+         Angle := Angle+20; { Look in adjacent target area. }
+         IF Angle > 90 THEN Angle := 10;
+       UNTIL Dead OR Winner;
+     END; {End_Game}
+
+
+     BEGIN {HotShot3 Main}
+       RaiseShield;
+       Angle := 0;
+       Ramble(500, 500); { Move to center of field -- if possible. }
+       Sweep := 0; { Initialize Sweep counter to zero. }
+       REPEAT { Until Dead or Winner }
+         Delta := 10; { Start with widest scanning arc. }
+
+                                         50
+
+
+
+         Range := scan(Angle, Delta);
+         WHILE (Range > 40) AND (Range < MaxMissileRange)
+           AND (ObjectScanned = Enemy)
+           DO { Must be far enough away to avoid self-damage. }
+           BEGIN
+             Sweep := 0; { Found foe, so reset Sweep to zero }
+             Aim(Angle, Delta); { Improve aim. }
+             IF ObjectScanned = Enemy
+               THEN cannon(Angle, Range); { Fire!! }
+             Range := scan(Angle, Delta); { Is foe still in sights? }
+           END;
+         Angle := Angle+20; { Look in adjacent target area. }
+         Sweep := Sweep+1;
+         IF Sweep = 18 THEN
+           BEGIN { If robot has scanned a full circle, move elsewhere. }
+             LowerShield; {Don't need shield (as much) when moving}
+             Move;
+           END;
+
+         RaiseShield; {Standing still so use shield}
+
+         {"End" game strategy}
+         IF (Fuel < 200) OR (Damage > 70) THEN End_Game;
+
+       UNTIL Dead OR Winner;
+     END; {HotShot3 Main}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                         51
+
+
+
+APPENDIX I: COMPILER ERRORS
+
+The PASCAL compiler in P-ROBOTS will report any syntax or logic errors that it
+encounters during the compilation process.  The program will then terminate
+without playing the game.  A listing of the robot(s) source code with the
+errors marked in the source will then be found in a file named LISTING.TXT on
+the disk/directory where P-ROBOTS is being run.  Because P-ROBOTS is going to
+write to the disk, you must NOT have a "write-protect" tab on the disk or you
+will get a fatal error whenever you try to run the program.  This file should
+be printed out and studied and your corrections made to your robot source
+files.  Do NOT make your corrections on the LISTING.TXT file!  The compiler
+only compiles robot files (i.e., files with a ".PR" extension).
+
+If your robot(s) source code did not have any errors (that the compiler could
+detect) there will not be a LISTING.TXT file created and the P-ROBOTS program
+will execute normally and the contest between the various robots will be
+played.
+
+The compiler will report the following errors by number:
+
+             0.   UNDEFINED IDENTIFIER
+             1.   MULTIPLE DEFINITION OF THIS IDENTIFIER
+             2.   EXPECTED AN IDENTIFIER
+             3.   PROGRAM MUST BEGIN WITH "PROGRAM"
+             4.   EXPECTED CLOSING PARENTHESIS ")"
+             5.   EXPECTED A COLON ":"
+             6.   INCORRECTLY USED SYMBOL
+             7.   EXPECTED IDENTIFIER OR THE SYMBOL "VAR"
+             8.   EXPECTED THE SYMBOL "OF"
+             9.   EXPECTED AN OPENING PARENTHESIS "("
+             10.  EXPECTED IDENTIFIER, "ARRAY" OR "RECORD"
+             11.  EXPECTED AN OPENING BRACKET "["
+             12.  EXPECTED A CLOSING BRACKET "]"
+             13.  EXPECTED ".." WITHOUT INTERVENING BLANKS
+             14.  EXPECTED A SEMICOLON ";"
+             15.  BAD RESULT TYPE FOR A FUNCTION
+             16.  EXPECTED AN EQUAL SIGN "="
+             17.  EXPECTED BOOLEAN EXPRESSION
+             18.  CONTROL VARIABLE OF THE WRONG TYPE
+             19.  MUST BE MATCHING TYPES
+             20.  "OUTPUT" IS REQUIRED IN PROGRAM HEADING
+             21.  THE NUMBER IS TOO LARGE
+             22.  EXPECT PERIOD ".", CHECK BEGIN-END PAIRS
+             23.  BAD TYPE FOR A CASE STATEMENT
+             24.  ILLEGAL CHARACTER
+             25.  ILLEGAL CONSTANT OR CONSTANT IDENTIFIER
+             26.  ILLEGAL ARRAY SUBSCRIPT (CHECK TYPE)
+             27.  ILLEGAL BOUNDS FOR AN ARRAY INDEX
+             28.  INDEXED VARIABLE MUST BE AN ARRAY
+             29.  EXPECTED A TYPE IDENTIFIER
+             30.  UNDEFINED TYPE
+
+                                         52
+
+
+
+             31.  VAR WITH FIELD SELECTOR MUST BE RECORD
+             32.  EXPECTED TYPE "BOOLEAN"
+             33.  ILLEGAL TYPE FOR ARITHMETIC EXPRESSION
+             34.  EXPECTED INTEGER FOR "DIV" OR "MOD"
+             35.  INCOMPATIBLE TYPES FOR COMPARISON
+             36.  PARAMETER TYPES DO NOT MATCH
+             37.  EXPECTED A VARIABLE
+             38.  A STRING MUST HAVE ONE OR MORE CHAR
+             39.  NUMBER OF PARAMETERS DO NOT MATCH
+             40.  INVALID "TeamAlly" NAME FORMAT
+             41.  ILLEGAL PARAMETERS TO "WRITE"
+             42.  PARAMETER MUST BE OF TYPE "REAL"
+             43.  PARAMETER MUST BE OF TYPE "INTEGER"
+             44.  EXPECTED VARIABLE OR CONSTANT
+             45.  EXPECTED A VARIABLE OR PROCEDURE
+             46.  TYPES MUST MATCH IN AN ASSIGNMENT
+             47.  CASE LABEL NOT SAME TYPE AS CASE CLAUSE
+             48.  ARGUMENT TO STD. FUNCTION OF WRONG TYPE
+             49.  THE PROGRAM REQUIRES TOO MUCH STORAGE
+             50.  ILLEGAL SYMBOL FOR A CONSTANT
+             51.  EXPECTED BECOMES ":="
+             52.  EXPECTED "THEN"
+             53.  EXPECTED "UNTIL"
+             54.  EXPECTED "DO"
+             55.  EXPECTED "TO" OR "DOWNTO"
+             56.  EXPECTED "BEGIN"
+             57.  EXPECTED "END"
+             58.  EXPECTED ID, CONST, "NOT" OR "("
+             59.  "INPUT"  IS REQUIRED IN PROGRAM HEADING
+             60.  ILLEGAL (CONTROL) CHARACTER PRESENT IN SOURCE
+
+Not all of the above error messages will be used in P-ROBOTS because the
+compiler has been modified to not allow certain kinds of PASCAL statements.
+For example, since P-ROBOTS does not allow READs and WRITEs you will not get
+the above error messages that are normally associated with READ and WRITE.  If
+you attempt to READ or WRITE in a P-ROBOTS program you will get an error
+message number zero -- "UNDEFINED IDENTIFIER".
+
+Remember not to use PASCAL "reserved" words as variable or procedure names.
+Variables named BEGIN, ARRAY, DO, FOR, etc. will cause strange error messages.
+
+On very rare occasions, you may get another kind of compiler error if the
+robots' source code you are currently trying to compile is so "verbose" that it
+causes  one of the compiler's tables to overflow.  When this happens, you will
+be given an error message which identifies which specific table has been over
+flowed.  The limits for these tables are as follows:
+
+
+
+
+
+
+                                         53
+
+
+
+
+        400    Identifiers (Variables, Constants, Procedure and Function names)
+         40    Procedures or Functions
+         40    Real Constants 
+         60    Arrays
+          7    Levels of "Nested" Procedures or Functions
+       5000    "Compiled" P-Code instructions
+
+These limits apply to the total number of identifiers (etc.) for all of the
+robots you have in the current contest.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                         54
+
+
+
+
+APPENDIX II: RUN-TIME ERRORS
+
+
+When using P-ROBOTS it is possible to get two kinds of run-time errors.  The
+first kind (and probably the most frequent) is an error that occurs within the
+P-ROBOTS program itself when you try to do something that the P-Code compiler
+within P-ROBOTS objects to -- like trying to divide by zero.  The second kind
+of run-time error is generated by Turbo Pascal.  These errors are due to
+situations like not having enough memory or disk space to run the P-ROBOTS
+program.  Each of these types of errors will be discussed below.
+
+
+P-ROBOTS RUN-TIME ERRORS
+
+It is possible that the P-ROBOTS compiler will detect an error during the game.
+These are known as "run-time" errors and they will cause the game to terminate
+and an error message to be printed.  The following kinds of run-time errors
+will be caught and reported:
+
+     1.   DIVIDE BY 0
+
+          For example, if Delta_X had a value of zero in the following program
+          statement, you would get a "DIVIDE BY 0" error:
+
+               Target_Angle := ArcTan(Delta_Y/Delta_X);
+
+     2.   UNDEFINED CASE
+
+          In the example below, if the variable X had a value of 12 below you
+          would get an "UNDEFINED CASE" error:
+
+               CASE X OF
+                  1 : .....
+                  2 : .....
+                  3 : .....
+                      .
+                      .
+                 10 : .....
+               END; {CASE}
+
+     3.   INVALID INDEX
+
+          An example of an invalid index would be a reference to the tenth
+          element of an array (i.e., Spot[10]) that was only defined to have
+          the elements one through five (i.e., Spot : ARRAY[1..5] OF INTEGER;)
+          would cause an "INVALID INDEX" error.
+
+
+
+
+
+
+                                         55
+
+
+
+
+     4.   STORAGE OVERFLOW
+
+          You would only get a "STORAGE OVERFLOW" error if one (or more) of
+          your robots in the current contest was making too many recursive
+          calls to the same procedure or function or was evaluating a large
+          number of very, very complex assignment statements so that the
+          robot's "stack" space was exceeded.  If you get this error, check
+          your overall robot logic -- there must be a better way!
+
+
+TURBO PASCAL RUN-TIME ERRORS
+
+Here are the run-time errors that might be generated by Turbo Pascal:
+
+     101  "Disk Write Error" -- You would get this error (probably) because you
+          do not have enough room on your disk to contain the complete
+          LISTING.TXT file (i.e., the error listing) or you do not have enough
+          room on your disk (at least 512K) for the "swap" file if you are
+          using the IDE.
+
+     203  "Heap Overflow Error" -- You probably don't have enough free memory.
+          P-ROBOTS needs at least 384K of free memory (i.e, after counting all
+          of the memory residents programs).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                         56
+
+
+
+APPENDIX III: COMMON PROBLEMS
+
+
+If P-ROBOTS is not doing what you think it should do, check for these common
+problems:
+
+     1.   Leaving a "write-protect" tab on the game disk will cause a fatal
+          crash.  There needs to be a way for the LISTING.TXT file (i.e., the
+          error listing) to be written on the disk.  Also, make sure you have
+          enough disk space to contain the LISTING.TXT file.  20K of available
+          disk space should be plenty of room.
+
+     2.   Your robot must be a self-contained PASCAL PROCEDURE with the same
+          name as the file (but without the .PR extension).
+
+     3.   Your robot must have an "infinite" loop in the "main" routine.
+
+     4.   Don't commit robot "suicide" by firing your cannon for a range of
+          zero.  For example:
+
+                  Drive(Angle,100);
+                  WHILE (Loc_X < 999) DO Cannon(Angle,Scan(Angle,10));
+
+          will cause your robot to commit suicide.
+
+     5.   You need to have at least 384K of free memory in order to run P-
+          ROBOTS.  If you don't have enough memory, you will get a Turbo Pascal
+          run-time error number 203.
+
+     6.   Are you playing a game with Obstacles with robots that have not been
+          designed to properly deal with Obstacles?  Do your robots "bang their
+          heads" against the Obstacles, or waste all of their missiles blasting
+          away at the Obstacles?  Reprogram your robots, or stop playing with
+          the Obstacles option!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                         57
+
+
+
+
+APPENDIX IV: THE P-ROBOTS PASCAL LANGUAGE
+
+
+"NORMAL" PASCAL
+
+P-ROBOTS allows a relatively rich subset of the "normal" PASCAL language.
+
+Predefined types include REAL, INTEGER, and BOOLEAN.  CONSTants, RECORDs and
+user-defined TYPEs are allowed.  ARRAYs are allowed.
+
+Comments may be added to a program by enclosing text with braces { }, or (* *)
+pairs.
+
+Variable and other identifier names may have up to 10 significant characters.
+
+Arithmetic operators include: +, -, *, /, DIV and MOD.  Comparison operators
+include: >, <, <>, =, <=, and >=.  Boolean operators include: AND, OR, and NOT.
+
+Control statements/structures include:  CASE, FOR-TO-DO, FOR-DOWNTO-DO,
+IF-THEN, IF-THEN-ELSE, REPEAT-UNTIL, and WHILE-DO.
+
+Functions and Procedures may or may not have parameters.  If a Function or a
+Procedure has parameters, these parameters may be passed by value or by
+reference (i.e., a VAR parameter).  Procedures and Functions may be "nested" to
+a maximum of seven levels.  Recursion is allowed.
+
+Pre-defined Functions include: TRUE, FALSE, ABS, SQR, ODD, SUCC, PRED, ROUND,
+TRUNC, SIN, COS, EXP, LN, SQRT, ARCTAN, and RANDOM.  All of these Functions
+have the same interpretation in P-ROBOTS as in standard PASCAL, except for the
+various Trig functions which use degrees in P-ROBOTS, rather than radians.
+
+The following are NOT allowed in P-ROBOTS and will generate error messages:
+CHAR, STRING, enumerated types, subranges, pointers, variant records, PACKED,
+sets, IN, files, input, output, GET, PUT, READ, WRITE, WITH, LABEL, GOTO.
+
+
+UNIQUE P-ROBOTS PASCAL PROCEDURES AND FUNCTIONS
+
+Alive -- returns a TRUE or FALSE depending upon whether your robot is alive or
+not.
+
+Ally -- a pre-defined P-ROBOTS "constant" which is one of the values returned
+by the "ObjectScanned" function.
+
+AllyAlive -- returns TRUE or FALSE depending upon whether your Ally is Alive or
+not.
+
+AllyDamage -- returns your Ally's current Damage level.
+
+AllyDead -- returns TRUE or FALSE depending upon whether your Ally is Dead or
+not.
+
+                                         58
+
+
+
+
+AllyFuel -- returns your Ally's current Fuel level.
+
+AllyHeading -- returns your Ally's current Heading.
+
+AllyLoc_X -- returns the current X coordinate of your Ally.
+
+AllyLoc_Y -- returns the current Y coordinate of your Ally.
+
+AllyMeters -- returns your Ally's current Meters.
+
+AllyShieldRaised -- returns TRUE or FALSE depending upon whether your Ally's
+shield is raised or not.
+
+AllySpeed -- returns your Ally's current Speed.
+
+Angle_To(X, Y) -- returns angle in degrees from your robot's current position
+to the point X, Y on the battlefield.
+
+Armor -- returns the type of armor with which your robot is equipped.  The
+result returned can have the "constant" values: Light, Medium or Heavy.
+
+BombsLeft -- returns the number of bombs that your robot currently has.  If
+your robot does not select the electronic bombs option, the returned value will
+be zero (obviously).
+
+Compact -- a pre-defined P-ROBOTS "constant" which is one of the values
+returned by the "Engine" function.
+
+Cannon(degree, range); -- fires a missile at an angle of "degree" and for a
+distance of "range".
+
+Damage -- returns the value of your robot's current damage level.
+
+Dead -- returns a TRUE or FALSE depending upon whether your robot is dead or
+not.
+
+Detonate; -- causes the bomb your robot had previous "dropped" or placed (using
+the PlaceBomb procedure) to explode.
+
+Distance(X1, Y1, X2, Y2) -- returns the distance in meters from the point X1,
+Y1 on the battle field to the point X2, Y2.
+
+Drive(degree, speed); -- causes your robot to move in the direction given by
+"degree" at a specified "speed".
+
+Economy -- a pre-defined P-ROBOTS "constant" which is one of the values
+returned by the "Engine" function.
+
+Enemy -- a pre-defined P-ROBOTS "constant" which is one of the values returned
+by the "ObjectScanned" function.
+
+
+                                         59
+
+
+
+
+Engine -- returns the type of engine that your robot is equipped with.  The
+result returned can have the "constant" values: Economy, Compact, Standard,
+Large, or ExtraLarge.
+
+ExtraLarge -- a pre-defined P-ROBOTS "constant" which is one of the values
+returned by the "Engine" function.
+
+Fuel -- returns the current value of your robot's fuel level in "jiggers".
+
+HaveCloak -- returns TRUE or FALSE depending upon whether your robot is
+equipped with a cloak.
+
+HaveRepairKit -- returns TRUE or FALSE depending upon whether your robot is
+equipped with a repair kit.
+
+HaveShield -- returns TRUE or FALSE depending upon whether your robot is
+equipped with a shield.
+
+Heavy -- a pre-defined P-ROBOTS "constant" which is one of the values returned
+by the "Armor" function.
+
+Large -- a pre-defined P-ROBOTS "constant" which is one of the values returned
+by the "Engine" function.
+
+Light -- a pre-defined P-ROBOTS "constant" which is one of the values returned
+by the "Armor" function.
+
+LimitedFuel -- returns TRUE or FALSE depending upon whether your current battle
+has fuel constraints or not.
+
+LowerCloak; -- causes your robot's cloak to be lowered.
+
+LowerShield; -- causes your robot's shield to be lowered.
+
+MakeRepairs; -- causes your robot to begin repairing itself.
+
+MaxRadarRange -- returns the maximum range (in meters) for your robot's radar.
+
+MaxSpeed -- returns the maximum speed for your robot.
+
+Medium -- a pre-defined P-ROBOTS "constant" which is one of the values returned
+by the "Armor" function.
+
+Meters -- returns the cumulative number of meters that your robot has traveled
+during the current battle.
+
+Normal -- a pre-defined P-ROBOTS "constant" which is one of the values returned
+by the "Warheads" function.
+
+Nothing -- a pre-defined P-ROBOTS "constant" which is one of the values
+returned by the "ObjectScanned" function.
+
+                                         60
+
+
+
+
+ObjectScanned -- returns the type of object that was found by the most recent
+"Scan" call (if any).  The result returned can have the "constant" values:
+Nothing, Ally, Enemy or Obstruction.
+
+Obstruction -- a pre-defined P-ROBOTS "constant" which is one of the values
+returned by the "ObjectScanned" function.
+
+PlaceBomb; -- causes your robot to "drop" or place an electronic bomb at the
+current location.
+
+Premium -- a pre-defined P-ROBOTS "constant" which is one of the values
+returned by the "Warheads" function.
+
+RaiseCloak; -- causes your robot's cloak to be raised.
+
+RaiseShield; -- causes your robot's shield to be raised.
+
+Random(limit) -- returns a random integer in the range of zero to "limit".
+
+Scan(degree, resolution) -- returns the distance in meters to any other robot
+or obstruction that is within the "viewing" arc/angle of "degree" +/-
+"resolution".  If nothing is scanned then the function "Scan" returns a value
+of zero.
+
+ShieldRaised -- returns TRUE or FALSE depending upon whether your robot's
+shield is up or down.
+
+Standard -- a pre-defined P-ROBOTS "constant" which is one of the values
+returned by the "Engine" function.
+
+StopRepairs; -- causes your robot to stop repairing itself.
+
+Time -- returns the current CPU cycle count.  This function can be used to time
+various events, speeds, etc., within your robot program.
+
+Warheads -- returns the type of warheads with which your robot is equipped.
+The result returned can have the "constant" values: Wimp, Normal, or Premium.
+
+Wimp -- a pre-defined P-ROBOTS "constant" which is one of the values returned
+by the "Warheads" function.
+
+Winner -- returns TRUE or FALSE depending upon your robot winning the battle.
+
+
+
+
+
+
+
+
+
+
+                                         61
+
+
+
+
+APPENDIX V: A BLATANT "PLUG" FOR ANOTHER SOFTWORKS PRODUCT
+
+The MASTER'S EDITION of ADVENTURE GAME TOOLKIT (AGT) lets you design and write
+your own high-quality text adventure games.  Using AGT's English-like language,
+you can concentrate on the creative side of game writing. even adding optional
+graphic illustrations, pop-up hints, sound effects, and music.  The high power
+of the Master's Edition gives you sophisticated, professional results.  Your
+adventure game can be shared with and enjoyed by others -- even if they do not
+have a copy of the Adventure Game Toolkit themselves.
+
+
+FEATURES OF MASTER'S EDITION OF THE ADVENTURE GAME TOOLKIT
+
+The Master's Edition of AGT has a number of features that make it the most
+comprehensive text adventure game creation product currently available.  Some
+of these key features are:
+
+*    Default "look-and-feel" of Infocom adventure games with similar screen
+     layout and standard vocabulary and routines.
+
+*    Large standard vocabulary with potential to define many more words unique
+     to a specific adventure.  Typical games can have a vocabulary of 1000
+     words or more.
+
+*    Sophisticated parser that can understand (1) complex input commands
+     including pronouns (IT, HIM, HER, THEM, MY and ITS), and (2) compound
+     commands separated by AND or THEN or punctuation symbols, and (3) commands
+     addressed to characters within the game.  Here are a few examples of
+     commands AGT can handle with ease:
+
+     GET THE FLASH LIGHT AND THEN SWITCH IT ON
+     PUT ON THE CLOAK, THEN EXAMINE IT; READ ITS LABEL
+     PLACE THE GREEN ROCK AND THE SMALL PEBBLE BEHIND THE TREE
+     ENTER THE HOUSE; GET ALL; EXIT; SOUTH; SOUTH THEN DOWN
+     SULU, SET A COURSE FOR ALPHA 14
+     SCOTTY, BEAM DOWN A TRICORDER AND THE QWERTY MODULE
+     DROP THE FOOD, THE KEY AND THE BOTTLE THEN UNLOCK THE DOOR WITH THE
+          BRASS KEY AND THEN LEAVE
+
+*    Function and cursor keys predefined to input frequently used commands and
+     move directions.  Function keys may also be redefined to input frequently
+     used commands like THROW AXE AT DWARF or GIVE MILK BOTTLE  TO BABY.
+
+*    An OOPS feature that allows you to edit/correct your input commands.
+
+*    SCRIPT and UNSCRIPT commands to echo game output to printer.
+
+*    Optional graphic illustrations using PCX formatted pictures for display on
+     CGA, EGA or VGA screens.  The PCX format is the most widely available of
+     any picture format and is supported by most PAINT and/or DRAW programs.
+     Plus -- a great deal of PCX "clip-art" is  available.
+
+                                         62
+
+
+
+
+*    Optional music and sound effects that can be played in the "background"
+     during the game.  These sound effects use the PC's internal speaker and do
+     not require any special "sound card."
+
+*    Optional user-definable "look-and-feel" interface including a menu-driven
+     player input option that displays feasible commands for the player to pick
+     from.
+
+*    Optional "pop-up" hints available when the <Alt> and <h> keys are pressed.
+
+*    Optional fonts (EGA and VGA monitors only) that can be changed to suit the
+     needs of the game.  The Master's Edition comes with over 30 sample fonts
+     including Old English, Scrawl, Computereze.  A  Font Editor is provided
+     that allows you to create your own unique fonts.
+
+WHAT THE REVIEWERS HAVE SAID ABOUT THE ADVENTURE GAME TOOLKIT
+
+"Using the Adventure Game Toolkit, anyone with an ounce of imagination can
+create a text adventure game ... similar in layout and sophistication to those
+made by Infocom and other commercial developers."
+        -- Donald B. Trivette in PC Magazine
+
+"The Adventure Game Toolkit (AGT) acts as a compiler which allows for creating
+remarkably complex and sophisticated games in a fairly simple way .... AGT's
+parser reminds me of Infocom's."
+        -- Scorpia in Computer Gaming World
+
+"If you have ever wondered what it is like to create your own adventure games,
+but didn't have the programming knowledge to do it, this product is for you
+.... The process is easy ... and you'll have hours of fun doing it."
+        -- Resul DeMaria in Public Domain Software & Shareware
+
+"The Adventure Game Toolkit from Softworks ... provides all the tools you need
+to build your own text based adventure games .... The Adventure Game Toolkit is
+an extremely powerful development package."
+        -- Bob Napp in "The Big Blue Disk"
+
+The Adventure & Strategy Club (of England) recently selected the Adventure Game
+Toolkit as the Best Utility of 1992.
+
+WHAT YOU PAY AND WHAT YOU GET
+
+The Master's Edition of AGT is also "Freeware."  Look for it on CompuServe,
+GEnie, various BBSs or from disk vendors.
+
+                                         63
+
+
+
+HOW TO GET A COPY OF THE ADVENTURE GAME TOOLKIT
+
+The Master's Edition of AGT is also "Freeware."  Look for it on CompuServe,
+GEnie, various BBSs or from disk vendors.
+
+
+                                         64
+
+
+
+
+APPENDIX VI: ABOUT THE AUTHOR
+
+
+Dave Malmberg has been active in the world of personal computer since 1977.  He
+is the author or co-author of seven published software products.  His most
+recent software product is the Master's Edition of the Adventure Game Toolkit.
+
+His most successful products were the Turtle Graphics series published by
+HESware.  These two programs have sold over 80,000 copies world-wide, were
+translated into Spanish, and won two Consumer Electronic Software Showcase
+awards as some of the best software of 1983.  These programs were widely used
+in schools to teach computer literacy to children and other computer novices.
+
+Dave has also published numerous articles and programs in various computer
+magazines.  He has been a Contributing Editor of both COMPUTE!'s HOME &
+EDUCATIONAL COMPUTING and MICRO magazines.  He was one of the principal authors
+of COMPUTE!'s FIRST BOOK OF VIC, the best selling computer book of 1983.  He
+has written regular columns on educational uses of computers and on LOGO for
+COMMODORE and POWER/PLAY magazines. He was delighted to receive recognition
+from abroad when the British-based Adventure & Strategy Club honored him with
+their Golden Chalice Award in 1992 for his adventure game system.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                                         65
+
+
+
+
+
+
+
+
+
