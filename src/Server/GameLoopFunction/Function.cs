@@ -152,8 +152,12 @@ namespace Challenge.LambdaRobots.Server.GameLoopFunction {
                 try {
                     var invocationTask = _lambdaClient.InvokeAsync(new InvokeRequest {
                         Payload = SerializeJson(new RobotRequest {
+                            Command = RobotCommand.GetAction,
                             GameId = game.Id,
-                            Robot = robot
+                            Robot = robot,
+
+                            // TODO: pass in server REST API
+                            ServerApi = "TODO"
                         }),
                         FunctionName = robot.LambdaArn,
                         InvocationType = InvocationType.RequestResponse

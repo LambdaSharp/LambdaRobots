@@ -28,16 +28,26 @@ using Newtonsoft.Json.Converters;
 
 namespace Challenge.LambdaRobots.Common {
 
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum RobotCommand {
+        Undefined,
+        GetName,
+        GetAction
+    }
+
     public class RobotRequest {
 
         //--- Properties ---
+        public RobotCommand Command { get; set; }
         public string GameId { get; set; }
+        public string ServerApi { get; set; }
         public Robot Robot { get; set; }
     }
 
     public class RobotResponse {
 
         //--- Properties ---
+        public string RobotName { get; set; }
         public RobotAction RobotAction { get; set; }
     }
 
