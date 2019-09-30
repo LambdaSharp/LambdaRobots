@@ -38,15 +38,7 @@ namespace Challenge.LambdaRobots.Server.Common {
         public string PK { get; set; }
         public string SK => "GAME";
         public Game Game { get; set; }
-    }
-
-    public class GameSessionRecord : IGameTableMultiRecord {
-
-        //--- Properties ---
-        public string PK { get; set; }
-        public string SK => $"{SKPrefix}{ConnectionId}";
-        public string ConnectionId { get; set; }
-        public string SKPrefix => "connection-";
+        public string GameExecutionArn { get; set; }
     }
 
     public class GameStateMachineRecord : IGameTableSingletonRecord {
@@ -57,13 +49,15 @@ namespace Challenge.LambdaRobots.Server.Common {
         public string StateMachineArn { get; set; }
     }
 
-    public interface IGameTableSingletonRecord {
+    public interface IGameTableRecord { }
+
+    public interface IGameTableSingletonRecord : IGameTableRecord {
 
         //--- Properties ---
         string SK { get; }
     }
 
-    public interface IGameTableMultiRecord {
+    public interface IGameTableMultiRecord : IGameTableRecord {
 
         //--- Properties ---
         string SKPrefix { get; }
@@ -82,7 +76,7 @@ namespace Challenge.LambdaRobots.Server.Common {
         }
 
         //--- Methods ---
-        public async Task CreateAsync<T>(T record) {
+        public async Task CreateAsync<T>(T record) where T : IGameTableRecord {
             await _table.PutItemAsync(Document.FromJson(JsonConvert.SerializeObject(record)), new PutItemOperationConfig {
                 ConditionalExpression = new Expression {
                     ExpressionStatement = "attribute_not_exists(PK)"
@@ -90,7 +84,7 @@ namespace Challenge.LambdaRobots.Server.Common {
             });
         }
 
-        public async Task UpdateAsync<T>(T record) {
+        public async Task UpdateAsync<T>(T record) where T : IGameTableRecord {
             await _table.PutItemAsync(Document.FromJson(JsonConvert.SerializeObject(record)), new PutItemOperationConfig {
                 ConditionalExpression = new Expression {
                     ExpressionStatement = "attribute_exists(PK)"
@@ -98,12 +92,20 @@ namespace Challenge.LambdaRobots.Server.Common {
             });
         }
 
+        public async Task UpdateAsync<T>(T record, IEnumerable<string> columnsToUpdate) where T : IGameTableRecord {
+            var document = Document.FromJson(JsonConvert.SerializeObject(record));
+            foreach(var key in document.Keys.Where(key => (key != "PK") && (key != "SK") && !columnsToUpdate.Contains(key)).ToList()) {
+                document.Remove(key);
+            }
+            await _table.UpdateItemAsync(document, new UpdateItemOperationConfig());
+        }
+
         public Task CreateOrUpdateAsync<T>(T record) => _table.PutItemAsync(Document.FromJson(JsonConvert.SerializeObject(record)));
 
         public Task<T> GetAsync<T>(string pk) where T : IGameTableSingletonRecord, new()
             => GetAsync<T>(pk, new T().SK);
 
-        public async Task<T> GetAsync<T>(string pk, string sk) {
+        public async Task<T> GetAsync<T>(string pk, string sk) where T : IGameTableRecord {
             var record = await _table.GetItemAsync(new Dictionary<string, DynamoDBEntry> {
                 ["PK"] = pk,
                 ["SK"] = sk

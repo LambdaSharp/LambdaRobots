@@ -1,6 +1,5 @@
 # game board
 * keep exploding missiles around until erased
-* random positioning of robots at start with at least a minimum distance of 100
 
 # Challenge
 * Level 0 - setup gameboard

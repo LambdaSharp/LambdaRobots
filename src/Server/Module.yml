@@ -30,8 +30,6 @@ Items:
         Invoke: OpenConnection
       - WebSocket: $disconnect
         Invoke: CloseConnection
-      - WebSocket: join
-        Invoke: JoinGame
       - WebSocket: start
         Invoke: StartGame
       - WebSocket: stop
@@ -79,10 +77,6 @@ Items:
   - Resource: InvokeLambdasPermission
     Allow: lambda:InvokeFunction
     Value: "*"
-
-  - Function: Finalizer
-    Memory: 256
-    Timeout: 900
 
   - Variable: WebSocketUrl
     Description: WebSocket URL

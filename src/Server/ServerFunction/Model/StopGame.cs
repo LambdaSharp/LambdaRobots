@@ -22,13 +22,19 @@
  * SOFTWARE.
  */
 
+using Challenge.LambdaRobots.Server.Common;
+
 namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
 
     public class StopGameRequest {
 
+        //--- Properties ---
+        public string GameId { get; set; }
     }
 
     public class StopGameResponse {
 
+        //--- Properties ---
+        public Game Game { get; set; }
     }
 }
