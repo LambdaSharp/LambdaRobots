@@ -3,6 +3,7 @@ Version: 1.0-DEV
 Description: Lambda-Robots is based on the 90s game P-Robots by David Malmberg
 Items:
   - Resource: GameTable
+    Description: Table for holding all active games and their WebSocket connections
     Scope: all
     Type: AWS::DynamoDB::Table
     Allow: ReadWrite
@@ -21,6 +22,7 @@ Items:
           KeyType: RANGE
 
   - Function: ServerFunction
+    Description: Function for handling REST API and WebSocket interactions
     Memory: 256
     Timeout: 30
     Sources:
@@ -38,7 +40,7 @@ Items:
         Invoke: ScanEnemies
 
   - Function: GameLoopFunction
-    Description: Simulate progress of the game board
+    Description: Function for computing the next game turn
     Memory: 256
     Timeout: 30
 
@@ -65,7 +67,11 @@ Items:
                 Resource: "*"
 
   - Resource: GameStateMachine
+    Scope: ServerFunction
     Type: AWS::StepFunctions::StateMachine
+    Allow:
+      - statemachine:StartExecution
+      - statemachine:StopExecution
     Properties:
       DefinitionString: !Sub [ !Include GameStateMachine.json ]
       RoleArn: !GetAtt GameStateMachineRole.Arn

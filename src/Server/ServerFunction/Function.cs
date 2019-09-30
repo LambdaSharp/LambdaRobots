@@ -28,6 +28,8 @@ using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using Amazon.StepFunctions;
+using Amazon.StepFunctions.Model;
 using Challenge.LambdaRobots.Common;
 using Challenge.LambdaRobots.Server.Common;
 using Challenge.LambdaRobots.Server.ServerFunction.Model;
@@ -46,6 +48,8 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
 
         //--- Fields ---
         private GameTable _table;
+        private string _gameStateMachine;
+        private IAmazonStepFunctions _stepFunctionsClient;
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
@@ -53,6 +57,8 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
                 config.ReadDynamoDBTableName("GameTable"),
                 new AmazonDynamoDBClient()
             );
+            _gameStateMachine = config.ReadText("GameStateMachine");
+            _stepFunctionsClient = new AmazonStepFunctionsClient();
         }
 
         public async Task OpenConnectionAsync(APIGatewayProxyRequest request, string username = null) {
@@ -159,14 +165,28 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             });
 
             // TODO:
-            //  - kick of game step function
-            throw Abort(CreateResponse(500, "Not Implemented"));
+            // - check that step function is not already running for this game
+            // - store step function so that it can be stopped
+
+            // kick off game step function
+            await _stepFunctionsClient.StartExecutionAsync(new StartExecutionRequest {
+                StateMachineArn = _gameStateMachine,
+                Name = $"{game.Id}-{DateTime.UtcNow:yyyyMMddHHmmss}",
+                Input = SerializeJson(new {
+                    GameId = game.Id
+                })
+            });
+
+            // return with kicked off game
+            return new StartGameResponse {
+                Game = game
+            };
         }
 
         public async Task<StopGameResponse> StopGameAsync(StopGameRequest request) {
 
             // TODO:
-            //  - delete game step function
+            //  - stop game step function
             throw Abort(CreateResponse(500, "Not Implemented"));
         }
 

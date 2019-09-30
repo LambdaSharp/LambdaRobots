@@ -41,19 +41,6 @@ using Newtonsoft.Json.Converters;
 
 namespace Challenge.LambdaRobots.Server.GameLoopFunction {
 
-    public class RobotLambdaRequest {
-
-        //--- Properties ---
-        public string GameId { get; set; }
-        public Robot Robot { get; set; }
-    }
-
-    public class RobotLambdaResponse {
-
-        //--- Properties ---
-        public RobotAction RobotAction { get; set; }
-    }
-
     [JsonConverter(typeof(StringEnumConverter))]
     public enum GameLoopState {
         Undefined,
@@ -136,11 +123,11 @@ namespace Challenge.LambdaRobots.Server.GameLoopFunction {
             }
 
             // local functions
-            async Task<RobotLambdaResponse> Invoke(Game game, Robot robot) {
+            async Task<RobotResponse> Invoke(Game game, Robot robot) {
                 var stopwatch = System.Diagnostics.Stopwatch.StartNew();
                 try {
                     var invocationTask = _lambdaClient.InvokeAsync(new InvokeRequest {
-                        Payload = SerializeJson(new RobotLambdaRequest {
+                        Payload = SerializeJson(new RobotRequest {
                             GameId = game.Id,
                             Robot = robot
                         }),
@@ -154,10 +141,10 @@ namespace Challenge.LambdaRobots.Server.GameLoopFunction {
 
                         // kill the robot
                         robot.State = RobotState.Dead;
-                        return new RobotLambdaResponse();
+                        return new RobotResponse();
                     }
                     var response = Encoding.UTF8.GetString(invocationTask.Result.Payload.ToArray());
-                    var result = DeserializeJson<RobotLambdaResponse>(response);
+                    var result = DeserializeJson<RobotResponse>(response);
                     LogInfo($"robot {robot.Id} responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
 
                     // always set the robot id (no cheating!)
@@ -170,7 +157,7 @@ namespace Challenge.LambdaRobots.Server.GameLoopFunction {
 
                     // kill the robot
                     robot.State = RobotState.Dead;
-                    return new RobotLambdaResponse();
+                    return new RobotResponse();
                 }
             }
         }

@@ -28,6 +28,19 @@ using Newtonsoft.Json.Converters;
 
 namespace Challenge.LambdaRobots.Common {
 
+    public class RobotRequest {
+
+        //--- Properties ---
+        public string GameId { get; set; }
+        public Robot Robot { get; set; }
+    }
+
+    public class RobotResponse {
+
+        //--- Properties ---
+        public RobotAction RobotAction { get; set; }
+    }
+
     [JsonConverter(typeof(StringEnumConverter))]
     public enum RobotState {
         Undefined,
@@ -84,5 +97,15 @@ namespace Challenge.LambdaRobots.Common {
         public double MissileDirectHitDamageBonus;
         public double MissileNearHitDamageBonus;
         public double MissileFarHitDamageBonus;
+    }
+
+    public class RobotAction {
+
+        //--- Fields ---
+        public string RobotId;
+        public double? Speed;
+        public double? Heading;
+        public double? FireMissileHeading;
+        public double? FireMissileRange;
     }
 }

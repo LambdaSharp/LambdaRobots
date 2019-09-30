@@ -89,14 +89,4 @@ namespace Challenge.LambdaRobots.Server.Common {
         public double NearHitDamageBonus;
         public double FarHitDamageBonus;
     }
-
-    public class RobotAction {
-
-        //--- Fields ---
-        public string RobotId;
-        public double? Speed;
-        public double? Heading;
-        public double? FireMissileHeading;
-        public double? FireMissileRange;
-    }
 }
