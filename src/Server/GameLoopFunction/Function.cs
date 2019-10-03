@@ -47,11 +47,13 @@ namespace Challenge.LambdaRobots.Server.GameLoopFunction {
 
         //--- Properties ---
         public string GameId { get; set; }
+        public GameState State { get; set; }
     }
 
     public class FunctionResponse {
 
         //--- Properties ---
+        public string GameId { get; set; }
         public GameState State { get; set; }
     }
 
@@ -67,6 +69,8 @@ namespace Challenge.LambdaRobots.Server.GameLoopFunction {
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
+
+            // initialize Lambda function
             _table = new GameTable(
                 config.ReadDynamoDBTableName("GameTable"),
                 new AmazonDynamoDBClient()
@@ -79,7 +83,7 @@ namespace Challenge.LambdaRobots.Server.GameLoopFunction {
 
         public override async Task<FunctionResponse> ProcessMessageAsync(FunctionRequest request) {
 
-            // get game
+            // get game state from DynamoDB table
             LogInfo($"Loading game state for ID={request.GameId}");
             var game = (await _table.GetAsync<GameRecord>(request.GameId))?.Game;
             if(game == null) {
@@ -93,15 +97,15 @@ namespace Challenge.LambdaRobots.Server.GameLoopFunction {
                 robot => GetRobotActionAsync(game, robot)
             ));
 
-            // update game
+            // determine game action to take
             var messageCount = game.Messages.Count;
             try {
 
                 // check game state
-                switch(game.State) {
+                switch(request.State) {
                 case GameState.Start:
 
-                    // initialize game
+                    // start game
                     LogInfo($"Start game: initializing {game.Robots.Count(robot => robot.State == RobotState.Alive)} robots (total: {game.Robots.Count})");
                     await logic.StartAsync();
                     game.State = GameState.NextTurn;
@@ -114,27 +118,44 @@ namespace Challenge.LambdaRobots.Server.GameLoopFunction {
                     LogInfo($"Start turn {game.TotalTurns} (max: {game.MaxTurns}): invoking {game.Robots.Count(robot => robot.State == RobotState.Alive)} robots (total: {game.Robots.Count})");
                     await logic.NextTurnAsync();
                     LogInfo($"End turn {game.TotalTurns} (max: {game.MaxTurns}): {game.Robots.Count(robot => robot.State == RobotState.Alive)} robots alive");
-
-                    // TODO: compute next turn
                     break;
                 case GameState.Finished:
+
+                    // nothing further to do
                     break;
                 default:
-                    throw new ApplicationException($"unexpected game state: '{game.State}'");
+                    game.State = GameState.Error;
+                    throw new ApplicationException($"unexpected game state: '{request.State}'");
                 }
 
-                // show new messages
+                // log new game messages
                 for(var i = messageCount; i < game.Messages.Count; ++i) {
                     LogInfo($"Game message {i + 1}: {game.Messages[i].Text}");
                 }
 
                 // update game state
-                game.State = ((game.TotalTurns < game.MaxTurns) && (game.Robots.Count(robot => robot.State == RobotState.Alive) > 1))
-                    ? GameState.NextTurn
-                    : GameState.Finished;
+                game.State = (game.TotalTurns >= game.MaxTurns) || (game.Robots.Count(robot => robot.State == RobotState.Alive) <= 1)
+                    ? GameState.Finished
+                    : GameState.NextTurn;
             } catch(Exception e) {
                 LogError(e, "error during game loop");
                 game.State = GameState.Error;
+            }
+
+            // notify WebSocket of new game state
+            LogInfo($"Posting game update to connection: {game.Id}");
+            try {
+                await _amaClient.PostToConnectionAsync(new PostToConnectionRequest {
+                    ConnectionId = game.Id,
+                    Data = new MemoryStream(Encoding.UTF8.GetBytes(SerializeJson(game)))
+                });
+            } catch(AmazonServiceException e) when(e.StatusCode == System.Net.HttpStatusCode.Gone) {
+
+                // connection has been closed, stop the game
+                LogInfo($"Connection is gone");
+                game.State = GameState.Finished;
+            } catch(Exception e) {
+                LogErrorAsWarning(e, "PostToConnectionAsync() failed");
             }
 
             // check if we need to update or delete the game from the game table
@@ -148,22 +169,8 @@ namespace Challenge.LambdaRobots.Server.GameLoopFunction {
                 LogInfo($"Deleting game ID={game.Id}");
                 await _table.DeleteAsync<GameRecord>(game.Id);
             }
-
-            // notify WebSocket of new game state
-            LogInfo($"Posting game update to connection: {game.Id}");
-            try {
-                await _amaClient.PostToConnectionAsync(new PostToConnectionRequest {
-                    ConnectionId = game.Id,
-                    Data = new MemoryStream(Encoding.UTF8.GetBytes(SerializeJson(game)))
-                });
-            } catch(AmazonServiceException e) when(e.StatusCode == System.Net.HttpStatusCode.Gone) {
-                LogInfo($"Connection is gone");
-            } catch(Exception e) {
-                LogErrorAsWarning(e, "PostToConnectionAsync() failed");
-            }
-
-            // check if game has not reached its max turns and if more than one robot is still alive
             return new FunctionResponse {
+                GameId = game.Id,
                 State = game.State
             };
         }
