@@ -31,7 +31,7 @@ namespace Challenge.LambdaRobots.Common {
     [JsonConverter(typeof(StringEnumConverter))]
     public enum RobotCommand {
         Undefined,
-        GetName,
+        GetConfig,
         GetAction
     }
 
@@ -47,8 +47,14 @@ namespace Challenge.LambdaRobots.Common {
     public class RobotResponse {
 
         //--- Properties ---
-        public string RobotName { get; set; }
+        public RobotConfig RobotConfig { get; set; }
         public RobotAction RobotAction { get; set; }
+    }
+
+    public class RobotConfig  {
+
+        //--- Properties ---
+        public string Name { get; set; }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -112,7 +118,6 @@ namespace Challenge.LambdaRobots.Common {
     public class RobotAction {
 
         //--- Fields ---
-        public string RobotId;
         public double? Speed;
         public double? Heading;
         public double? FireMissileHeading;

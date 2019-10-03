@@ -25,6 +25,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Challenge.LambdaRobots.Common;
 
 namespace Challenge.LambdaRobots.Server.Common {
@@ -37,6 +38,8 @@ namespace Challenge.LambdaRobots.Server.Common {
 
         //--- Methods ---
         double NextRandomDouble();
+        Task<RobotConfig> GetRobotConfig(Robot robot);
+        Task<RobotAction> GetRobotAction(Robot robot);
     }
 
     public class DependencyProvider : IDependencyProvider {
@@ -45,12 +48,22 @@ namespace Challenge.LambdaRobots.Server.Common {
         private Game _game;
         private DateTime _utcNow;
         private Random _random;
+        private readonly Func<Robot, Task<RobotConfig>> _getConfig;
+        private readonly Func<Robot, Task<RobotAction>> _getAction;
 
         //--- Constructors ---
-        public DependencyProvider(Game game, DateTime utcNow, Random random) {
+        public DependencyProvider(
+            Game game,
+            DateTime utcNow,
+            Random random,
+            Func<Robot, Task<RobotConfig>> getConfig,
+            Func<Robot, Task<RobotAction>> getAction
+        ) {
             _game = game ?? throw new ArgumentNullException(nameof(game));
             _utcNow = utcNow;
             _random = random ?? throw new ArgumentNullException(nameof(random));
+            _getConfig = getConfig ?? throw new ArgumentNullException(nameof(getConfig));
+            _getAction = getAction ?? throw new ArgumentNullException(nameof(getAction));
         }
 
         //--- Properties ---
@@ -59,9 +72,11 @@ namespace Challenge.LambdaRobots.Server.Common {
 
         //--- Methods ---
         public double NextRandomDouble() => _random.NextDouble();
+        public Task<RobotConfig> GetRobotConfig(Robot robot) => _getConfig(robot);
+        public Task<RobotAction> GetRobotAction(Robot robot) => _getAction(robot);
     }
 
-    public class Logic {
+    public class GameLogic {
 
         //--- Class Methods ---
         private static double Distance(double x1, double y1, double x2, double y2)
@@ -81,7 +96,7 @@ namespace Challenge.LambdaRobots.Server.Common {
         private IDependencyProvider _provider;
 
         //--- Constructors ---
-        public Logic(IDependencyProvider provider) {
+        public GameLogic(IDependencyProvider provider) {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
@@ -90,15 +105,80 @@ namespace Challenge.LambdaRobots.Server.Common {
         public Game Game => _provider.Game;
 
         //--- Methods ---
-        public void MainLoop(IEnumerable<RobotAction> actions) {
+        public async Task StartAsync() {
 
-            // update robot states
+            // reset game state
+            Game.TotalTurns = 0;
+            Game.Missiles.Clear();
+            Game.Messages.Clear();
+            foreach(var robot in Game.Robots) {
+                robot.ReloadDelay = 0.0;
+                robot.Speed = 0.0;
+                robot.State = RobotState.Alive;
+                robot.TargetHeading = 0.0;
+                robot.TargetSpeed = 0.0;
+                robot.TimeOfDeath = null;
+                robot.TotalDamageDealt = 0.0;
+                robot.TotalKills = 0;
+                robot.TotalMissileFiredCount = 0;
+                robot.TotalMissileHitCount = 0;
+                robot.TotalScanCount = 0;
+                robot.TotalTravelDistance = 0.0;
+            }
+
+            // get configuration for all robots
+            await Task.WhenAll(Game.Robots.Select(async robot => {
+                var config = await _provider.GetRobotConfig(robot);
+                robot.Name = config?.Name ?? robot.Id;
+                if(config == null) {
+                    robot.State = RobotState.Dead;
+                    AddMessage($"{robot.Name} was disqualified by failure to initialize");
+                }
+                return true;
+            }));
+
+            // place robots on playfield
+            var marginWidth = Game.BoardWidth * 0.1;
+            var marginHeight = Game.BoardHeight * 0.1;
+            var attempts = 0;
+        again:
+            if(attempts >= 10) {
+                throw new ApplicationException($"unable to place all robots with minimum separation of {Game.MinRobotStartDistance:N2}");
+            }
+
+            // assign random locations to all robots
             foreach(var robot in Game.Robots.Where(robot => robot.State == RobotState.Alive)) {
+                robot.X = marginWidth + _provider.NextRandomDouble() * (Game.BoardWidth - 2.0 * marginWidth);
+                robot.Y = marginHeight + _provider.NextRandomDouble() * (Game.BoardHeight - 2.0 * marginHeight);
+            }
 
-                // apply action if present
-                ApplyRobotAction(robot, actions.FirstOrDefault(a => a.RobotId == robot.Id));
+            // verify that none of the robots are too close to each other
+            for(var i = 0; i < Game.Robots.Count; ++i) {
+                for(var j = i + 1; j < Game.Robots.Count; ++j) {
+                    if((Game.Robots[i].State == RobotState.Alive) && (Game.Robots[j].State == RobotState.Alive)) {
+                        var distance = Distance(Game.Robots[i].X, Game.Robots[i].Y, Game.Robots[j].X, Game.Robots[j].Y);
+                        if(distance < Game.MinRobotStartDistance) {
+                            ++attempts;
+                            goto again;
+                        }
+                    }
+                }
+            }
+        }
 
-                // move robot
+        public async Task NextTurnAsync() {
+
+            // invoke all robots to get their actions
+            await Task.WhenAll(Game.Robots
+                .Where(robot => robot.State == RobotState.Alive)
+                .Select(async robot => {
+                    ApplyRobotAction(robot, await _provider.GetRobotAction(robot));
+                    return true;
+                })
+            );
+
+            // move robots
+            foreach(var robot in Game.Robots.Where(robot => robot.State == RobotState.Alive)) {
                 MoveRobot(robot);
             }
 
@@ -150,57 +230,12 @@ namespace Challenge.LambdaRobots.Server.Common {
             return result;
         }
 
-        public void Reset() {
-
-            // reset game state
-            Game.TotalTurns = 0;
-            Game.Missiles.Clear();
-            Game.Messages.Clear();
-            foreach(var robot in Game.Robots) {
-                robot.ReloadDelay = 0.0;
-                robot.Speed = 0.0;
-                robot.State = RobotState.Alive;
-                robot.TargetHeading = 0.0;
-                robot.TargetSpeed = 0.0;
-                robot.TimeOfDeath = null;
-                robot.TotalDamageDealt = 0.0;
-                robot.TotalKills = 0;
-                robot.TotalMissileFiredCount = 0;
-                robot.TotalMissileHitCount = 0;
-                robot.TotalScanCount = 0;
-                robot.TotalTravelDistance = 0.0;
-            }
-
-            // place robots on playfield
-            var marginWidth = Game.BoardWidth * 0.1;
-            var marginHeight = Game.BoardHeight * 0.1;
-            var attempts = 0;
-        again:
-            if(attempts >= 10) {
-                throw new ApplicationException($"unable to place all robots with minimum separation of {Game.MinRobotStartDistance:N2}");
-            }
-
-            // assign random locations to all robots
-            foreach(var robot in Game.Robots) {
-                robot.X = marginWidth + _provider.NextRandomDouble() * (Game.BoardWidth - 2.0 * marginWidth);
-                robot.Y = marginHeight + _provider.NextRandomDouble() * (Game.BoardHeight - 2.0 * marginHeight);
-            }
-
-            // verify that none of the robots are too close to each other
-            for(var i = 0; i < Game.Robots.Count; ++i) {
-                for(var j = i + 1; j < Game.Robots.Count; ++j) {
-                    var distance = Distance(Game.Robots[i].X, Game.Robots[i].Y, Game.Robots[j].X, Game.Robots[j].Y);
-                    if(distance < Game.MinRobotStartDistance) {
-                        ++attempts;
-                        goto again;
-                    }
-                }
-            }
-        }
-
-
         private void ApplyRobotAction(Robot robot, RobotAction action) {
             if(action == null) {
+
+                // robot didn't respond with an action; consider it dead
+                robot.State = RobotState.Dead;
+                AddMessage($"{robot.Name} was disqualified by lack of action");
                 return;
             }
 

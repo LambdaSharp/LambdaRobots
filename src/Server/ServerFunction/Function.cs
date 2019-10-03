@@ -24,10 +24,13 @@
 
 using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
+using Amazon.Lambda;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using Amazon.Lambda.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 using Challenge.LambdaRobots.Common;
@@ -50,6 +53,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
         private GameTable _table;
         private string _gameStateMachine;
         private IAmazonStepFunctions _stepFunctionsClient;
+        private IAmazonLambda _lambdaClient;
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
@@ -59,6 +63,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             );
             _gameStateMachine = config.ReadText("GameStateMachine");
             _stepFunctionsClient = new AmazonStepFunctionsClient();
+            _lambdaClient = new AmazonLambdaClient();
         }
 
         public async Task OpenConnectionAsync(APIGatewayProxyRequest request, string username = null) {
@@ -93,18 +98,14 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             };
             var logic = new Logic(new DependencyProvider(game, DateTime.UtcNow, _random));
 
-            // add robots
-            foreach(var robotArn in request.RobotArns) {
+            // collect names
+            game.Robots.AddRange((await Task.WhenAll(request.RobotArns.Select(async robotArn => {
 
-                // TODO:
-                // - invoke robot ARN to validate robot
-                // - get robot name
-                var name = robotArn;
-                game.Robots.Add(new Robot {
+                // create new robot data structure
+                var robot = new Robot {
 
                     // robot state
                     Id = $"{game.Id}:R{game.Robots.Count}",
-                    Name = name,
                     LambdaArn = robotArn,
                     State = RobotState.Alive,
                     X = 0.0,
@@ -136,8 +137,12 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
                     MissileDirectHitDamageBonus = 3.0,
                     MissileNearHitDamageBonus = 2.1,
                     MissileFarHitDamageBonus = 1.0
-                });
-            }
+                };
+
+                // get robot configuration
+                await GetRobotConfig(robot);
+                return robot;
+            }))).Where(robot => robot.State == RobotState.Alive).ToList());
 
             // reset game
             logic.Reset();
@@ -167,6 +172,47 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             return new StartGameResponse {
                 Game = game
             };
+
+            // local functions
+            async Task<RobotResponse> GetRobotConfig(Robot robot) {
+                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+                try {
+                    var getNameTask = _lambdaClient.InvokeAsync(new InvokeRequest {
+                        Payload = SerializeJson(new RobotRequest {
+                            Command = RobotCommand.GetConfig,
+                            GameId = game.Id
+                        }),
+                        FunctionName = robot.LambdaArn,
+                        InvocationType = InvocationType.RequestResponse
+                    });
+
+                    // check if lambda responds within time limit
+                    if(await Task.WhenAny(getNameTask, Task.Delay(TimeSpan.FromSeconds(game.RobotTimeoutSeconds))) != getNameTask) {
+                        LogInfo($"Robot {robot.Id} GetName timed out after {stopwatch.Elapsed.TotalSeconds:N2}s");
+
+                        // kill the robot
+                        robot.State = RobotState.Dead;
+                        return new RobotResponse();
+                    }
+                    var response = Encoding.UTF8.GetString(getNameTask.Result.Payload.ToArray());
+                    var result = DeserializeJson<RobotResponse>(response);
+                    LogInfo($"Robot {robot.Id} GetName responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
+
+                    // always set the robot name
+                    if(result.RobotConfig == null) {
+                        result.RobotConfig = new RobotConfig{
+                            Name = $"Robot-{robot.Id}"
+                        };
+                    }
+                    return result;
+                } catch(Exception e) {
+                    LogErrorAsWarning(e, $"Robot {robot.Id} GetName failed (arn: {robot.LambdaArn})");
+
+                    // kill the robot
+                    robot.State = RobotState.Dead;
+                    return new RobotResponse();
+                }
+            }
         }
 
         public async Task<StopGameResponse> StopGameAsync(StopGameRequest request) {

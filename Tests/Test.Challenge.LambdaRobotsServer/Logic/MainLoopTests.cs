@@ -23,6 +23,8 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using Challenge.LambdaRobots.Common;
 using Challenge.LambdaRobots.Server.Common;
 using FluentAssertions;
@@ -34,9 +36,10 @@ namespace Test.Challenge.LambdaRobots.Server {
 
         //--- Fields ---
         private IDependencyProvider _provider;
+        private Dictionary<string, List<Func<RobotAction>>> _robotActions = new Dictionary<string, List<Func<RobotAction>>>();
 
         //--- Properties ---
-        public Game Game => _provider.Game;
+        private Game Game => _provider.Game;
 
         //--- Methods ---
 
@@ -47,15 +50,15 @@ namespace Test.Challenge.LambdaRobots.Server {
             // arrange
             var robot = NewRobot("Bob", 500, 500);
             var logic = NewLogic(robot);
-
-            // act
-            logic.MainLoop(new[] {
-                new RobotAction {
-                    RobotId = robot.Id,
+            _robotActions["Bob"] = new List<Func<RobotAction>> {
+                () => new RobotAction {
                     Heading = 0.0,
                     Speed = 100.0
                 }
-            });
+            };
+
+            // act
+            logic.NextTurnAsync().Wait();
 
             // assert
             robot.X.Should().Be(500);
@@ -69,16 +72,16 @@ namespace Test.Challenge.LambdaRobots.Server {
             // arrange
             var robot = NewRobot("Bob", 500, 500);
             var logic = NewLogic(robot);
-
-            // act
-            logic.MainLoop(new[] {
-                new RobotAction {
-                    RobotId = robot.Id,
+            _robotActions["Bob"] = new List<Func<RobotAction>> {
+                () => new RobotAction {
                     Heading = 0.0,
                     Speed = 100.0
                 }
-            });
-            logic.MainLoop(new RobotAction[0]);
+            };
+
+            // act
+            logic.NextTurnAsync().Wait();
+            logic.NextTurnAsync().Wait();
 
             // assert
             robot.X.Should().Be(500);
@@ -92,15 +95,15 @@ namespace Test.Challenge.LambdaRobots.Server {
             // arrange
             var robot = NewRobot("Bob", 500, 500);
             var logic = NewLogic(robot);
-
-            // act
-            logic.MainLoop(new[] {
-                new RobotAction {
-                    RobotId = robot.Id,
+            _robotActions["Bob"] = new List<Func<RobotAction>> {
+                () => new RobotAction {
                     Heading = 90.0,
                     Speed = 100.0
                 }
-            });
+            };
+
+            // act
+            logic.NextTurnAsync().Wait();
 
             // assert
             robot.X.Should().Be(510);
@@ -122,7 +125,7 @@ namespace Test.Challenge.LambdaRobots.Server {
             var logic = NewLogic(robot);
 
             // act
-            logic.MainLoop(new RobotAction[0]);
+            logic.NextTurnAsync().Wait();
 
             // assert
             robot.X.Should().BeLessThan(1000.0);
@@ -142,7 +145,7 @@ namespace Test.Challenge.LambdaRobots.Server {
             var logic = NewLogic(bob, dave);
 
             // act
-            logic.MainLoop(new RobotAction[0]);
+            logic.NextTurnAsync().Wait();
 
             // assert
             bob.Damage.Should().Be(bob.CollisionDamage);
@@ -201,6 +204,25 @@ namespace Test.Challenge.LambdaRobots.Server {
         }
         #endregion
 
+        #region *** Disqualification Tests ***
+        [Fact]
+        public void DisqualifiedDueToFailureToRespond() {
+
+            // arrange
+            var robot = NewRobot("Bob", 500, 500);
+            var logic = NewLogic(robot);
+            _robotActions["Bob"] = new List<Func<RobotAction>> {
+                () => null
+            };
+
+            // act
+            logic.NextTurnAsync().Wait();
+
+            // assert
+            robot.State.Should().Be(RobotState.Dead);
+        }
+        #endregion
+
         private Game NewGame() => new Game {
             Id = "Test",
             BoardWidth = 1000.0,
@@ -254,11 +276,28 @@ namespace Test.Challenge.LambdaRobots.Server {
             MissileFarHitDamageBonus = 1.0
         };
 
-        private Logic NewLogic(params Robot[] robots) {
+        private GameLogic NewLogic(params Robot[] robots) {
             var game = NewGame();
             game.Robots.AddRange(robots);
-            _provider = new DependencyProvider(game, new DateTime(2019, 09, 27, 14, 30, 0), new Random());
-            return new Logic(_provider);
+            _provider = new DependencyProvider(
+                game,
+                new DateTime(2019, 09, 27, 14, 30, 0),
+                new Random(100),
+                async robot => new RobotConfig {
+                    Name = robot.Id
+                },
+                async robot => {
+
+                    // destructively fetch next action from dictionary or null if none exist
+                    if(_robotActions.TryGetValue(robot.Id, out var actions) && (actions?.Any() ?? false)) {
+                        var action = actions.First();
+                        actions.RemoveAt(0);
+                        return action();
+                    }
+                    return new RobotAction();
+                }
+            );
+            return new GameLogic(_provider);
         }
     }
 }

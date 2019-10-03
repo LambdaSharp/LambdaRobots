@@ -43,29 +43,53 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
 
             // TO-DO: add robot initialization and reading configuration settings
             _name = config.ReadText("RobotName");
-        }
-
-        public override async Task<RobotResponse> ProcessMessageAsync(RobotRequest request) {
-            switch(request.Command) {
-            case RobotCommand.GetName:
-                return new RobotResponse {
-                    RobotName = GetName()
-                };
-            case RobotCommand.GetAction:
-                return new RobotResponse {
-                    RobotAction = await GetAction(request)
-                };
-            default:
-                throw new ApplicationException($"unexpected command: '{request.Command}'");
+            if(string.IsNullOrWhiteSpace(_name)) {
+                _name = CurrentContext.FunctionName;
             }
         }
 
-        // TODO: overwrite to provide custom robot name
-        private string GetName() => !string.IsNullOrWhiteSpace(_name) ? _name : CurrentContext.FunctionName;
+        public override async Task<RobotResponse> ProcessMessageAsync(RobotRequest request) {
 
-        private async Task<RobotAction> GetAction(RobotRequest request) {
+            // NOTE (2019-10-03, bjorg): this method dispatches to other methods based on the incoming
+            //  request; most likely, there is nothing to change here.
+            LogInfo($"Command: {request.Command}");
+            RobotResponse response;
+            switch(request.Command) {
+            case RobotCommand.GetConfig:
+
+                // robot configuration request
+                response = new RobotResponse {
+                    RobotConfig = GetConfig()
+                };
+                break;
+            case RobotCommand.GetAction:
+
+                // robot action request
+                response = new RobotResponse {
+                    RobotAction = await GetActionAsync(request)
+                };
+                break;
+            default:
+
+                // unrecognized request
+                throw new ApplicationException($"unexpected request: '{request.Command}'");
+            }
+            LogInfo($"Response:\n{SerializeJson(response)}");
+            return response;
+        }
+
+        private RobotConfig GetConfig() {
+
+            // TODO: this method is always invoked at the beginning of a match
+            return new RobotConfig {
+                Name = _name
+            };
+        }
+
+        private async Task<RobotAction> GetActionAsync(RobotRequest request) {
+
+            // TODO: this method is invoked for every turn of a match
             return new RobotAction {
-                RobotId = request.Robot.Id,
 
                 // TODO: set Speed and Heading fields to direct the robot
                 // Speed = 50.0,

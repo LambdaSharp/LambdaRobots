@@ -30,12 +30,22 @@ using Newtonsoft.Json.Converters;
 
 namespace Challenge.LambdaRobots.Server.Common {
 
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum GameState {
+        Undefined,
+        Start,
+        NextTurn,
+        Finished,
+        Error
+    }
+
     public class Game {
 
         //--- Fields ---
         public string Id;
 
         // current state
+        public GameState State;
         public int TotalTurns;
         public List<RobotMissile> Missiles = new List<RobotMissile>();
         public List<Robot> Robots = new List<Robot>();
@@ -72,21 +82,45 @@ namespace Challenge.LambdaRobots.Server.Common {
     public class RobotMissile {
 
         //--- Fields ---
+
+        [JsonRequired]
         public string Id;
+
+        [JsonRequired]
         public string RobotId;
 
         // current state
+
+        [JsonRequired]
         public MissileState State;
+
+        [JsonRequired]
         public double X;
+
+        [JsonRequired]
         public double Y;
+
+        [JsonRequired]
         public double Distance;
 
         // missile characteristics
+
+        [JsonRequired]
         public double Speed;
+
+        [JsonRequired]
         public double Heading;
+
+        [JsonRequired]
         public double Range;
+
+        [JsonRequired]
         public double DirectHitDamageBonus;
+
+        [JsonRequired]
         public double NearHitDamageBonus;
+
+        [JsonRequired]
         public double FarHitDamageBonus;
     }
 }
