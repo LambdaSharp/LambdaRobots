@@ -22,3 +22,9 @@ Items:
       Action: lambda:InvokeFunction
       FunctionName: !Ref RobotFunction
       Principal: !Ref AwsAccountId
+
+  - Variable: RobotArn
+    Description: Lambda function ARN
+    Scope: public
+    Value: !GetAtt RobotFunction.Arn
+

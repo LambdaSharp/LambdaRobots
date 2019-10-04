@@ -37,6 +37,7 @@ using Challenge.LambdaRobots.Server.Common;
 using LambdaSharp;
 using System.IO;
 using Amazon.Runtime;
+using System.Collections.Generic;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -55,6 +56,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
         //--- Properties ---
         public string GameId { get; set; }
         public GameState State { get; set; }
+        public List<string> Messages { get; set; }
     }
 
     public class Function : ALambdaFunction<FunctionRequest, FunctionResponse> {
@@ -115,10 +117,9 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                 case GameState.NextTurn:
 
                     // next turn
-                    ++game.TotalTurns;
                     LogInfo($"Start turn {game.TotalTurns} (max: {game.MaxTurns}): invoking {game.Robots.Count(robot => robot.State == RobotState.Alive)} robots (total: {game.Robots.Count})");
                     await logic.NextTurnAsync();
-                    LogInfo($"End turn {game.TotalTurns} (max: {game.MaxTurns}): {game.Robots.Count(robot => robot.State == RobotState.Alive)} robots alive");
+                    LogInfo($"End turn: {game.Robots.Count(robot => robot.State == RobotState.Alive)} robots alive");
                     break;
                 case GameState.Finished:
 
@@ -128,19 +129,16 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                     game.State = GameState.Error;
                     throw new ApplicationException($"unexpected game state: '{request.State}'");
                 }
-
-                // log new game messages
-                for(var i = messageCount; i < game.Messages.Count; ++i) {
-                    LogInfo($"Game message {i + 1}: {game.Messages[i].Text}");
-                }
-
-                // update game state
-                game.State = (game.TotalTurns >= game.MaxTurns) || (game.Robots.Count(robot => robot.State == RobotState.Alive) <= 1)
-                    ? GameState.Finished
-                    : GameState.NextTurn;
             } catch(Exception e) {
                 LogError(e, "error during game loop");
                 game.State = GameState.Error;
+            }
+
+            // log new game messages
+            var newMessages = new List<string>();
+            for(var i = messageCount; i < game.Messages.Count; ++i) {
+                LogInfo($"Game message {i + 1}: {game.Messages[i].Text}");
+                newMessages.Add(game.Messages[i].Text);
             }
 
             // notify WebSocket of new game state
@@ -165,14 +163,15 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                 await _table.UpdateAsync(new GameRecord {
                     PK = game.Id,
                     Game = game
-                });
+                }, new[] { nameof(GameRecord.Game) });
             } else {
                 LogInfo($"Deleting game ID={game.Id}");
                 await _table.DeleteAsync<GameRecord>(game.Id);
             }
             return new FunctionResponse {
                 GameId = game.Id,
-                State = game.State
+                State = game.State,
+                Messages = newMessages
             };
         }
 

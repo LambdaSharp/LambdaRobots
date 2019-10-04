@@ -201,6 +201,9 @@ namespace Challenge.LambdaRobots.Server.Common {
 
         public async Task NextTurnAsync() {
 
+            // increment turn counter
+            ++Game.TotalTurns;
+
             // invoke all robots to get their actions
             await Task.WhenAll(Game.Robots
                 .Where(robot => robot.State == RobotState.Alive)
@@ -225,6 +228,19 @@ namespace Challenge.LambdaRobots.Server.Common {
                 }
             }
             Game.Missiles.RemoveAll(missile => missile.State != MissileState.Flying);
+
+            // update game state
+            var robotCount = Game.Robots.Count(robot => robot.State == RobotState.Alive);
+            if(robotCount == 0) {
+                AddMessage("All robots have perished. Game Over.");
+                Game.State = GameState.Finished;
+            } else if(robotCount == 1) {
+                AddMessage($"{Game.Robots.First(robot => robot.State == RobotState.Alive).Name} is victorious! Game Over.");
+                Game.State = GameState.Finished;
+            } else if(Game.TotalTurns >= Game.MaxTurns) {
+                AddMessage($"Reached max turns. {robotCount:N0} robots are left. Game Over.");
+                Game.State = GameState.Finished;
+            }
         }
 
         public double? ScanRobots(Robot robot, double heading, double resolution) {

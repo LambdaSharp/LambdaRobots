@@ -79,6 +79,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             // create a new game
             var game = new Game {
                 Id = CurrentRequest.RequestContext.ConnectionId,
+                State = GameState.Start,
                 BoardWidth = 1000.0,
                 BoardHeight = 1000.0,
                 SecondsPerTurn = 1.0,
@@ -105,7 +106,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
                 Name = $"LambdaRobotsGame-{game.Id}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
                 Input = SerializeJson(new {
                     GameId = game.Id,
-                    State = GameState.Start
+                    State = game.State
                 })
             });
 
