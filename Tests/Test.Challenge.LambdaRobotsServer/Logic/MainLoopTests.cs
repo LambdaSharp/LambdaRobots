@@ -243,7 +243,6 @@ namespace Test.Challenge.LambdaRobots.Server {
             // robot state
             Id = id,
             Name = id,
-            LambdaArn = "NO USED",
             State = RobotState.Alive,
             X = x,
             Y = y,

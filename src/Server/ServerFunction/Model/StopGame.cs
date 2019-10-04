@@ -23,18 +23,24 @@
  */
 
 using Challenge.LambdaRobots.Server.Common;
+using Newtonsoft.Json;
 
 namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
 
     public class StopGameRequest {
 
         //--- Properties ---
+        [JsonRequired]
+        public string Action { get; set; }
+
+        [JsonRequired]
         public string GameId { get; set; }
     }
 
     public class StopGameResponse {
 
         //--- Properties ---
+        [JsonRequired]
         public Game Game { get; set; }
     }
 }

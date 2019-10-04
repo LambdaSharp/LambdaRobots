@@ -38,7 +38,8 @@ namespace Challenge.LambdaRobots.Server.Common {
         public string PK { get; set; }
         public string SK => "GAME";
         public Game Game { get; set; }
-        public string GameExecutionArn { get; set; }
+        public List<string> LambdaRobotArns { get; set; }
+        public string GameLoopArn { get; set; }
     }
 
     public class GameStateMachineRecord : IGameTableSingletonRecord {

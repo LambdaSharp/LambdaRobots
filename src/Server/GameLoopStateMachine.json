@@ -1,0 +1,40 @@
+{
+    "Comment": "LambdaRobots game loop machine",
+
+    "StartAt": "GameLoop",
+    "States": {
+
+      "GameLoop": {
+        "Type": "Choice",
+        "Choices": [
+            {
+                "Variable": "$.State",
+                "StringEquals": "Start",
+                "Next": "GameStart"
+            },
+            {
+              "Variable": "$.State",
+              "StringEquals": "NextTurn",
+              "Next": "GameNextTurn"
+            }
+      ],
+        "Default": "GameOver"
+      },
+
+      "GameStart": {
+        "Type": "Task",
+        "Resource": "${GameTurnFunction.Arn}",
+        "Next": "GameLoop"
+      },
+
+      "GameNextTurn": {
+        "Type": "Task",
+        "Resource": "${GameTurnFunction.Arn}",
+        "Next": "GameLoop"
+      },
+
+      "GameOver": {
+          "Type": "Succeed"
+      }
+    }
+  }

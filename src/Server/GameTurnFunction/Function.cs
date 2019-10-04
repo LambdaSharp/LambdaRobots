@@ -85,16 +85,17 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
 
             // get game state from DynamoDB table
             LogInfo($"Loading game state for ID={request.GameId}");
-            var game = (await _table.GetAsync<GameRecord>(request.GameId))?.Game;
-            if(game == null) {
+            var gameRecord = await _table.GetAsync<GameRecord>(request.GameId);
+            if(gameRecord == null) {
                 throw new ApplicationException($"game ID={request.GameId} not found");
             }
+            var game = gameRecord.Game;
             var logic = new GameLogic(new DependencyProvider(
-                game,
+                gameRecord.Game,
                 DateTime.UtcNow,
                 _random,
-                robot => GetRobotConfigAsync(game, robot),
-                robot => GetRobotActionAsync(game, robot)
+                robot => GetRobotConfigAsync(game, robot, gameRecord.LambdaRobotArns[gameRecord.Game.Robots.IndexOf(robot)]),
+                robot => GetRobotActionAsync(game, robot, gameRecord.LambdaRobotArns[gameRecord.Game.Robots.IndexOf(robot)])
             ));
 
             // determine game action to take
@@ -107,7 +108,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
 
                     // start game
                     LogInfo($"Start game: initializing {game.Robots.Count(robot => robot.State == RobotState.Alive)} robots (total: {game.Robots.Count})");
-                    await logic.StartAsync();
+                    await logic.StartAsync(gameRecord.LambdaRobotArns.Count);
                     game.State = GameState.NextTurn;
                     LogInfo($"Done: {game.Robots.Count(robot => robot.State == RobotState.Alive)} robots ready");
                     break;
@@ -175,7 +176,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
             };
         }
 
-        private async Task<RobotConfig> GetRobotConfigAsync(Game game, Robot robot) {
+        private async Task<RobotConfig> GetRobotConfigAsync(Game game, Robot robot, string lambdaArn) {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
                 var getNameTask = _lambdaClient.InvokeAsync(new InvokeRequest {
@@ -183,7 +184,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                         Command = RobotCommand.GetConfig,
                         GameId = game.Id
                     }),
-                    FunctionName = robot.LambdaArn,
+                    FunctionName = lambdaArn,
                     InvocationType = InvocationType.RequestResponse
                 });
 
@@ -197,13 +198,13 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                 LogInfo($"Robot {robot.Id} GetName responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
                 return result.RobotConfig;
             } catch(Exception e) {
-                LogErrorAsWarning(e, $"Robot {robot.Id} GetName failed (arn: {robot.LambdaArn})");
+                LogErrorAsWarning(e, $"Robot {robot.Id} GetName failed (arn: {lambdaArn})");
                 return null;
             }
         }
 
 
-        private async Task<RobotAction> GetRobotActionAsync(Game game, Robot robot) {
+        private async Task<RobotAction> GetRobotActionAsync(Game game, Robot robot, string lambdaArn) {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
                 var getActionTask = _lambdaClient.InvokeAsync(new InvokeRequest {
@@ -215,7 +216,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                         // TODO: pass in server REST API
                         ServerApi = "TODO"
                     }),
-                    FunctionName = robot.LambdaArn,
+                    FunctionName = lambdaArn,
                     InvocationType = InvocationType.RequestResponse
                 });
 
@@ -229,7 +230,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                 LogInfo($"Robot {robot.Id} GetAction responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
                 return result.RobotAction;
             } catch(Exception e) {
-                LogErrorAsWarning(e, $"Robot {robot.Id} GetAction failed (arn: {robot.LambdaArn})");
+                LogErrorAsWarning(e, $"Robot {robot.Id} GetAction failed (arn: {lambdaArn})");
                 return null;
             }
         }

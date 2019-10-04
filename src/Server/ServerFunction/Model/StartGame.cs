@@ -31,9 +31,8 @@ namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
     public class StartGameRequest {
 
         //--- Properties ---
-
         [JsonRequired]
-        public string GameId { get; set; }
+        public string Action { get; set; }
 
         [JsonRequired]
         public List<string> RobotArns { get; set; } = new List<string>();
@@ -41,6 +40,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
 
     public class StartGameResponse {
 
+        //--- Properties ---
         [JsonRequired]
         public Game Game { get; set; }
     }

@@ -105,25 +105,58 @@ namespace Challenge.LambdaRobots.Server.Common {
         public Game Game => _provider.Game;
 
         //--- Methods ---
-        public async Task StartAsync() {
+        public async Task StartAsync(int robotCount) {
 
             // reset game state
             Game.TotalTurns = 0;
             Game.Missiles.Clear();
             Game.Messages.Clear();
-            foreach(var robot in Game.Robots) {
-                robot.ReloadDelay = 0.0;
-                robot.Speed = 0.0;
-                robot.State = RobotState.Alive;
-                robot.TargetHeading = 0.0;
-                robot.TargetSpeed = 0.0;
-                robot.TimeOfDeath = null;
-                robot.TotalDamageDealt = 0.0;
-                robot.TotalKills = 0;
-                robot.TotalMissileFiredCount = 0;
-                robot.TotalMissileHitCount = 0;
-                robot.TotalScanCount = 0;
-                robot.TotalTravelDistance = 0.0;
+            Game.Robots.Clear();
+            for(var i = 0; i < robotCount; ++i) {
+                Game.Robots.Add(new Robot {
+
+                    // robot state
+                    Id = $"{Game.Id}:R{i}",
+                    State = RobotState.Alive,
+                    X = 0.0,
+                    Y = 0.0,
+                    Speed = 0.0,
+                    Heading = 0.0,
+                    Damage = 0.0,
+                    ReloadDelay = 0.0,
+                    TimeOfDeath = null,
+                    TotalDamageDealt = 0.0,
+                    TotalKills = 0,
+                    TotalMissileFiredCount = 0,
+                    TotalMissileHitCount = 0,
+                    TotalScanCount = 0,
+                    TotalTravelDistance = 0.0,
+
+                    // action
+                    TargetHeading = 0.0,
+                    TargetSpeed = 0.0,
+
+                    // robot characteristics
+                    MaxSpeed = 100.0,
+                    Acceleration = 10.0,
+                    Deceleration = -20.0,
+                    MaxTurnSpeed = 50.0,
+                    ScannerRange = 600.0,
+                    ScannerResolution = 10.0,
+                    MaxDamage = 100.0,
+                    CollisionDamage = 2.0,
+                    DirectHitDamage = 8.0,
+                    NearHitDamage = 4.0,
+                    FarHitDamage = 2.0,
+
+                    // missile characteristics
+                    MissileReloadDelay = 2.0,
+                    MissileSpeed = 50.0,
+                    MissileRange = 700.0,
+                    MissileDirectHitDamageBonus = 3.0,
+                    MissileNearHitDamageBonus = 2.1,
+                    MissileFarHitDamageBonus = 1.0
+                });
             }
 
             // get configuration for all robots

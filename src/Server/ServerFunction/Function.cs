@@ -61,7 +61,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
                 config.ReadDynamoDBTableName("GameTable"),
                 new AmazonDynamoDBClient()
             );
-            _gameStateMachine = config.ReadText("GameStateMachine");
+            _gameStateMachine = config.ReadText("GameLoopStateMachine");
             _stepFunctionsClient = new AmazonStepFunctionsClient();
             _lambdaClient = new AmazonLambdaClient();
         }
@@ -72,11 +72,6 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
 
         public async Task CloseConnectionAsync(APIGatewayProxyRequest request) {
             LogInfo($"Disconnected: {request.RequestContext.ConnectionId}");
-
-            // stop the game, just in case it's still going
-            await StopGameAsync(new StopGameRequest {
-                GameId = request.RequestContext.ConnectionId
-            });
         }
 
         public async Task<StartGameResponse> StartGameAsync(StartGameRequest request) {
@@ -96,128 +91,41 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
                 TotalTurns = 0,
                 MaxTurns = 300
             };
-            var logic = new Logic(new DependencyProvider(game, DateTime.UtcNow, _random));
 
-            // collect names
-            game.Robots.AddRange((await Task.WhenAll(request.RobotArns.Select(async robotArn => {
-
-                // create new robot data structure
-                var robot = new Robot {
-
-                    // robot state
-                    Id = $"{game.Id}:R{game.Robots.Count}",
-                    LambdaArn = robotArn,
-                    State = RobotState.Alive,
-                    X = 0.0,
-                    Y = 0.0,
-                    Speed = 0.0,
-                    Heading = 0.0,
-                    TotalTravelDistance = 0.0,
-                    Damage = 0.0,
-                    ReloadDelay = 0.0,
-                    TotalMissileFiredCount = 0,
-
-                    // robot characteristics
-                    MaxSpeed = 100.0,
-                    Acceleration = 10.0,
-                    Deceleration = -20.0,
-                    MaxTurnSpeed = 50.0,
-                    ScannerRange = 600.0,
-                    ScannerResolution = 10.0,
-                    MaxDamage = 100.0,
-                    CollisionDamage = 2.0,
-                    DirectHitDamage = 8.0,
-                    NearHitDamage = 4.0,
-                    FarHitDamage = 2.0,
-
-                    // missile characteristics
-                    MissileReloadDelay = 2.0,
-                    MissileSpeed = 50.0,
-                    MissileRange = 700.0,
-                    MissileDirectHitDamageBonus = 3.0,
-                    MissileNearHitDamageBonus = 2.1,
-                    MissileFarHitDamageBonus = 1.0
-                };
-
-                // get robot configuration
-                await GetRobotConfig(robot);
-                return robot;
-            }))).Where(robot => robot.State == RobotState.Alive).ToList());
-
-            // reset game
-            logic.Reset();
-
-            // create game record
+            // store game record
             await _table.CreateAsync(new GameRecord {
                 PK = game.Id,
-                Game = game
+                Game = game,
+                LambdaRobotArns = request.RobotArns
             });
 
             // kick off game step function
             var startGame = await _stepFunctionsClient.StartExecutionAsync(new StartExecutionRequest {
                 StateMachineArn = _gameStateMachine,
-                Name = $"LambdaRobotsGame-{game.Id}",
+                Name = $"LambdaRobotsGame-{game.Id}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
                 Input = SerializeJson(new {
-                    GameId = game.Id
+                    GameId = game.Id,
+                    State = GameState.Start
                 })
             });
 
             // update execution ARN for game record
             await _table.UpdateAsync(new GameRecord {
                 PK = game.Id,
-                GameExecutionArn = startGame.ExecutionArn
-            }, new[] { nameof(GameRecord.GameExecutionArn) });
+                GameLoopArn = startGame.ExecutionArn
+            }, new[] {
+                nameof(GameRecord.GameLoopArn)
+            });
 
             // return with kicked off game
             return new StartGameResponse {
                 Game = game
             };
-
-            // local functions
-            async Task<RobotResponse> GetRobotConfig(Robot robot) {
-                var stopwatch = System.Diagnostics.Stopwatch.StartNew();
-                try {
-                    var getNameTask = _lambdaClient.InvokeAsync(new InvokeRequest {
-                        Payload = SerializeJson(new RobotRequest {
-                            Command = RobotCommand.GetConfig,
-                            GameId = game.Id
-                        }),
-                        FunctionName = robot.LambdaArn,
-                        InvocationType = InvocationType.RequestResponse
-                    });
-
-                    // check if lambda responds within time limit
-                    if(await Task.WhenAny(getNameTask, Task.Delay(TimeSpan.FromSeconds(game.RobotTimeoutSeconds))) != getNameTask) {
-                        LogInfo($"Robot {robot.Id} GetName timed out after {stopwatch.Elapsed.TotalSeconds:N2}s");
-
-                        // kill the robot
-                        robot.State = RobotState.Dead;
-                        return new RobotResponse();
-                    }
-                    var response = Encoding.UTF8.GetString(getNameTask.Result.Payload.ToArray());
-                    var result = DeserializeJson<RobotResponse>(response);
-                    LogInfo($"Robot {robot.Id} GetName responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
-
-                    // always set the robot name
-                    if(result.RobotConfig == null) {
-                        result.RobotConfig = new RobotConfig{
-                            Name = $"Robot-{robot.Id}"
-                        };
-                    }
-                    return result;
-                } catch(Exception e) {
-                    LogErrorAsWarning(e, $"Robot {robot.Id} GetName failed (arn: {robot.LambdaArn})");
-
-                    // kill the robot
-                    robot.State = RobotState.Dead;
-                    return new RobotResponse();
-                }
-            }
         }
 
         public async Task<StopGameResponse> StopGameAsync(StopGameRequest request) {
 
-            // attempt to fetch game from table
+            // fetch game record from table
             var gameRecord = await _table.GetAsync<GameRecord>(request.GameId);
             if(gameRecord == null) {
 
@@ -226,9 +134,9 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             }
 
             // check if game state machine needs to be stopped
-            if(gameRecord.GameExecutionArn != null) {
+            if(gameRecord.GameLoopArn != null) {
                 await _stepFunctionsClient.StopExecutionAsync(new StopExecutionRequest {
-                    ExecutionArn = gameRecord.GameExecutionArn,
+                    ExecutionArn = gameRecord.GameLoopArn,
                     Cause = "user requested game to be stopped"
                 });
             }
@@ -244,19 +152,27 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
 
         public async Task<ScanEnemiesResponse> ScanEnemiesAsync(ScanEnemiesRequest request) {
 
-            // check if the game ID exists
+            // fetch game record from table
             var gameRecord = await _table.GetAsync<GameRecord>(request.GameId);
             if(gameRecord == null) {
                 throw AbortNotFound($"could not find a game session with ID={request.GameId ?? "<NULL>"}");
             }
+            var gameLogic = new GameLogic(new DependencyProvider(
+                gameRecord.Game,
+                DateTime.UtcNow,
+                _random,
+                r => throw new NotImplementedException("not implementation for GetConfig"),
+                r => throw new NotImplementedException("not implementation for GetAction")
+            ));
 
-            // find nearest enemy within scan resolution
-            var logic = new Logic(new DependencyProvider(gameRecord.Game, DateTime.UtcNow, _random));
+            // identify scanning robot
             var robot = gameRecord.Game.Robots.FirstOrDefault(r => r.Id == request.RobotId);
             if(robot == null) {
                 throw AbortNotFound($"could not find a robot with ID={request.RobotId}");
             }
-            var distanceFound = logic.ScanRobots(robot, request.Heading, request.Resolution);
+
+            // find nearest enemy within scan resolution
+            var distanceFound = gameLogic.ScanRobots(robot, request.Heading, request.Resolution);
             return new ScanEnemiesResponse {
                 Found = distanceFound.HasValue,
                 Distance = distanceFound.GetValueOrDefault()
