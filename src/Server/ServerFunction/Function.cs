@@ -80,17 +80,16 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             var game = new Game {
                 Id = CurrentRequest.RequestContext.ConnectionId,
                 State = GameState.Start,
-                BoardWidth = 1000.0,
-                BoardHeight = 1000.0,
-                SecondsPerTurn = 1.0,
-                DirectHitRange = 5.0,
-                NearHitRange = 20.0,
-                FarHitRange = 40.0,
-                CollisionRange = 2.0,
-                MinRobotStartDistance = 100.0,
-                RobotTimeoutSeconds = 10.0,
-                TotalTurns = 0,
-                MaxTurns = 300
+                BoardWidth = request.BoardWidth ?? 1000.0,
+                BoardHeight = request.BoardHeight ?? 1000.0,
+                SecondsPerTurn = request.SecondsPerTurn ?? 1.0,
+                MaxTurns = request.MaxTurns ?? 300,
+                DirectHitRange = request.DirectHitRange ?? 5.0,
+                NearHitRange = request.NearHitRange ?? 20.0,
+                FarHitRange = request.FarHitRange ?? 40.0,
+                CollisionRange = request.CollisionRange ?? 2.0,
+                MinRobotStartDistance = request.MinRobotStartDistance ?? 100.0,
+                RobotTimeoutSeconds = request.RobotTimeoutSeconds ?? 15.0
             };
 
             // store game record

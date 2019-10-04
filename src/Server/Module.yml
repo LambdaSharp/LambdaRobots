@@ -103,5 +103,5 @@ Items:
 
   - Variable: RestApiUrl
     Description: REST API URL
-    Scope: public
+    Scope: public, GameTurnFunction
     Value: !Ref Module::RestApi::Url

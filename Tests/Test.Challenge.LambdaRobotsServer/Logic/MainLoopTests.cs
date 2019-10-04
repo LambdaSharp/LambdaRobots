@@ -250,7 +250,7 @@ namespace Test.Challenge.LambdaRobots.Server {
             Heading = 0.0,
             TotalTravelDistance = 0.0,
             Damage = 0.0,
-            ReloadDelay = 0.0,
+            ReloadCoolDown = 0.0,
             TotalMissileFiredCount = 0,
 
             // robot characteristics

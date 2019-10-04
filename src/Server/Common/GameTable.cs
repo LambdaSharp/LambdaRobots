@@ -95,8 +95,10 @@ namespace Challenge.LambdaRobots.Server.Common {
 
         public async Task UpdateAsync<T>(T record, IEnumerable<string> columnsToUpdate) where T : IGameTableRecord {
             var document = Document.FromJson(JsonConvert.SerializeObject(record));
-            foreach(var key in document.Keys.Where(key => (key != "PK") && (key != "SK") && !columnsToUpdate.Contains(key)).ToList()) {
-                document.Remove(key);
+            if(columnsToUpdate.Any()) {
+                foreach(var key in document.Keys.Where(key => (key != "PK") && (key != "SK") && !columnsToUpdate.Contains(key)).ToList()) {
+                    document.Remove(key);
+                }
             }
             await _table.UpdateItemAsync(document, new UpdateItemOperationConfig());
         }

@@ -40,7 +40,10 @@ namespace Challenge.LambdaRobots.Common {
         //--- Properties ---
         public RobotCommand Command { get; set; }
         public string GameId { get; set; }
-        public string ServerApi { get; set; }
+        public string GameApi { get; set; }
+        public double GameBoardWidth { get; set; }
+        public double GameBoardHeight { get; set; }
+        public int GameMaxTurns { get; set; }
         public Robot Robot { get; set; }
     }
 
@@ -77,7 +80,7 @@ namespace Challenge.LambdaRobots.Common {
         public double Speed;
         public double Heading;
         public double Damage;
-        public double ReloadDelay;
+        public double ReloadCoolDown;
 
         // target state
         public double TargetSpeed;

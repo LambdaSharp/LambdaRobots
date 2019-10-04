@@ -123,7 +123,7 @@ namespace Challenge.LambdaRobots.Server.Common {
                     Speed = 0.0,
                     Heading = 0.0,
                     Damage = 0.0,
-                    ReloadDelay = 0.0,
+                    ReloadCoolDown = 0.0,
                     TimeOfDeath = null,
                     TotalDamageDealt = 0.0,
                     TotalKills = 0,
@@ -293,11 +293,11 @@ namespace Challenge.LambdaRobots.Server.Common {
             robot.TargetHeading = NormalizeAngle(action.Heading ?? robot.TargetHeading);
 
             // fire missile if requested and possible
-            if((action.FireMissileHeading.HasValue || action.FireMissileRange.HasValue) && (robot.ReloadDelay == 0.0)) {
+            if((action.FireMissileHeading.HasValue || action.FireMissileRange.HasValue) && (robot.ReloadCoolDown == 0.0)) {
 
                 // update robot state
                 ++robot.TotalMissileFiredCount;
-                robot.ReloadDelay = robot.MissileReloadDelay;
+                robot.ReloadCoolDown = robot.MissileReloadDelay;
 
                 // add missile
                 var missile = new RobotMissile {
@@ -384,8 +384,8 @@ namespace Challenge.LambdaRobots.Server.Common {
         private void MoveRobot(Robot robot) {
 
             // reduce reload time if any is active
-            if(robot.ReloadDelay > 0) {
-                robot.ReloadDelay = Math.Max(0.0, robot.ReloadDelay - Game.SecondsPerTurn);
+            if(robot.ReloadCoolDown > 0) {
+                robot.ReloadCoolDown = Math.Max(0.0, robot.ReloadCoolDown - Game.SecondsPerTurn);
             }
 
             // compute new speed

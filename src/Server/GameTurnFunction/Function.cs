@@ -66,6 +66,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
 
         //--- Fields ---
         private GameTable _table;
+        private string _gameApi;
         private IAmazonLambda _lambdaClient;
         private IAmazonApiGatewayManagementApi _amaClient;
 
@@ -77,6 +78,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                 config.ReadDynamoDBTableName("GameTable"),
                 new AmazonDynamoDBClient()
             );
+            _gameApi = config.ReadText("RestApiUrl");
             _lambdaClient = new AmazonLambdaClient();
             _amaClient = new AmazonApiGatewayManagementApiClient(new AmazonApiGatewayManagementApiConfig {
                 ServiceURL = config.ReadText("Module::WebSocket::Url")
@@ -210,10 +212,11 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                     Payload = SerializeJson(new RobotRequest {
                         Command = RobotCommand.GetAction,
                         GameId = game.Id,
-                        Robot = robot,
-
-                        // TODO: pass in server REST API
-                        ServerApi = "TODO"
+                        GameBoardWidth = game.BoardWidth,
+                        GameBoardHeight = game.BoardHeight,
+                        GameMaxTurns = game.MaxTurns,
+                        GameApi = _gameApi,
+                        Robot = robot
                     }),
                     FunctionName = lambdaArn,
                     InvocationType = InvocationType.RequestResponse

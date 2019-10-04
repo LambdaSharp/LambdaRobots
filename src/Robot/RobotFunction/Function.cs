@@ -22,7 +22,6 @@
  * SOFTWARE.
  */
 
-using System;
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 using Challenge.LambdaRobots.Common;
@@ -33,72 +32,86 @@ using LambdaSharp;
 
 namespace Challenge.LambdaRobots.Robot.RobotFunction {
 
-    public class Function : ALambdaFunction<RobotRequest, RobotResponse> {
-
-        //--- Fields ---
-        private string _name;
+    public class Function : ALambdaRobotFunction {
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
+            await base.InitializeAsync(config);
 
             // TO-DO: add robot initialization and reading configuration settings
-            _name = config.ReadText("RobotName");
-            if(string.IsNullOrWhiteSpace(_name)) {
-                _name = CurrentContext.FunctionName;
-            }
         }
 
-        public override async Task<RobotResponse> ProcessMessageAsync(RobotRequest request) {
-
-            // NOTE (2019-10-03, bjorg): this method dispatches to other methods based on the incoming
-            //  request; most likely, there is nothing to change here.
-            LogInfo($"Command: {request.Command}");
-            RobotResponse response;
-            switch(request.Command) {
-            case RobotCommand.GetConfig:
-
-                // robot configuration request
-                response = new RobotResponse {
-                    RobotConfig = GetConfig()
-                };
-                break;
-            case RobotCommand.GetAction:
-
-                // robot action request
-                response = new RobotResponse {
-                    RobotAction = await GetActionAsync(request)
-                };
-                break;
-            default:
-
-                // unrecognized request
-                throw new ApplicationException($"unexpected request: '{request.Command}'");
-            }
-            LogInfo($"Response:\n{SerializeJson(response)}");
-            return response;
-        }
-
-        private RobotConfig GetConfig() {
+        public override async Task<RobotConfig> GetConfigAsync() {
 
             // TODO: this method is always invoked at the beginning of a match
             return new RobotConfig {
-                Name = _name
+                Name = Name
             };
         }
 
-        private async Task<RobotAction> GetActionAsync(RobotRequest request) {
+        public override async Task GetActionAsync() {
 
-            // TODO: this method is invoked for every turn of a match
-            return new RobotAction {
+            // check if robot needs to accelerate
+            if(Speed < 40.0) {
+                SetSpeed(40.0);
+                SetHeading(Random.NextDouble() * 360.0);
+            }
 
-                // TODO: set Speed and Heading fields to direct the robot
-                // Speed = 50.0,
-                // Heading = 90.0,
+            // check if robot needs to turn
+            if(X < 100.0) {
 
-                // TODO: set FireMissileHeading and FireMissileRange to fire a rocket
-                // FireMissileHeading = 270.0,
-                // FireMissileRange = 500.0
-            };
+                // too close to left wall, go right
+                SetHeading(45.0 + Random.NextDouble() * 90.0);
+            } else if(X > (GameBoardWidth - 100.0)) {
+
+                // too close to right wall, go left
+                SetHeading(-45.0 - Random.NextDouble() * 90.0);
+            }
+            if(Y < 100.0) {
+
+                // too close to bottom wall, go up
+                SetHeading(-45.0 + Random.NextDouble() * 90.0);
+            } else if(Y > (GameBoardHeight - 100.0)) {
+
+                // too close to top wall, go down
+                SetHeading(135.0 + Random.NextDouble() * 90.0);
+            }
+
+            // check if robot can fire a missile
+            if(ReloadCoolDown == 0.0) {
+
+                // scan in the direction we're heading
+                var scanHeading = Heading;
+                var resolution = 10.0;
+                double? distance = null;
+
+                // keep scanning until the direction is precise enough
+                while(resolution > 1.0) {
+                    for(var i = 0; i < 3; ++i) {
+                        var currentScanHeading = scanHeading + ((i - 1) * 2.0 * resolution);
+                        distance = await Scan(currentScanHeading, resolution);
+
+                        // check if we found something
+                        if(distance.HasValue) {
+
+                            // center scanner in the direction where we found something
+                            scanHeading = currentScanHeading + resolution * 0.5;
+
+                            // narrow the scan resolution for a more precise heading reading
+                            resolution = resolution / 3.0;
+                            continue;
+                        }
+                    }
+
+                    // scanner didn't find anything
+                    break;
+                }
+
+                // check if a target was found
+                if(distance.HasValue) {
+                    Fire(scanHeading, distance.Value);
+                }
+            }
         }
     }
 }

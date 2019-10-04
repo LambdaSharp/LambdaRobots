@@ -36,6 +36,18 @@ namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
 
         [JsonRequired]
         public List<string> RobotArns { get; set; } = new List<string>();
+
+        // optional board initialization settings
+        public double? BoardWidth { get; set; }
+        public double? BoardHeight { get; set; }
+        public double? SecondsPerTurn { get; set; }
+        public int? MaxTurns { get; set; }
+        public double? DirectHitRange { get; set; }
+        public double? NearHitRange { get; set; }
+        public double? FarHitRange { get; set; }
+        public double? CollisionRange { get; set; }
+        public double? MinRobotStartDistance { get; set; }
+        public double? RobotTimeoutSeconds { get; set; }
     }
 
     public class StartGameResponse {

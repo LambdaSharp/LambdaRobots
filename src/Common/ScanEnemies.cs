@@ -22,10 +22,7 @@
  * SOFTWARE.
  */
 
-using Challenge.LambdaRobots.Server.Common;
-using Newtonsoft.Json;
-
-namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
+namespace Challenge.LambdaRobots.Common {
 
     public class ScanEnemiesRequest {
 
