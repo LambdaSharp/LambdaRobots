@@ -99,7 +99,7 @@ function messagesUi(messages) {
   messagesElement.innerText = "";
   messages.forEach(message => {
     messagesElement.appendChild(
-      document.createTextNode(`${message.Timestamp}:${message.Text}`)
+      document.createTextNode(`${message.Timestamp}:${message.Text}\n`)
     );
   });
 }
