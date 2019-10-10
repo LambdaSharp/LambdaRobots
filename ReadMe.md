@@ -1,6 +1,6 @@
 # LambdaRobots
 
-Port of the old school C/Pascal Robots game to AWS serverless .NET
+Port of the 90s [P-Robots](https://corewar.co.uk/probots.htm) game to AWS serverless .NET
 
 ## Step 1: Deploy LambdaRobots Server
 
@@ -21,11 +21,12 @@ lash deploy src/Robot
     "Action": "start",
     "RobotArns": [
         "arn:aws:lambda:us-west-2:254924790709:function:SteveBTest-Challenge-LambdaRobots-Ro-RobotFunction-1CVA9K57UVTMV",
-        "arn:aws:lambda:us-west-2:254924790709:function:SteveBTest-Challenge-LambdaRobots-Ro-RobotFunction-1CVA9K57UVTMV"
+        "arn:aws:lambda:us-west-2:115273393711:function:Challenge-LambdaRobots-Robot-RobotFunction-1LVT90DMNW57D"
     ],
     "BoardWidth": 1000,
     "BoardHeight": 1000,
-    "MaxTurns": 30
+    "MaxTurns": 30,
+    "RobotTimeoutSeconds": 30
 }
 ```
 
@@ -98,20 +99,22 @@ lash deploy src/Robot
 
 ### Properties
 
+The most commonly needed properties are readily available as properties from the base class.
+
 |Property Name      |Type       |Description |
 |-------------------|-----------|------------|
-|Random             |Random     |Initialized random number generate. See [Random Class](https://docs.microsoft.com/en-us/dotnet/api/system.random?view=netstandard-2.0). |
+|Damage             |double     |Robot damage. Value is always between 0 and `Robot.MaxDamage`. When the value is equal to `Robot.MaxDamage` the robot is considered killed. |
+|GameBoardHeight    |double     |Height of the game board. |
+|GameBoardWidth     |double     |Width of the game board. |
+|GameId             |string     |Unique Game ID. |
+|GameMaxTurns       |int        |Maximum number of turns before the game ends in a draw. |
+|Heading            |double     |Robot heading. Value is always between `-180` and `180`. |
+|Random             |Random     |Initialized random number generator. Instance of [Random Class](https://docs.microsoft.com/en-us/dotnet/api/system.random?view=netstandard-2.0). |
+|ReloadCoolDown     |double     |Number of seconds until the missile launcher is ready again. |
+|Robot              |Robot      |Robot data-structure (see below). |
+|Speed              |double     |Robot speed. Value is between `0` and `Robot.MaxSpeed`. |
 |X                  |double     |Horizontal position of robot. Value is between `0` and `GameBoardWidth`. |
 |Y                  |double     |Vertical position of robot. Value is between `0` and `GameBoardHeight`. |
-|Speed              |double     |Robot speed. Value is between `0` and `Robot.MaxSpeed`. |
-|Heading            |double     |Robot heading. Value is always between `-180` and `180`. |
-|Damage             |double     |Robot damage. Value is always between 0 and `Robot.MaxDamage`. When the value is equal to `Robot.MaxDamage` the robot is considered killed. |
-|ReloadCoolDown     |double     |Number of seconds until the missile launcher is ready again. |
-|GameId             |string     |Unique Game ID. |
-|GameBoardWidth     |double     |Maximum width of the game board. |
-|GameBoardHeight    |double     |Maximum height of the game board. |
-|GameMaxTurns       |int        |Maximum number of turns before the game ends in a draw. |
-|Robot              |Robot      |Robot data-structure (see below). |
 
 ### Methods
 

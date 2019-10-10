@@ -98,16 +98,6 @@ Items:
     Allow: lambda:InvokeFunction
     Value: "*"
 
-  - Variable: WebSocketUrl
-    Description: WebSocket URL
-    Scope: public
-    Value: !Ref Module::WebSocket::Url
-
-  - Variable: RestApiUrl
-    Description: REST API URL
-    Scope: public, GameTurnFunction
-    Value: !Ref Module::RestApi::Url
-  
   - Resource: WebsiteBucket
     Description: S3 bucket for hosting the game
     Type: AWS::S3::Bucket
@@ -150,3 +140,19 @@ Items:
       Key: config.json
       Contents:
         wss: !Ref WebSocketUrl
+
+  # Output Variables
+  - Variable: WebSocketUrl
+    Description: WebSocket URL
+    Scope: public
+    Value: !Ref Module::WebSocket::Url
+
+  - Variable: RestApiUrl
+    Description: REST API URL
+    Scope: public, GameTurnFunction
+    Value: !Ref Module::RestApi::Url
+
+  - Variable: WebsiteUrl
+    Description: Website URL
+    Scope: public
+    Value: !GetAtt WebsiteBucket.WebsiteURL
