@@ -55,9 +55,10 @@ export default class WebSocketClient {
     this._writeToScreen(
       '<span style="color: blue;">RESPONSE: ' + evt.data + "</span>"
     );
+    let jsonResult;
     try {
       if (this.onMessage) {
-        const jsonResult = JSON.parse(evt.data);
+        jsonResult = JSON.parse(evt.data);
         this.onMessage(jsonResult);
       }
     } catch (error) {

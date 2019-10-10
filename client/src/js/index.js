@@ -25,6 +25,7 @@ async function init() {
         stopGameUi();
       }
       if (data.Game.State === "Start") {
+        sessionStorage.setItem("gameId", data.Game.Id);
         startGameUi();
       }
     }
@@ -76,7 +77,7 @@ function startGame() {
 function stopGame() {
   const request = {
     Action: "stop",
-    RobotArns: getRobotArns()
+    GameId: sessionStorage.getItem("gameId")
   };
   wsClient.doSend(JSON.stringify(request));
 }

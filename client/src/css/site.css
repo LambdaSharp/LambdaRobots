@@ -21,4 +21,5 @@ body {
   min-width: 400px;
   max-height: 1000px;
   overflow: auto;
+  padding: 1%;
 }
