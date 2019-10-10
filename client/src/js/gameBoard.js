@@ -24,6 +24,7 @@ export default class GameBoard {
       gameStat.State === "NextTurn"
     ) {
       this._Robots(gameStat.Robots);
+      this._Missiles(gameStat.Missiles);
       return;
     }
   }
@@ -34,12 +35,25 @@ export default class GameBoard {
 
   _Robots(robots) {
     this.context.font = "16px Arial";
+    this.context.fillStyle = "black";
     for (let index = 0; index < robots.length; index++) {
       const robot = robots[index];
       this.context.fillText(
         index + 1,
         Math.round(robot.X),
         Math.round(robot.Y)
+      );
+    }
+  }
+
+  _Missiles(missiles) {
+    for (let index = 0; index < missiles.length; index++) {
+      const missile = missiles[index];
+      this.context.fillStyle = "red";
+      this.context.fillText(
+        "|",
+        Math.round(missile.X),
+        Math.round(missile.Y)
       );
     }
   }

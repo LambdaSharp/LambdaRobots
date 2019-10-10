@@ -18,26 +18,29 @@ async function init() {
     5000,
     data => {
       gameBoardClient.Repaint(data);
+      if (typeof data.Messages !== "undefined") {
+        messagesUi(data.Messages);
+      }
       if (typeof data.State !== "undefined" && data.State === "Finished") {
         stopGameUi();
+      }
+      if (typeof data.State !== "undefined" && data.State === "Start") {
+        startGameUi();
       }
     }
   );
   document.getElementById("btnStartGame").addEventListener("click", () => {
     startGame();
-    mainMenu.style.display = "none";
-    leaderBoard.style.display = "none";
-    gameBoardStatsContainer.style.display = "block";
+    startGameUI(); // remove this when bug has been fixed.
   });
   document.getElementById("btnStopGame").addEventListener("click", () => {
     stopGame();
-    stopGameUi();
   });
   document.getElementById("btnClear").addEventListener("click", () => {
     localStorage.clear();
     window.location.href = "/";
   });
-  const robotArns = JSON.parse(localStorage.getItem("robotArns") || []);
+  const robotArns = JSON.parse(localStorage.getItem("robotArns")) || [];
   const robotArnsElements = [].slice.call(document.getElementsByName("robots"));
   for (let index = 0; index < robotArns.length; index++) {
     robotArnsElements[index].value = robotArns[index];
@@ -58,14 +61,15 @@ function startGame() {
   const robotArnsElements = [].slice.call(document.getElementsByName("robots"));
   const robotArns = robotArnsElements
     .map(robotArn => robotArn.value)
-    .filter(robotArn => robotArn.length > 10);
+    .filter(robotArn => robotArn.length > 10)
+    .map(robotArn => robotArn.trim());
   localStorage.setItem("robotArns", JSON.stringify(robotArns));
   const request = {
     Action: "start",
     RobotArns: robotArns,
     BoardWidth: 1000,
     BoardHeight: 1000,
-    MaxTurns: 50
+    MaxTurns: 150
   };
   wsClient.doSend(JSON.stringify(request));
 }
@@ -77,11 +81,27 @@ function stopGame() {
   wsClient.doSend(JSON.stringify(request));
 }
 
+function startGameUI() {
+  mainMenu.style.display = "none";
+  leaderBoard.style.display = "none";
+  gameBoardStatsContainer.style.display = "block";
+}
+
 function stopGameUi() {
   mainMenu.style.display = "block";
   gameBoardStatsContainer.style.display = "none";
   mainMenu.style.display = "block";
   leaderBoard.style.display = "block";
+}
+
+function messagesUi(messages) {
+  const messagesElement = document.getElementById("statsBoxMessages");
+  messagesElement.innerText = "";
+  messages.forEach(message => {
+    messagesElement.appendChild(
+      document.createTextNode(`${message.Timestamp}:${message.Text}`)
+    );
+  });
 }
 
 window.addEventListener("load", init, false);

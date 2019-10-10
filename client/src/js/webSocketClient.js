@@ -44,7 +44,6 @@ export default class WebSocketClient {
         this._reconnect(evt);
         break;
     }
-    this.onclose(evt);
   }
 
   _onMessage(evt, onMessage) {
@@ -73,7 +72,7 @@ export default class WebSocketClient {
     var that = this;
     setTimeout(function() {
       console.log("WebSocketClient: reconnecting...");
-      that.open(that.wss);
+      that.websocket.open(that.wss);
     }, this.autoReconnectInterval);
   };
 
