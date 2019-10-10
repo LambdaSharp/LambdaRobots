@@ -214,6 +214,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                         GameId = game.Id,
                         GameBoardWidth = game.BoardWidth,
                         GameBoardHeight = game.BoardHeight,
+                        GameSecondsPerTurn = game.SecondsPerTurn,
                         GameMaxTurns = game.MaxTurns,
                         GameApi = _gameApi,
                         Robot = robot

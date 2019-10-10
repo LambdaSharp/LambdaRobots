@@ -119,7 +119,6 @@ The most commonly needed properties are readily available as properties from the
 ### Methods
 
 #### `void SetHeading(double heading)`
-
 #### `void SetSpeed(double speed)`
-
-#### `Task<double?> Scan(double heading, double resolution)`
+#### `Task<double?> ScanForEnemies(double heading, double resolution)`
+#### `double AngleTo(double x, double y)`

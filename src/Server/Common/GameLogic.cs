@@ -232,14 +232,23 @@ namespace Challenge.LambdaRobots.Server.Common {
             // update game state
             var robotCount = Game.Robots.Count(robot => robot.State == RobotState.Alive);
             if(robotCount == 0) {
+
+                // no robots left
                 AddMessage("All robots have perished. Game Over.");
                 Game.State = GameState.Finished;
+                Game.Missiles.Clear();
             } else if(robotCount == 1) {
+
+                // last robot standing
                 AddMessage($"{Game.Robots.First(robot => robot.State == RobotState.Alive).Name} is victorious! Game Over.");
                 Game.State = GameState.Finished;
+                Game.Missiles.Clear();
             } else if(Game.TotalTurns >= Game.MaxTurns) {
+
+                // game has reached its turn limit
                 AddMessage($"Reached max turns. {robotCount:N0} robots are left. Game Over.");
                 Game.State = GameState.Finished;
+                Game.Missiles.Clear();
             }
         }
 
@@ -293,7 +302,7 @@ namespace Challenge.LambdaRobots.Server.Common {
             robot.TargetHeading = NormalizeAngle(action.Heading ?? robot.TargetHeading);
 
             // fire missile if requested and possible
-            if((action.FireMissileHeading.HasValue || action.FireMissileRange.HasValue) && (robot.ReloadCoolDown == 0.0)) {
+            if((action.FireMissileHeading.HasValue || action.FireMissileDistance.HasValue) && (robot.ReloadCoolDown == 0.0)) {
 
                 // update robot state
                 ++robot.TotalMissileFiredCount;
@@ -308,7 +317,7 @@ namespace Challenge.LambdaRobots.Server.Common {
                     Y = robot.Y,
                     Speed = robot.MissileSpeed,
                     Heading = NormalizeAngle(action.FireMissileHeading ?? robot.Heading),
-                    Range = MinMax(0.0, action.FireMissileRange ?? robot.MissileRange, robot.MissileRange),
+                    Range = MinMax(0.0, action.FireMissileDistance ?? robot.MissileRange, robot.MissileRange),
                     DirectHitDamageBonus = robot.MissileDirectHitDamageBonus,
                     NearHitDamageBonus = robot.MissileNearHitDamageBonus,
                     FarHitDamageBonus = robot.MissileFarHitDamageBonus

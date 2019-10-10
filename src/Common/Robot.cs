@@ -43,6 +43,7 @@ namespace Challenge.LambdaRobots.Common {
         public string GameApi { get; set; }
         public double GameBoardWidth { get; set; }
         public double GameBoardHeight { get; set; }
+        public double GameSecondsPerTurn { get; set; }
         public int GameMaxTurns { get; set; }
         public Robot Robot { get; set; }
     }
@@ -123,6 +124,6 @@ namespace Challenge.LambdaRobots.Common {
         public double? Speed;
         public double? Heading;
         public double? FireMissileHeading;
-        public double? FireMissileRange;
+        public double? FireMissileDistance;
     }
 }
