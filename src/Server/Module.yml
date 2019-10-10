@@ -4,6 +4,8 @@ Description: Lambda-Robots is based on the 90s game P-Robots by David Malmberg
 Pragmas:
   - Overrides:
       Module::WebSocket.RouteSelectionExpression: $request.body.Action
+Using:
+  - Module: LambdaSharp.S3.IO@lambdasharp
 Items:
 
   - Resource: GameTable
@@ -105,3 +107,46 @@ Items:
     Description: REST API URL
     Scope: public, GameTurnFunction
     Value: !Ref Module::RestApi::Url
+  
+  - Resource: WebsiteBucket
+    Description: S3 bucket for hosting the game
+    Type: AWS::S3::Bucket
+    Properties:
+      WebsiteConfiguration:
+        IndexDocument: index.html
+
+  - Resource: WebsiteBucketPolicy
+    Description: Public access policy
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      PolicyDocument:
+        Id: WebsiteBucket
+        Version: 2012-10-17
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: "*"
+            Action: s3:GetObject
+            Resource: !Sub "${WebsiteBucket.Arn}/*"
+      Bucket: !Ref WebsiteBucket
+    DependsOn: DeployWebsiteFiles
+
+  - Package: WebsiteFiles
+    Description: Website files to deploy
+    Files: "../../client/src"
+
+  - Resource: DeployWebsiteFiles
+    Type: LambdaSharp::S3::Unzip
+    Properties:
+      SourceBucket: !Ref DeploymentBucketName
+      SourceKey: !Ref WebsiteFiles
+      DestinationBucket: !Ref WebsiteBucket
+      DestinationKey: ""
+
+  - Resource: WebsiteConfigJson
+    Type: LambdaSharp::S3::WriteJson
+    Properties:
+      Bucket: !Ref WebsiteBucket
+      Key: config.json
+      Contents:
+        wss: !Ref WebSocketUrl
