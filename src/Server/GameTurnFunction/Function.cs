@@ -32,7 +32,6 @@ using Amazon.ApiGatewayManagementApi.Model;
 using Amazon.Lambda;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Model;
-using Challenge.LambdaRobots.Server;
 using LambdaSharp;
 using System.IO;
 using Amazon.Runtime;
@@ -57,6 +56,12 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
         public string GameId { get; set; }
         public GameState State { get; set; }
         public List<string> Messages { get; set; }
+    }
+
+    public class GameTurnNotification {
+
+        //--- Properties ---
+        public ServerGame Game { get; set; }
     }
 
     public class Function : ALambdaFunction<FunctionRequest, FunctionResponse> {
@@ -148,7 +153,9 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
             try {
                 await _amaClient.PostToConnectionAsync(new PostToConnectionRequest {
                     ConnectionId = game.Id,
-                    Data = new MemoryStream(Encoding.UTF8.GetBytes(SerializeJson(game)))
+                    Data = new MemoryStream(Encoding.UTF8.GetBytes(SerializeJson(new GameTurnNotification {
+                        Game = game
+                    })))
                 });
             } catch(AmazonServiceException e) when(e.StatusCode == System.Net.HttpStatusCode.Gone) {
 
