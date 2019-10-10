@@ -79,6 +79,14 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
 
             // check if robot can fire a missile
             if(ReloadCoolDown == 0.0) {
+#if true
+
+                // fire in a random direction
+                Fire(
+                    heading: Random.NextDouble() * 360.0,
+                    distance: 50.0 + Random.NextDouble() * (Robot.MissileRange - 50.0)
+                );
+#else
 
                 // scan in the direction we're heading
                 var scanHeading = Heading;
@@ -111,6 +119,7 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
                 if(distance.HasValue) {
                     Fire(scanHeading, distance.Value);
                 }
+#endif
             }
         }
     }
