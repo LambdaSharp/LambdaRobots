@@ -73,10 +73,11 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
         }
 
         public async Task<StartGameResponse> StartGameAsync(StartGameRequest request) {
+            LogInfo($"Starting a new game for ConnectionId={CurrentRequest.RequestContext.ConnectionId}");
 
             // create a new game
             var game = new ServerGame {
-                Id = CurrentRequest.RequestContext.ConnectionId,
+                Id = Guid.NewGuid().ToString("N"),
                 State = GameState.Start,
                 BoardWidth = request.BoardWidth ?? 1000.0,
                 BoardHeight = request.BoardHeight ?? 1000.0,
@@ -94,13 +95,16 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             await _table.CreateAsync(new GameRecord {
                 PK = game.Id,
                 Game = game,
-                LambdaRobotArns = request.RobotArns
+                LambdaRobotArns = request.RobotArns,
+                ConnectionId = CurrentRequest.RequestContext.ConnectionId
             });
 
             // kick off game step function
+            var startGameId = $"LambdaRobotsGame-{game.Id}";
+            LogInfo($"Kicking off Step Function: Name={startGameId}");
             var startGame = await _stepFunctionsClient.StartExecutionAsync(new StartExecutionRequest {
                 StateMachineArn = _gameStateMachine,
-                Name = $"LambdaRobotsGame-{game.Id}-{DateTimeOffset.UtcNow.ToUnixTimeSeconds()}",
+                Name = startGameId,
                 Input = SerializeJson(new {
                     GameId = game.Id,
                     State = game.State
@@ -122,10 +126,12 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
         }
 
         public async Task<StopGameResponse> StopGameAsync(StopGameRequest request) {
+            LogInfo($"Stop game for ConnectionId={CurrentRequest.RequestContext.ConnectionId}");
 
             // fetch game record from table
             var gameRecord = await _table.GetAsync<GameRecord>(request.GameId);
             if(gameRecord == null) {
+                LogInfo("No game found to stop");
 
                 // game is already stopped, nothing further to do
                 return new StopGameResponse();
@@ -133,6 +139,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
 
             // check if game state machine needs to be stopped
             if(gameRecord.GameLoopArn != null) {
+                LogInfo($"Stopping Step Function: Name={gameRecord.GameLoopArn}");
                 await _stepFunctionsClient.StopExecutionAsync(new StopExecutionRequest {
                     ExecutionArn = gameRecord.GameLoopArn,
                     Cause = "user requested game to be stopped"
@@ -140,7 +147,15 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             }
 
             // delete game record
+            LogInfo($"Deleting game record: ID={request.GameId}");
             await _table.DeleteAsync<GameRecord>(request.GameId);
+
+            // update game state to indicated it was stopped
+            gameRecord.Game.State = GameState.Finished;
+            gameRecord.Game.Messages.Add(new Message {
+                Timestamp = DateTime.UtcNow,
+                Text = "Game stopped."
+            });
 
             // return final game state
             return new StopGameResponse {

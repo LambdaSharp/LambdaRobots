@@ -40,6 +40,7 @@ namespace Challenge.LambdaRobots.Server {
         public ServerGame Game { get; set; }
         public List<string> LambdaRobotArns { get; set; }
         public string GameLoopArn { get; set; }
+        public string ConnectionId { get; set; }
     }
 
     public class GameStateMachineRecord : IGameTableSingletonRecord {

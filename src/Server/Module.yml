@@ -88,9 +88,11 @@ Items:
           - Sid: StateMachineStartStopPermission
             Effect: Allow
             Action:
-            - states:StartExecution
-            - states:StopExecution
-            Resource: !Ref GameLoopStateMachine
+              - states:StartExecution
+              - states:StopExecution
+            Resource:
+              - !Ref GameLoopStateMachine
+              - !Sub "arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:${GameLoopStateMachine.Name}:*"
       Roles:
         - !Ref Module::Role
 
