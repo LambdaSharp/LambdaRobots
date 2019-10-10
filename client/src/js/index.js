@@ -105,9 +105,9 @@ function stopGameUi() {
 function messagesUi(messages) {
   const messagesElement = document.getElementById("statsBoxMessages");
   messagesElement.innerText = "";
-  messages.forEach(message => {
+  messages.reverse().forEach(message => {
     messagesElement.appendChild(
-      document.createTextNode(`${message.Timestamp}:${message.Text}\n`)
+      document.createTextNode(`${message.Text}\n`)
     );
   });
 }

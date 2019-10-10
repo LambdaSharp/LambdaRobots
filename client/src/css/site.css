@@ -19,4 +19,6 @@ body {
   border: 1px solid #000000;
   border-left: none;
   min-width: 400px;
+  max-height: 1000px;
+  overflow: auto;
 }
