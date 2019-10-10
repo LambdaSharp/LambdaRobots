@@ -21,21 +21,15 @@ export default class GameBoard {
       return;
     }
     this._clear();
-    if (
-      typeof gameStat.Game !== "undefined" &&
-      gameStat.Game.State === "Start"
-    ) {
+    if (gameStat.Game.State === "Start") {
       this.canvas.width = gameStat.Game.BoardWidth;
       this.canvas.height = gameStat.Game.BoardHeight;
       return;
     }
     clearTimeout(this._spinnerInterval);
-    if (
-      typeof gameStat.Robots !== "undefined" &&
-      gameStat.State === "NextTurn"
-    ) {
-      this._robots(gameStat.Robots);
-      this._missiles(gameStat.Missiles);
+    if (gameStat.Game.State === "NextTurn") {
+      this._robots(gameStat.Game.Robots);
+      this._missiles(gameStat.Game.Missiles);
       return;
     }
   }
@@ -60,8 +54,22 @@ export default class GameBoard {
   _missiles(missiles) {
     for (let index = 0; index < missiles.length; index++) {
       const missile = missiles[index];
-      this.context.fillStyle = "red";
-      this.context.fillText("|", Math.round(missile.X), Math.round(missile.Y));
+      this.context.save();
+      this.context.beginPath();
+      this.context.moveTo(Math.round(missile.X), Math.round(missile.Y));
+      const lineLength = 12;
+      this.context.lineTo(
+        Math.round(
+          missile.X + Math.sin((missile.Heading * Math.PI) / 180) * lineLength
+        ),
+        Math.round(
+          missile.Y + Math.cos((missile.Heading * Math.PI) / 180) * lineLength
+        )
+      );
+      this.context.strokeStyle = "red";
+      this.context.lineWidth = 2;
+      this.context.stroke();
+      this.context.restore();
     }
   }
 

@@ -18,13 +18,13 @@ async function init() {
     5000,
     data => {
       gameBoardClient.Repaint(data);
-      if (typeof data.Messages !== "undefined") {
-        messagesUi(data.Messages);
+      if (typeof data.Game.Messages !== "undefined") {
+        messagesUi(data.Game.Messages);
       }
-      if (typeof data.State !== "undefined" && data.State === "Finished") {
+      if (data.Game.State === "Finished") {
         stopGameUi();
       }
-      if (typeof data.Game !== "undefined" && data.Game.State === "Start") {
+      if (data.Game.State === "Start") {
         startGameUi();
       }
     }
@@ -90,6 +90,7 @@ function getRobotArns() {
 }
 
 function startGameUi() {
+  messagesUi([]);
   mainMenu.style.display = "none";
   leaderBoard.style.display = "none";
   gameBoardStatsContainer.style.display = "block";
@@ -106,9 +107,7 @@ function messagesUi(messages) {
   const messagesElement = document.getElementById("statsBoxMessages");
   messagesElement.innerText = "";
   messages.reverse().forEach(message => {
-    messagesElement.appendChild(
-      document.createTextNode(`${message.Text}\n`)
-    );
+    messagesElement.appendChild(document.createTextNode(`${message.Text}\n`));
   });
 }
 
