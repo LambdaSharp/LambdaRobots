@@ -256,7 +256,7 @@ namespace Test.Challenge.LambdaRobots.Server {
             // robot characteristics
             MaxSpeed = 100.0,
             Acceleration = 10.0,
-            Deceleration = -20.0,
+            Deceleration = 20.0,
             MaxTurnSpeed = 50.0,
             ScannerRange = 600.0,
             ScannerResolution = 10.0,

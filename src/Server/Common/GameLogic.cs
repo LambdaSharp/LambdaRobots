@@ -139,7 +139,7 @@ namespace Challenge.LambdaRobots.Server.Common {
                     // robot characteristics
                     MaxSpeed = 100.0,
                     Acceleration = 10.0,
-                    Deceleration = -20.0,
+                    Deceleration = 20.0,
                     MaxTurnSpeed = 50.0,
                     ScannerRange = 600.0,
                     ScannerResolution = 10.0,
@@ -401,7 +401,7 @@ namespace Challenge.LambdaRobots.Server.Common {
             if(robot.TargetSpeed > robot.Speed) {
                 robot.Speed = Math.Min(robot.TargetSpeed, robot.Speed + robot.Acceleration * Game.SecondsPerTurn);
             } else if(robot.TargetSpeed < robot.Speed) {
-                robot.Speed = Math.Max(robot.TargetSpeed, robot.Speed + robot.Deceleration * Game.SecondsPerTurn);
+                robot.Speed = Math.Max(robot.TargetSpeed, robot.Speed - robot.Deceleration * Game.SecondsPerTurn);
             }
 
             // compute new heading

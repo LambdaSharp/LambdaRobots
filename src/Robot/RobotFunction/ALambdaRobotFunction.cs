@@ -181,9 +181,20 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
         /// </summary>
         /// <param name="heading">Heading in degrees where to fire the missile to</param>
         /// <param name="distance">Distance at which the missile impacts</param>
-        public void Fire(double heading, double distance) {
+        public void FireAngle(double heading, double distance) {
             _action.FireMissileHeading = heading;
             _action.FireMissileDistance = distance;
+        }
+
+        /// <summary>
+        /// Fire a missile in at the given coordinates.
+        /// </summary>
+        /// <param name="x">Target horizontal coordinate</param>
+        /// <param name="y">Target vertical coordinate</param>
+        public void FireCoordinates(double x, double y) {
+            var heading = AngleToCoordinates(x, y);
+            var distance = DistanceToCoordinates(x, y);
+            FireAngle(heading, distance);
         }
 
         /// <summary>
@@ -208,7 +219,7 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
         /// <param name="heading">Scan heading in degrees</param>
         /// <param name="resolution">Scan resolution in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
-        public async Task<double?> ScanForEnemies(double heading, double resolution) {
+        public async Task<double?> ScanAngleForEnemiesAsync(double heading, double resolution) {
             var httpResponse = await HttpClient.PostAsync($"{_gameApi}/scan", new StringContent(SerializeJson(new ScanEnemiesRequest {
                 GameId = GameId,
                 RobotId = Robot.Id,
@@ -223,11 +234,12 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
 
         /// <summary>
         /// Determine angle in degrees relative to current robot position.
+        /// Return value range from `-180` to `180` degrees.
         /// </summary>
         /// <param name="x">Target horizontal coordinate</param>
         /// <param name="y">Target vertical coordinate</param>
         /// <returns>Angle in degrees</returns>
-        public double AngleTo(double x, double y) => Math.Atan2(x - X, y - Y) * 180.0 / Math.PI;
+        public double AngleToCoordinates(double x, double y) => NormalizeAngle(Math.Atan2(x - X, y - Y) * 180.0 / Math.PI);
 
         /// <summary>
         /// Determine distance relative to current robot position.
@@ -235,10 +247,69 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
         /// <param name="x">Target horizontal coordinate</param>
         /// <param name="y">Target vertical coordinate</param>
         /// <returns>Distance to target</returns>
-        public double DistanceTo(double x, double y) {
+        public double DistanceToCoordinates(double x, double y) {
             var deltaX = x - X;
             var deltaY = y - Y;
             return Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
         }
+
+        /// <summary>
+        /// Normalize angle to be between `-180` and `180` degrees.
+        /// </summary>
+        /// <param name="angle">Angle in degrees to normalize</param>
+        /// <returns>Angle in degrees</returns>
+        public double NormalizeAngle(double angle) {
+            var result = angle % 360;
+            return (result < -180.0)
+                ? (result + 360.0)
+                : result;
+        }
+
+        /// <summary>
+        /// Adjust speed and heading to move robot to specified heading and distance.
+        /// </summary>
+        /// <param name="heading">Target heading in degrees</param>
+        /// <param name="distance">Target distance</param>
+        public void MoveToAngle(double heading, double distance) {
+
+            // check if robot is close enough to target location
+            if(distance < 1.0) {
+
+                // close enough; stop moving
+                SetSpeed(0.0);
+                return;
+            }
+
+            // NOTE: the distance required to stop the robot from moving is obtained with the following formula:
+            //      Distance = Speed^2 / 2*Deceleration
+            //  solving for Speed, gives us the maximum travel speed to avoid overshooting our target
+            var speed = Math.Sqrt(distance * 2.0 * Robot.Deceleration);
+
+            // check if angle needs to be adjusted
+            if(Math.Abs(Heading - heading) < 0.1) {
+
+                // check if robot is moving slow enough to turn
+                if(Speed <= Robot.MaxTurnSpeed) {
+
+                    // adjust heading towards target
+                    SetHeading(heading);
+                } else {
+
+                    // adjust speed to either max-turn-speed or max-travel-speed, whichever is lower
+                    SetSpeed(Math.Min(Robot.MaxTurnSpeed, speed));
+                }
+            } else {
+
+                // adjust speed to max-travel-speed
+                SetSpeed(speed);
+            }
+        }
+
+        /// <summary>
+        /// Adjust speed and heading to move robot to specified coordinates.
+        /// </summary>
+        /// <param name="x">Target horizontal coordinate</param>
+        /// <param name="y">Target vertical coordinate</param>
+        public void MoveToCoordinates(double x, double y) => MoveToAngle(AngleToCoordinates(x, y), DistanceToCoordinates(x, y));
     }
 }
