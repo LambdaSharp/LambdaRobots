@@ -29,7 +29,7 @@ export default class GameBoard {
     clearTimeout(this._spinnerInterval);
     if (gameStat.Game.State === "NextTurn") {
       this._robots(gameStat.Game.Robots);
-      this._missiles(gameStat.Game.Missiles);
+      this._missiles(gameStat.Game, gameStat.Game.Missiles);
       return;
     }
   }
@@ -51,21 +51,34 @@ export default class GameBoard {
     }
   }
 
-  _missiles(missiles) {
+  _missiles(game, missiles) {
     for (let index = 0; index < missiles.length; index++) {
       const missile = missiles[index];
       this.context.save();
       this.context.beginPath();
-      this.context.moveTo(Math.round(missile.X), Math.round(missile.Y));
-      const lineLength = 12;
-      this.context.lineTo(
-        Math.round(
-          missile.X + Math.sin((missile.Heading * Math.PI) / 180) * lineLength
-        ),
-        Math.round(
-          missile.Y + Math.cos((missile.Heading * Math.PI) / 180) * lineLength
-        )
-      );
+      switch(missile.State) {
+      case "Flying":
+        this.context.moveTo(Math.round(missile.X), Math.round(missile.Y));
+        const lineLength = 12;
+        this.context.lineTo(
+          Math.round(
+            missile.X + Math.sin((missile.Heading * Math.PI) / 180) * lineLength
+          ),
+          Math.round(
+            missile.Y + Math.cos((missile.Heading * Math.PI) / 180) * lineLength
+          )
+        );
+        break;
+      case "ExplodingDirect":
+        this.context.arc(Math.round(missile.X), Math.round(missile.Y), Math.round(game.DirectHitRange), 0, 2 * Math.PI);
+        break;
+      case "ExplodingNear":
+        this.context.arc(Math.round(missile.X), Math.round(missile.Y), Math.round(game.NearHitRange), 0, 2 * Math.PI);
+        break;
+      case "ExplodingFar":
+        this.context.arc(Math.round(missile.X), Math.round(missile.Y), Math.round(game.FarHitRange), 0, 2 * Math.PI);
+        break;
+      }
       this.context.strokeStyle = "red";
       this.context.lineWidth = 2;
       this.context.stroke();

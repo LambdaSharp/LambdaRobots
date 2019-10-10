@@ -23,7 +23,6 @@
  */
 
 using System.Collections.Generic;
-using Challenge.LambdaRobots.Server;
 using Newtonsoft.Json;
 
 namespace Challenge.LambdaRobots.Server.ServerFunction.Model {

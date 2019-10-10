@@ -218,15 +218,39 @@ namespace Challenge.LambdaRobots.Server {
             }
 
             // update missile states
-            foreach(var missile in Game.Missiles.Where(missile => missile.State == MissileState.Flying)) {
-                MoveMissile(missile);
+            foreach(var missile in Game.Missiles) {
+                switch(missile.State) {
+                case MissileState.Flying:
 
-                // check if missile has hit something and came to a stop
-                if(missile.State == MissileState.Exploding) {
+                    // move flying missiles
+                    MoveMissile(missile);
+                    break;
+                case MissileState.ExplodingDirect:
+
+                    // missile is exploding; assess direct damage
                     AssessMissileDamage(missile);
+                    missile.State = MissileState.ExplodingNear;
+                    break;
+                case MissileState.ExplodingNear:
+
+                    // missile is exploding; assess near damage
+                    AssessMissileDamage(missile);
+                    missile.State = MissileState.ExplodingFar;
+                    break;
+                case MissileState.ExplodingFar:
+
+                    // missile is exploding; assess far damage
+                    AssessMissileDamage(missile);
+                    missile.State = MissileState.Destroyed;
+                    break;
+                default:
+                    missile.State = MissileState.Destroyed;
+                    break;
                 }
             }
-            Game.Missiles.RemoveAll(missile => missile.State != MissileState.Flying);
+
+            // remove destroyed missiles
+            Game.Missiles.RemoveAll(missile => missile.State == MissileState.Destroyed);
 
             // update game state
             var robotCount = Game.Robots.Count(robot => robot.State == RobotState.Alive);
@@ -341,7 +365,7 @@ namespace Challenge.LambdaRobots.Server {
                 out collision
             );
             if(collision) {
-                missile.State = MissileState.Exploding;
+                missile.State = MissileState.ExplodingDirect;
                 missile.Speed = 0.0;
             }
         }
@@ -351,12 +375,22 @@ namespace Challenge.LambdaRobots.Server {
 
                 // compute damage dealt by missile
                 double damage = 0.0;
-                if(distance <= Game.DirectHitRange) {
-                    damage = robot.DirectHitDamage + missile.DirectHitDamageBonus;
-                } else if(distance <= Game.NearHitRange) {
-                    damage = robot.NearHitDamage + missile.NearHitDamageBonus;
-                } else if(distance <= Game.FarHitRange) {
-                    damage = robot.FarHitDamage + missile.FarHitDamageBonus;
+                switch(missile.State) {
+                case MissileState.ExplodingDirect:
+                    if(distance <= Game.DirectHitRange) {
+                        damage = robot.DirectHitDamage + missile.DirectHitDamageBonus;
+                    }
+                    break;
+                case MissileState.ExplodingNear:
+                    if(distance <= Game.NearHitRange) {
+                        damage = robot.NearHitDamage + missile.NearHitDamageBonus;
+                    }
+                    break;
+                case MissileState.ExplodingFar:
+                    if(distance <= Game.FarHitRange) {
+                        damage = robot.FarHitDamage + missile.FarHitDamageBonus;
+                    }
+                    break;
                 }
 
                 // check if any damage was dealt
@@ -368,6 +402,7 @@ namespace Challenge.LambdaRobots.Server {
 
                 // apply damage to target
                 Damage(robot, damage);
+
                 // record damage dealt
                 var from = Game.Robots.FirstOrDefault(fromRobot => fromRobot.Id == missile.RobotId);
                 if(from != null) {
@@ -386,7 +421,6 @@ namespace Challenge.LambdaRobots.Server {
                 }
                 return true;
             });
-            missile.State = MissileState.Destroyed;
         }
 
         private void MoveRobot(Robot robot) {

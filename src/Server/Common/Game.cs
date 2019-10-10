@@ -74,7 +74,9 @@ namespace Challenge.LambdaRobots.Server {
     public enum MissileState {
         Undefined,
         Flying,
-        Exploding,
+        ExplodingDirect,
+        ExplodingNear,
+        ExplodingFar,
         Destroyed
     }
 
