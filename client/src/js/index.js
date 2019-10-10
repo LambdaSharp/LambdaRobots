@@ -24,14 +24,17 @@ async function init() {
       if (typeof data.State !== "undefined" && data.State === "Finished") {
         stopGameUi();
       }
-      if (typeof data.State !== "undefined" && data.State === "Start") {
+      if (typeof data.Game !== "undefined" && data.Game.State === "Start") {
         startGameUi();
       }
     }
   );
   document.getElementById("btnStartGame").addEventListener("click", () => {
-    startGame();
-    startGameUI(); // remove this when bug has been fixed.
+    startGameUi();
+    gameBoardClient.Repaint(null);
+    setTimeout(() => {
+      startGame();
+    }, 500);
   });
   document.getElementById("btnStopGame").addEventListener("click", () => {
     stopGame();
@@ -58,11 +61,7 @@ async function getConfig() {
 }
 
 function startGame() {
-  const robotArnsElements = [].slice.call(document.getElementsByName("robots"));
-  const robotArns = robotArnsElements
-    .map(robotArn => robotArn.value)
-    .filter(robotArn => robotArn.length > 10)
-    .map(robotArn => robotArn.trim());
+  const robotArns = getRobotArns();
   localStorage.setItem("robotArns", JSON.stringify(robotArns));
   const request = {
     Action: "start",
@@ -76,12 +75,21 @@ function startGame() {
 
 function stopGame() {
   const request = {
-    Action: "stop"
+    Action: "stop",
+    RobotArns: getRobotArns()
   };
   wsClient.doSend(JSON.stringify(request));
 }
 
-function startGameUI() {
+function getRobotArns() {
+  const robotArnsElements = [].slice.call(document.getElementsByName("robots"));
+  return robotArnsElements
+    .map(robotArn => robotArn.value)
+    .filter(robotArn => robotArn.length > 10)
+    .map(robotArn => robotArn.trim());
+}
+
+function startGameUi() {
   mainMenu.style.display = "none";
   leaderBoard.style.display = "none";
   gameBoardStatsContainer.style.display = "block";

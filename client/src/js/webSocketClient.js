@@ -3,20 +3,8 @@ export default class WebSocketClient {
     this.autoReconnectInterval = autoReconnectInterval;
     this.wss = wss;
     this.output = element;
-    this.websocket = new WebSocket(wss);
-    const self = this;
-    this.websocket.onopen = function(evt) {
-      self._onOpen(evt);
-    };
-    this.websocket.onclose = function(evt) {
-      self._onClose(evt);
-    };
-    this.websocket.onmessage = function(evt) {
-      self._onMessage(evt, onMessage);
-    };
-    this.websocket.onerror = function(evt) {
-      self._onError(evt);
-    };
+    this.onMessage = onMessage;
+    this._init();
   }
 
   doSend(message) {
@@ -28,6 +16,23 @@ export default class WebSocketClient {
       this._writeToScreen("SENT: " + message);
       this.websocket.send(message);
     }
+  }
+
+  _init() {
+    const self = this;
+    self.websocket = new WebSocket(self.wss);
+    self.websocket.onopen = function(evt) {
+      self._onOpen(evt);
+    };
+    this.websocket.onclose = function(evt) {
+      self._onClose(evt);
+    };
+    this.websocket.onmessage = function(evt) {
+      self._onMessage(evt);
+    };
+    this.websocket.onerror = function(evt) {
+      self._onError(evt);
+    };
   }
 
   _onOpen(evt) {
@@ -46,14 +51,14 @@ export default class WebSocketClient {
     }
   }
 
-  _onMessage(evt, onMessage) {
+  _onMessage(evt) {
     this._writeToScreen(
       '<span style="color: blue;">RESPONSE: ' + evt.data + "</span>"
     );
     try {
-      if (onMessage) {
+      if (this.onMessage) {
         const jsonResult = JSON.parse(evt.data);
-        onMessage(jsonResult);
+        this.onMessage(jsonResult);
       }
     } catch (error) {
       console.warn("Could not run function with parsed JSON data");
@@ -72,7 +77,7 @@ export default class WebSocketClient {
     var that = this;
     setTimeout(function() {
       console.log("WebSocketClient: reconnecting...");
-      that.websocket.open(that.wss);
+      that._init();
     }, this.autoReconnectInterval);
   };
 
