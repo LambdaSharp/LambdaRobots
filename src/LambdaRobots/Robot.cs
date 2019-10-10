@@ -26,40 +26,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Challenge.LambdaRobots.Common {
-
-    [JsonConverter(typeof(StringEnumConverter))]
-    public enum RobotCommand {
-        Undefined,
-        GetConfig,
-        GetAction
-    }
-
-    public class RobotRequest {
-
-        //--- Properties ---
-        public RobotCommand Command { get; set; }
-        public string GameId { get; set; }
-        public string GameApi { get; set; }
-        public double GameBoardWidth { get; set; }
-        public double GameBoardHeight { get; set; }
-        public double GameSecondsPerTurn { get; set; }
-        public int GameMaxTurns { get; set; }
-        public Robot Robot { get; set; }
-    }
-
-    public class RobotResponse {
-
-        //--- Properties ---
-        public RobotConfig RobotConfig { get; set; }
-        public RobotAction RobotAction { get; set; }
-    }
-
-    public class RobotConfig  {
-
-        //--- Properties ---
-        public string Name { get; set; }
-    }
+namespace Challenge.LambdaRobots {
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum RobotState {
@@ -116,14 +83,5 @@ namespace Challenge.LambdaRobots.Common {
         public double MissileDirectHitDamageBonus;
         public double MissileNearHitDamageBonus;
         public double MissileFarHitDamageBonus;
-    }
-
-    public class RobotAction {
-
-        //--- Fields ---
-        public double? Speed;
-        public double? Heading;
-        public double? FireMissileHeading;
-        public double? FireMissileDistance;
     }
 }

@@ -23,18 +23,17 @@
  */
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Challenge.LambdaRobots.Common;
+using Challenge.LambdaRobots.Protocol;
 
-namespace Challenge.LambdaRobots.Server.Common {
+namespace Challenge.LambdaRobots.Server {
 
-    public interface IDependencyProvider {
+    public interface IGameDependencyProvider {
 
         //--- Properties ---
         DateTime UtcNow { get; }
-        Game Game { get; }
+        ServerGame Game { get; }
 
         //--- Methods ---
         double NextRandomDouble();
@@ -42,18 +41,18 @@ namespace Challenge.LambdaRobots.Server.Common {
         Task<RobotAction> GetRobotAction(Robot robot);
     }
 
-    public class DependencyProvider : IDependencyProvider {
+    public class GameDependencyProvider : IGameDependencyProvider {
 
         //--- Fields ---
-        private Game _game;
+        private ServerGame _game;
         private DateTime _utcNow;
         private Random _random;
         private readonly Func<Robot, Task<RobotConfig>> _getConfig;
         private readonly Func<Robot, Task<RobotAction>> _getAction;
 
         //--- Constructors ---
-        public DependencyProvider(
-            Game game,
+        public GameDependencyProvider(
+            ServerGame game,
             DateTime utcNow,
             Random random,
             Func<Robot, Task<RobotConfig>> getConfig,
@@ -68,7 +67,7 @@ namespace Challenge.LambdaRobots.Server.Common {
 
         //--- Properties ---
         public DateTime UtcNow => _utcNow;
-        public Game Game => _game;
+        public ServerGame Game => _game;
 
         //--- Methods ---
         public double NextRandomDouble() => _random.NextDouble();
@@ -93,16 +92,16 @@ namespace Challenge.LambdaRobots.Server.Common {
         }
 
         //--- Fields ---
-        private IDependencyProvider _provider;
+        private IGameDependencyProvider _provider;
 
         //--- Constructors ---
-        public GameLogic(IDependencyProvider provider) {
+        public GameLogic(IGameDependencyProvider provider) {
             _provider = provider ?? throw new ArgumentNullException(nameof(provider));
         }
 
         //--- Properties ---
         public DateTime UtcNow => _provider.UtcNow;
-        public Game Game => _provider.Game;
+        public ServerGame Game => _provider.Game;
 
         //--- Methods ---
         public async Task StartAsync(int robotCount) {

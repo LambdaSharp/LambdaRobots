@@ -15,8 +15,14 @@
     <PackageReference Include="FluentAssertions" Version="5.6.0" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\src\Common\**"/>
+    <ProjectReference Include="../../src/LambdaRobots/LambdaRobots.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="..\..\src\Server\Common\Game.cs"/>
     <Compile Include="..\..\src\Server\Common\GameLogic.cs"/>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp" Version="0.7.0.*"/>
+    <ProjectReference Condition="'$(LAMBDASHARP)'!=''" Include="$(LAMBDASHARP)/src/LambdaSharp/LambdaSharp.csproj" />
   </ItemGroup>
 </Project>

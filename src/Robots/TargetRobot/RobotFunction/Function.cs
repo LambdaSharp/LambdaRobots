@@ -22,38 +22,28 @@
  * SOFTWARE.
  */
 
-using System.Collections.Generic;
-using Challenge.LambdaRobots.Server;
-using Newtonsoft.Json;
+using System.Threading.Tasks;
+using Amazon.Lambda.Core;
+using Challenge.LambdaRobots.Protocol;
+using LambdaSharp;
 
-namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
+// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
+[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
-    public class StartGameRequest {
+namespace Challenge.LambdaRobots.TargetRobot.RobotFunction {
 
-        //--- Properties ---
-        [JsonRequired]
-        public string Action { get; set; }
+    public class Function : ALambdaRobotFunction {
 
-        [JsonRequired]
-        public List<string> RobotArns { get; set; } = new List<string>();
+        //--- Methods ---
+        public override async Task<RobotConfig> GetConfigAsync() {
+            return new RobotConfig {
+                Name = "CannonFodder"
+            };
+        }
 
-        // optional board initialization settings
-        public double? BoardWidth { get; set; }
-        public double? BoardHeight { get; set; }
-        public double? SecondsPerTurn { get; set; }
-        public int? MaxTurns { get; set; }
-        public double? DirectHitRange { get; set; }
-        public double? NearHitRange { get; set; }
-        public double? FarHitRange { get; set; }
-        public double? CollisionRange { get; set; }
-        public double? MinRobotStartDistance { get; set; }
-        public double? RobotTimeoutSeconds { get; set; }
-    }
+        public override async Task GetActionAsync() {
 
-    public class StartGameResponse {
-
-        //--- Properties ---
-        [JsonRequired]
-        public ServerGame Game { get; set; }
+            // NOTE: target robot is stationary and doesn't do anything
+        }
     }
 }

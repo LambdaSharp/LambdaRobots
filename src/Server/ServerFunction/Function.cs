@@ -24,17 +24,15 @@
 
 using System;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.Lambda;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
-using Amazon.Lambda.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
-using Challenge.LambdaRobots.Common;
-using Challenge.LambdaRobots.Server.Common;
+using Challenge.LambdaRobots.Api.Model;
+using Challenge.LambdaRobots.Server;
 using Challenge.LambdaRobots.Server.ServerFunction.Model;
 using LambdaSharp;
 using LambdaSharp.ApiGateway;
@@ -77,7 +75,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
         public async Task<StartGameResponse> StartGameAsync(StartGameRequest request) {
 
             // create a new game
-            var game = new Game {
+            var game = new ServerGame {
                 Id = CurrentRequest.RequestContext.ConnectionId,
                 State = GameState.Start,
                 BoardWidth = request.BoardWidth ?? 1000.0,
@@ -157,7 +155,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             if(gameRecord == null) {
                 throw AbortNotFound($"could not find a game session with ID={request.GameId ?? "<NULL>"}");
             }
-            var gameLogic = new GameLogic(new DependencyProvider(
+            var gameLogic = new GameLogic(new GameDependencyProvider(
                 gameRecord.Game,
                 DateTime.UtcNow,
                 _random,

@@ -4,16 +4,12 @@
     <Deterministic>true</Deterministic>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <RootNamespace>Challenge.LambdaRobots.Robot.RobotFunction</RootNamespace>
-    <AWSProjectType>Lambda</AWSProjectType>
+    <RootNamespace>Challenge.LambdaRobots</RootNamespace>
     <NoWarn>CS1998</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.Core" Version="1.1.0"/>
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.5.0"/>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="../../LambdaRobots/LambdaRobots.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp" Version="0.7.0.*"/>

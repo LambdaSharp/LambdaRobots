@@ -30,14 +30,14 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using Newtonsoft.Json;
 
-namespace Challenge.LambdaRobots.Server.Common {
+namespace Challenge.LambdaRobots.Server {
 
     public class GameRecord : IGameTableSingletonRecord {
 
         //--- Properties ---
         public string PK { get; set; }
         public string SK => "GAME";
-        public Game Game { get; set; }
+        public ServerGame Game { get; set; }
         public List<string> LambdaRobotArns { get; set; }
         public string GameLoopArn { get; set; }
     }

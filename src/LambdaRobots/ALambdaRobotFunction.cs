@@ -23,17 +23,17 @@
  */
 
 using System;
-using System.Net.Http;
-using System.Text;
 using System.Threading.Tasks;
-using Challenge.LambdaRobots.Common;
+using Challenge.LambdaRobots.Api;
+using Challenge.LambdaRobots.Protocol;
 using LambdaSharp;
 
-namespace Challenge.LambdaRobots.Robot.RobotFunction {
+namespace Challenge.LambdaRobots {
 
     public abstract class ALambdaRobotFunction : ALambdaFunction<RobotRequest, RobotResponse> {
 
         //--- Class Fields ---
+
         /// <summary>
         /// Initialized random number generator. Instance of [Random Class](https://docs.microsoft.com/en-us/dotnet/api/system.random?view=netstandard-2.0).
         /// </summary>
@@ -41,19 +41,18 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
 
         //--- Fields ---
         private RobotAction _action;
-        private string _gameApi;
 
         //--- Properties ---
 
         /// <summary>
-        /// Robot name used to identify the robot during a game.
-        /// </summary>
-        public string Name { get; set; }
-
-        /// <summary>
         /// Robot data structure describing the state and characteristics of the robot.
         /// </summary>
-        public Challenge.LambdaRobots.Common.Robot Robot { get; set; }
+        public Challenge.LambdaRobots.Robot Robot { get; set; }
+
+        /// <summary>
+        /// Game data structure describing the state and characteristics of the game;
+        /// </summary>
+        public Challenge.LambdaRobots.Game Game { get; set; }
 
         /// <summary>
         /// Horizontal position of robot. Value is between `0` and `GameBoardWidth`.
@@ -85,45 +84,12 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
         /// </summary>
         public double ReloadCoolDown => Robot.ReloadCoolDown;
 
-        /// <summary>
-        /// Unique Game ID.
-        /// </summary>
-        public string GameId { get; private set; }
-
-        /// <summary>
-        /// Width of the game board.
-        /// </summary>
-        public double GameBoardWidth { get; private set; }
-
-        /// <summary>
-        /// Height of the game board.
-        /// </summary>
-        public double GameBoardHeight { get; private set; }
-
-        /// <summary>
-        /// Seconds elapsed per game turn.
-        /// </summary>
-        /// <value></value>
-        public double GameSecondsPerTurn { get; private set; }
-
-        /// <summary>
-        /// Maximum number of turns before the game ends in a draw.
-        /// </summary>
-        public int GameMaxTurns { get; private set; }
-
         //--- Abstract Methods ---
         public abstract Task<RobotConfig> GetConfigAsync();
         public abstract Task GetActionAsync();
 
         //--- Methods ---
-        public override async Task InitializeAsync(LambdaConfig config) {
-
-            // read robot name from configuration; default to function name if need be
-            Name = config.ReadText("RobotName");
-            if(string.IsNullOrWhiteSpace(Name)) {
-                Name = CurrentContext.FunctionName;
-            }
-        }
+        public override async Task InitializeAsync(LambdaConfig config) { }
 
         public override sealed async Task<RobotResponse> ProcessMessageAsync(RobotRequest request) {
             LogInfo($"Request:\n{SerializeJson(request)}");
@@ -145,12 +111,7 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
                 try {
 
                     // capture request fields for easy access
-                    GameId = request.GameId;
-                    GameBoardWidth = request.GameBoardWidth;
-                    GameBoardHeight = request.GameBoardHeight;
-                    GameSecondsPerTurn = request.GameSecondsPerTurn;
-                    GameMaxTurns = request.GameMaxTurns;
-                    _gameApi = request.GameApi;
+                    Game = request.Game;
                     Robot = request.Robot;
 
                     // initialize a default empty action
@@ -219,28 +180,8 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
         /// <param name="heading">Scan heading in degrees</param>
         /// <param name="resolution">Scan resolution in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
-        public async Task<double?> ScanAngleForEnemiesAsync(double heading, double resolution) {
-
-            // issue scan request to game API
-            var postTask = HttpClient.PostAsync($"{_gameApi}/scan", new StringContent(SerializeJson(new ScanEnemiesRequest {
-                GameId = GameId,
-                RobotId = Robot.Id,
-                Heading = heading,
-                Resolution = resolution
-            }), Encoding.UTF8, "application/json"));
-
-            // wait for response or timeout
-            if(await Task.WhenAny(postTask, Task.Delay(TimeSpan.FromSeconds(1.0))) != postTask) {
-                LogInfo("ScanAngleForEnemiesAsync() timed out");
-                return null;
-            }
-
-            // deserialize scan response
-            var httpResponseText = await postTask.Result.Content.ReadAsStringAsync();
-            var response = DeserializeJson<ScanEnemiesResponse>(httpResponseText);
-            LogInfo($"ScanAngleForEnemiesAsync() returned {httpResponseText}");
-            return response.Found ? response.Distance : (double?)null;
-        }
+        public Task<double?> ScanAngleAsync(double heading, double resolution)
+            => new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Game.Id, Robot.Id).ScanEnemiesAsync(heading, resolution);
 
         /// <summary>
         /// Determine angle in degrees relative to current robot position.

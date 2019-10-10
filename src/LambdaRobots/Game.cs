@@ -1,4 +1,4 @@
-﻿/*
+/*
  * MIT License
  *
  * Copyright (c) 2019 LambdaSharp
@@ -22,21 +22,40 @@
  * SOFTWARE.
  */
 
-namespace Challenge.LambdaRobots.Common {
-
-    public class ScanEnemiesRequest {
-
-        //--- Properties ---
-        public string GameId { get; set; }
-        public string RobotId { get; set; }
-        public double Heading { get; set; }
-        public double Resolution { get; set; }
-    }
-
-    public class ScanEnemiesResponse {
+namespace Challenge.LambdaRobots {
+    public class Game {
 
         //--- Properties ---
-        public bool Found { get; set; }
-        public double Distance { get; set; }
+
+        /// <summary>
+        /// Unique Game ID.
+        /// </summary>
+        public string Id { get; set; }
+
+        /// <summary>
+        /// Width of the game board.
+        /// </summary>
+        public double BoardWidth { get; set; }
+
+        /// <summary>
+        /// Height of the game board.
+        /// </summary>
+        public double BoardHeight { get; set; }
+
+        /// <summary>
+        /// Number of seconds elapsed per game turn.
+        /// </summary>
+        public double SecondsPerTurn { get; set; }
+
+        /// <summary>
+        /// Maximum number of turns before the game ends in a draw.
+        /// </summary>
+        public int MaxTurns { get; set; }
+
+        /// <summary>
+        /// URL for Game API.
+        /// </summary>
+        /// <value></value>
+        public string ApiUrl { get; set; }
     }
 }

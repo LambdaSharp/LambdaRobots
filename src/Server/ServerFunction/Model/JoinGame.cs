@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-using Challenge.LambdaRobots.Server.Common;
+using Challenge.LambdaRobots.Server;
 using Newtonsoft.Json;
 
 namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
@@ -40,6 +40,6 @@ namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
         //--- Properties ---
 
         [JsonRequired]
-        public Game Game { get; set; }
+        public ServerGame Game { get; set; }
     }
 }

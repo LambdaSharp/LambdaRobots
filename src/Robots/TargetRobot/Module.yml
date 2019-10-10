@@ -1,0 +1,14 @@
+Module: Challenge.LambdaRobots.TargetRobot
+Description: Stationary target robot
+Version: 1.0-DEV
+Items:
+
+  - Function: RobotFunction
+    Memory: 256
+    Timeout: 30
+
+  - Variable: RobotArn
+    Description: Lambda function ARN
+    Scope: public
+    Value: !GetAtt RobotFunction.Arn
+

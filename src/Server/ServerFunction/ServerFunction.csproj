@@ -16,7 +16,9 @@
     <PackageReference Include="AWSSDK.StepFunctions" Version="3.3.102.8"/>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\Common\**"/>
+    <ProjectReference Include="../../LambdaRobots/LambdaRobots.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <Compile Include="..\Common\**"/>
   </ItemGroup>
   <ItemGroup>

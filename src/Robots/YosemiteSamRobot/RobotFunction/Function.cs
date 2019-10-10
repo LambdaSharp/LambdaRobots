@@ -30,28 +30,16 @@ using LambdaSharp;
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
-namespace Challenge.LambdaRobots.Robot.RobotFunction {
+namespace Challenge.LambdaRobots.YosemiteSamRobot.RobotFunction {
 
     public class Function : ALambdaRobotFunction {
 
-        //--- Properties ---
-        public string Name { get; set; }
-
         //--- Methods ---
-        public override async Task InitializeAsync(LambdaConfig config) {
-
-            // read robot name from configuration; default to function name if need be
-            Name = config.ReadText("RobotName");
-            if(string.IsNullOrWhiteSpace(Name)) {
-                Name = CurrentContext.FunctionName;
-            }
-        }
-
         public override async Task<RobotConfig> GetConfigAsync() {
 
             // TODO: this method is always invoked at the beginning of a match
             return new RobotConfig {
-                Name = Name
+                Name = "Yosemite Sam"
             };
         }
 
@@ -85,47 +73,12 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
 
             // check if robot can fire a missile
             if(ReloadCoolDown == 0.0) {
-#if true
 
                 // fire in a random direction
                 FireAngle(
                     heading: Random.NextDouble() * 360.0,
                     distance: 50.0 + Random.NextDouble() * (Robot.MissileRange - 50.0)
                 );
-#else
-
-                // scan in the direction we're heading
-                var scanHeading = Heading;
-                var resolution = 10.0;
-                double? distance = null;
-
-                // keep scanning until the direction is precise enough
-                while(resolution > 1.0) {
-                    for(var i = 0; i < 3; ++i) {
-                        var currentScanHeading = scanHeading + ((i - 1) * 2.0 * resolution);
-                        distance = await Scan(currentScanHeading, resolution);
-
-                        // check if we found something
-                        if(distance.HasValue) {
-
-                            // center scanner in the direction where we found something
-                            scanHeading = currentScanHeading + resolution * 0.5;
-
-                            // narrow the scan resolution for a more precise heading reading
-                            resolution = resolution / 3.0;
-                            continue;
-                        }
-                    }
-
-                    // scanner didn't find anything
-                    break;
-                }
-
-                // check if a target was found
-                if(distance.HasValue) {
-                    Fire(scanHeading, distance.Value);
-                }
-#endif
             }
         }
     }

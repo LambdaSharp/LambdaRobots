@@ -32,12 +32,12 @@ using Amazon.ApiGatewayManagementApi.Model;
 using Amazon.Lambda;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Model;
-using Challenge.LambdaRobots.Common;
-using Challenge.LambdaRobots.Server.Common;
+using Challenge.LambdaRobots.Server;
 using LambdaSharp;
 using System.IO;
 using Amazon.Runtime;
 using System.Collections.Generic;
+using Challenge.LambdaRobots.Protocol;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -66,7 +66,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
 
         //--- Fields ---
         private GameTable _table;
-        private string _gameApi;
+        private string _gameApiUrl;
         private IAmazonLambda _lambdaClient;
         private IAmazonApiGatewayManagementApi _amaClient;
 
@@ -78,7 +78,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                 config.ReadDynamoDBTableName("GameTable"),
                 new AmazonDynamoDBClient()
             );
-            _gameApi = config.ReadText("RestApiUrl");
+            _gameApiUrl = config.ReadText("RestApiUrl");
             _lambdaClient = new AmazonLambdaClient();
             _amaClient = new AmazonApiGatewayManagementApiClient(new AmazonApiGatewayManagementApiConfig {
                 ServiceURL = config.ReadText("Module::WebSocket::Url")
@@ -94,7 +94,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                 throw new ApplicationException($"game ID={request.GameId} not found");
             }
             var game = gameRecord.Game;
-            var logic = new GameLogic(new DependencyProvider(
+            var logic = new GameLogic(new GameDependencyProvider(
                 gameRecord.Game,
                 DateTime.UtcNow,
                 _random,
@@ -177,13 +177,19 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
             };
         }
 
-        private async Task<RobotConfig> GetRobotConfigAsync(Game game, Robot robot, string lambdaArn) {
+        private async Task<RobotConfig> GetRobotConfigAsync(ServerGame game, Robot robot, string lambdaArn) {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
                 var getNameTask = _lambdaClient.InvokeAsync(new InvokeRequest {
                     Payload = SerializeJson(new RobotRequest {
                         Command = RobotCommand.GetConfig,
-                        GameId = game.Id
+                        Game = new Game {
+                            Id = game.Id,
+                            BoardWidth = game.BoardWidth,
+                            BoardHeight = game.BoardHeight,
+                            MaxTurns = game.MaxTurns,
+                            SecondsPerTurn = game.SecondsPerTurn
+                        }
                     }),
                     FunctionName = lambdaArn,
                     InvocationType = InvocationType.RequestResponse
@@ -204,19 +210,20 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
             }
         }
 
-
-        private async Task<RobotAction> GetRobotActionAsync(Game game, Robot robot, string lambdaArn) {
+        private async Task<RobotAction> GetRobotActionAsync(ServerGame game, Robot robot, string lambdaArn) {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
                 var getActionTask = _lambdaClient.InvokeAsync(new InvokeRequest {
                     Payload = SerializeJson(new RobotRequest {
                         Command = RobotCommand.GetAction,
-                        GameId = game.Id,
-                        GameBoardWidth = game.BoardWidth,
-                        GameBoardHeight = game.BoardHeight,
-                        GameSecondsPerTurn = game.SecondsPerTurn,
-                        GameMaxTurns = game.MaxTurns,
-                        GameApi = _gameApi,
+                        Game = new Game {
+                            Id = game.Id,
+                            BoardWidth = game.BoardWidth,
+                            BoardHeight = game.BoardHeight,
+                            MaxTurns = game.MaxTurns,
+                            SecondsPerTurn = game.SecondsPerTurn,
+                            ApiUrl = _gameApiUrl
+                        },
                         Robot = robot
                     }),
                     FunctionName = lambdaArn,

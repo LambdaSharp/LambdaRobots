@@ -24,11 +24,10 @@
 
 using System;
 using System.Collections.Generic;
-using Challenge.LambdaRobots.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Challenge.LambdaRobots.Server.Common {
+namespace Challenge.LambdaRobots.Server {
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum GameState {
@@ -39,7 +38,7 @@ namespace Challenge.LambdaRobots.Server.Common {
         Error
     }
 
-    public class Game {
+    public class ServerGame {
 
         //--- Fields ---
         public string Id;

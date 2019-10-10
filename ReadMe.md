@@ -1,9 +1,17 @@
-# LambdaRobots
+# λ-Robots
 
-Port of the 90s [P-Robots](https://corewar.co.uk/probots.htm) game to AWS serverless .NET
+In λ-Robots (pronounced _Lambda Robots_), you program a battle robot that participates on a square game field. Each turn, the server invokes your robot's Lambda function to get its action for the turn until either the robot wins or is destroyed.
+
+λ-Robots is a port of the 90s [P-Robots](https://corewar.co.uk/probots.htm) game to AWS Serverless .NET using [LambdaSharp](https://lambdasharp.net).
 
 ## Step 1: Deploy LambdaRobots Server
 
+**Option 1. Direct-Deploy**
+```bash
+lash deploy Challenge.LambdaRobots.Server@lambdasharp
+```
+
+**Option 2. Compile and Deploy**
 ```bash
 lash deploy src/Server
 ```
@@ -20,8 +28,9 @@ lash deploy src/Robot
 {
     "Action": "start",
     "RobotArns": [
-        "arn:aws:lambda:us-west-2:254924790709:function:SteveBTest-Challenge-LambdaRobots-Ro-RobotFunction-1CVA9K57UVTMV",
-        "arn:aws:lambda:us-west-2:115273393711:function:Challenge-LambdaRobots-Robot-RobotFunction-1LVT90DMNW57D"
+
+        "arn:aws:lambda:us-west-2:254924790709:function:SteveBTest-Challenge-LambdaRobots-Yo-RobotFunction-75MJVEQWIWXG",
+        "arn:aws:lambda:us-west-2:254924790709:function:SteveBTest-Challenge-LambdaRobots-Ta-RobotFunction-115OTP03MCCOM"
     ],
     "BoardWidth": 1000,
     "BoardHeight": 1000,
@@ -122,3 +131,5 @@ The most commonly needed properties are readily available as properties from the
 #### `void SetSpeed(double speed)`
 #### `Task<double?> ScanForEnemies(double heading, double resolution)`
 #### `double AngleTo(double x, double y)`
+#### `double DistanceTo(double x, double y)`
+

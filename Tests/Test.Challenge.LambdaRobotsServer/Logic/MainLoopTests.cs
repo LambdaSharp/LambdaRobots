@@ -25,21 +25,29 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Challenge.LambdaRobots.Common;
-using Challenge.LambdaRobots.Server.Common;
+using Challenge.LambdaRobots;
+using Challenge.LambdaRobots.Protocol;
+using Challenge.LambdaRobots.Server;
 using FluentAssertions;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Test.Challenge.LambdaRobots.Server {
 
     public class MainLoopTests {
 
         //--- Fields ---
-        private IDependencyProvider _provider;
+        private readonly ITestOutputHelper _output;
+        private IGameDependencyProvider _provider;
         private Dictionary<string, List<Func<RobotAction>>> _robotActions = new Dictionary<string, List<Func<RobotAction>>>();
 
+        //--- Constructors ---
+        public MainLoopTests(ITestOutputHelper output) {
+            _output = output;
+        }
+
         //--- Properties ---
-        private Game Game => _provider.Game;
+        private ServerGame Game => _provider.Game;
 
         //--- Methods ---
 
@@ -114,7 +122,7 @@ namespace Test.Challenge.LambdaRobots.Server {
 
         #region *** Collision Tests ***
         [Fact]
-        public void MoveRobotColliedWithWall() {
+        public void MoveRobotCollideWithWall() {
 
             // arrange
             var robot = NewRobot("Bob", 990.0, 990.0);
@@ -132,8 +140,9 @@ namespace Test.Challenge.LambdaRobots.Server {
             robot.Y.Should().Be(1000.0);
             robot.Speed.Should().Be(0.0);
             robot.Damage.Should().Be(robot.CollisionDamage);
-            Game.Messages.Count.Should().Be(1);
+            Game.Messages.Count.Should().Be(2);
             Game.Messages[0].Text.Should().Be("Bob was damaged 2 by wall collision");
+            Game.Messages[1].Text.Should().Be("Bob is victorious! Game Over.");
         }
 
         [Fact]
@@ -223,7 +232,7 @@ namespace Test.Challenge.LambdaRobots.Server {
         }
         #endregion
 
-        private Game NewGame() => new Game {
+        private ServerGame NewGame() => new ServerGame {
             Id = "Test",
             BoardWidth = 1000.0,
             BoardHeight = 1000.0,
@@ -278,7 +287,7 @@ namespace Test.Challenge.LambdaRobots.Server {
         private GameLogic NewLogic(params Robot[] robots) {
             var game = NewGame();
             game.Robots.AddRange(robots);
-            _provider = new DependencyProvider(
+            _provider = new GameDependencyProvider(
                 game,
                 new DateTime(2019, 09, 27, 14, 30, 0),
                 new Random(100),

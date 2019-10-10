@@ -22,38 +22,27 @@
  * SOFTWARE.
  */
 
-using System.Collections.Generic;
-using Challenge.LambdaRobots.Server;
-using Newtonsoft.Json;
+namespace Challenge.LambdaRobots.Protocol {
 
-namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
-
-    public class StartGameRequest {
+    public class RobotResponse {
 
         //--- Properties ---
-        [JsonRequired]
-        public string Action { get; set; }
-
-        [JsonRequired]
-        public List<string> RobotArns { get; set; } = new List<string>();
-
-        // optional board initialization settings
-        public double? BoardWidth { get; set; }
-        public double? BoardHeight { get; set; }
-        public double? SecondsPerTurn { get; set; }
-        public int? MaxTurns { get; set; }
-        public double? DirectHitRange { get; set; }
-        public double? NearHitRange { get; set; }
-        public double? FarHitRange { get; set; }
-        public double? CollisionRange { get; set; }
-        public double? MinRobotStartDistance { get; set; }
-        public double? RobotTimeoutSeconds { get; set; }
+        public RobotConfig RobotConfig { get; set; }
+        public RobotAction RobotAction { get; set; }
     }
 
-    public class StartGameResponse {
+    public class RobotConfig  {
 
         //--- Properties ---
-        [JsonRequired]
-        public ServerGame Game { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class RobotAction {
+
+        //--- Properties ---
+        public double? Speed { get; set; }
+        public double? Heading { get; set; }
+        public double? FireMissileHeading { get; set; }
+        public double? FireMissileDistance { get; set; }
     }
 }
