@@ -5,7 +5,6 @@ const mainMenu = document.getElementById("mainMenuContainer");
 const gameBoardStatsContainer = document.getElementById(
   "gameBoardStatsContainer"
 );
-const leaderBoard = document.getElementById("leaderBoardContainer");
 let wsClient;
 async function init() {
   const config = await getConfig();
@@ -45,6 +44,9 @@ async function init() {
     localStorage.clear();
     window.location.href = "/";
   });
+  document.getElementById("btnReset").addEventListener("click", () => {
+    resetGameUi();
+  });
   fillRobotArnsFromLocalStorage();
 }
 
@@ -66,7 +68,8 @@ function startGame() {
     RobotArns: robotArns,
     BoardWidth: 1000,
     BoardHeight: 1000,
-    MaxTurns: 150
+    MaxTurns: 150,
+    DirectHitRange: 200
   };
   wsClient.doSend(JSON.stringify(request));
 }
@@ -98,15 +101,21 @@ function getRobotArnsFromInputs() {
 function startGameUi() {
   messagesUi([]);
   mainMenu.style.display = "none";
-  leaderBoard.style.display = "none";
   gameBoardStatsContainer.style.display = "block";
+  document.getElementById("btnReset").disabled = true;
+  document.getElementById("btnStopGame").disabled = false;
 }
 
 function stopGameUi() {
+  document.getElementById("btnReset").disabled = false;
+  document.getElementById("btnStopGame").disabled = true;
+}
+
+function resetGameUi() {
   mainMenu.style.display = "block";
   gameBoardStatsContainer.style.display = "none";
-  mainMenu.style.display = "block";
-  leaderBoard.style.display = "block";
+  document.getElementById("btnReset").disabled = true;
+  document.getElementById("btnStopGame").disabled = false;
 }
 
 function messagesUi(messages) {
@@ -123,22 +132,42 @@ function updateRobotStats(robots) {
   for (let index = 0; index < robots.length; index++) {
     const robot = robots[index];
     const robotContainer = createElement("div");
-    robotContainer.appendChild(createElement("h3", `${robot.Name} (R${index}) (${robot.State})`));
+    if (robot.State !== "Alive") {
+      robotContainer.style.backgroundColor = "lightgray";
+    }
+    robotContainer.appendChild(
+      createElement("h3", `${robot.Name} (R${index})`)
+    );
     const robotPrimaryStatsContainer = createElement("table");
     const robotTr1 = createElement("tr");
     robotTr1.appendChild(createElement("td", `Damage: ${robot.Damage}`));
-    robotTr1.appendChild(createElement("td", `Collision Damage: ${robot.CollisionDamage}`));
-    robotTr1.appendChild(createElement("td", `Total Damage Dealt: ${robot.TotalDamageDealt}`));
+    robotTr1.appendChild(
+      createElement("td", `Collision Damage: ${robot.CollisionDamage}`)
+    );
+    robotTr1.appendChild(
+      createElement("td", `Total Damage Dealt: ${robot.TotalDamageDealt}`)
+    );
     robotPrimaryStatsContainer.appendChild(robotTr1);
     const robotTr2 = createElement("tr");
-    robotTr2.appendChild(createElement("td", `Missile Fire #: ${robot.TotalMissileFiredCount}`));
-    robotTr2.appendChild(createElement("td", `Missile Hit #: ${robot.TotalMissileHitCount}`));
-    robotTr2.appendChild(createElement("td", `Total Kills: ${robot.TotalKills}`));
+    robotTr2.appendChild(
+      createElement("td", `Missile Fire #: ${robot.TotalMissileFiredCount}`)
+    );
+    robotTr2.appendChild(
+      createElement("td", `Missile Hit #: ${robot.TotalMissileHitCount}`)
+    );
+    robotTr2.appendChild(
+      createElement("td", `Total Kills: ${robot.TotalKills}`)
+    );
     robotPrimaryStatsContainer.appendChild(robotTr2);
     const robotTr3 = createElement("tr");
     robotTr3.appendChild(createElement("td", `X: ${Math.round(robot.X)}`));
     robotTr3.appendChild(createElement("td", `Y: ${Math.round(robot.Y)}`));
-    robotTr3.appendChild(createElement("td", `Total Travel Distance: ${Math.round(robot.TotalTravelDistance)}`));
+    robotTr3.appendChild(
+      createElement(
+        "td",
+        `Total Travel Distance: ${Math.round(robot.TotalTravelDistance)}`
+      )
+    );
     robotPrimaryStatsContainer.appendChild(robotTr3);
     const robotPrimaryAllStats = createElement("pre");
     robotPrimaryAllStats.innerText = JSON.stringify(robot, null, 2);
