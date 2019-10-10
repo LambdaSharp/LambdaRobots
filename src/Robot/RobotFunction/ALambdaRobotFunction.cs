@@ -220,15 +220,25 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
         /// <param name="resolution">Scan resolution in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
         public async Task<double?> ScanAngleForEnemiesAsync(double heading, double resolution) {
-            var httpResponse = await HttpClient.PostAsync($"{_gameApi}/scan", new StringContent(SerializeJson(new ScanEnemiesRequest {
+
+            // issue scan request to game API
+            var postTask = HttpClient.PostAsync($"{_gameApi}/scan", new StringContent(SerializeJson(new ScanEnemiesRequest {
                 GameId = GameId,
                 RobotId = Robot.Id,
                 Heading = heading,
                 Resolution = resolution
             }), Encoding.UTF8, "application/json"));
-            var httpResponseText = await httpResponse.Content.ReadAsStringAsync();
+
+            // wait for response or timeout
+            if(await Task.WhenAny(postTask, Task.Delay(TimeSpan.FromSeconds(1.0))) != postTask) {
+                LogInfo("ScanAngleForEnemiesAsync() timed out");
+                return null;
+            }
+
+            // deserialize scan response
+            var httpResponseText = await postTask.Result.Content.ReadAsStringAsync();
             var response = DeserializeJson<ScanEnemiesResponse>(httpResponseText);
-            LogInfo($"ScanResponse: {httpResponseText}");
+            LogInfo($"ScanAngleForEnemiesAsync() returned {httpResponseText}");
             return response.Found ? response.Distance : (double?)null;
         }
 
