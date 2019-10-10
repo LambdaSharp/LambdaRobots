@@ -152,7 +152,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
             LogInfo($"Posting game update to connection: {game.Id}");
             try {
                 await _amaClient.PostToConnectionAsync(new PostToConnectionRequest {
-                    ConnectionId = game.Id,
+                    ConnectionId = gameRecord.ConnectionId,
                     Data = new MemoryStream(Encoding.UTF8.GetBytes(SerializeJson(new GameTurnNotification {
                         Game = game
                     })))

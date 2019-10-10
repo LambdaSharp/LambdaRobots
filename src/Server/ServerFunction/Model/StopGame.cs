@@ -40,7 +40,6 @@ namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
     public class StopGameResponse {
 
         //--- Properties ---
-        [JsonRequired]
         public ServerGame Game { get; set; }
     }
 }
