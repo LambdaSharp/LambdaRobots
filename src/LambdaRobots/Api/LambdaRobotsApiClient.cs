@@ -57,7 +57,7 @@ namespace Challenge.LambdaRobots.Api {
         /// <param name="heading">Scan heading in degrees</param>
         /// <param name="resolution">Scan resolution in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
-        public async Task<double?> ScanEnemiesAsync(double heading, double resolution) {
+        public async Task<double?> ScanAsync(double heading, double resolution) {
 
             // issue scan request to game API
             var postTask = _httpClient.PostAsync($"{_gameApi}/scan", new StringContent(JsonConvert.SerializeObject(new ScanEnemiesRequest {

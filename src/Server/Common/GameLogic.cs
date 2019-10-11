@@ -154,7 +154,7 @@ namespace Challenge.LambdaRobots.Server {
             // get configuration for all robots
             await Task.WhenAll(Game.Robots.Select(async robot => {
                 var config = await _provider.GetRobotConfig(robot);
-                robot.Name = config?.Name ?? robot.Id;
+                robot.Name = config?.Name ?? robot.Id.Split(':').Last();
                 if(config == null) {
                     robot.State = RobotState.Dead;
                     AddMessage($"{robot.Name} was disqualified by failure to initialize");
@@ -400,24 +400,31 @@ namespace Challenge.LambdaRobots.Server {
                     return false;
                 }
 
-                // apply damage to target
-                Damage(robot, damage);
-
                 // record damage dealt
                 var from = Game.Robots.FirstOrDefault(fromRobot => fromRobot.Id == missile.RobotId);
                 if(from != null) {
                     from.TotalDamageDealt += damage;
                     ++from.TotalMissileHitCount;
-                }
 
-                // check if robot was killed
-                if(robot.State == RobotState.Dead) {
-                    if(from != null) {
+                    // check if robot was killed
+                    if(Damage(robot, damage)) {
                         ++from.TotalKills;
+
+                        // check if robot inflicted damage to itself
+                        if(robot.Id == from.Id) {
+                            AddMessage($"{robot.Name} killed itself");
+                        } else {
+                            AddMessage($"{robot.Name} was killed by {from.Name}");
+                        }
+                    } else {
+
+                        // check if robot inflicted damage to itself
+                        if(robot.Id == from.Id) {
+                            AddMessage($"{robot.Name} caused damage {damage:N0} to itself");
+                        } else {
+                            AddMessage($"{robot.Name} was damaged {damage:N0} by {from.Name}");
+                        }
                     }
-                    AddMessage($"{robot.Name} was killed by {from?.Name ?? "???"}");
-                } else {
-                    AddMessage($"{robot.Name} was damaged {damage:N0} by {from?.Name ?? "???"}");
                 }
                 return true;
             });
@@ -478,6 +485,8 @@ namespace Challenge.LambdaRobots.Server {
                         AddMessage($"{robot.Name} was damaged {robot.CollisionDamage:N0} by collision with {other.Name}");
                     }
                 }
+
+                // keep looking for more collisions unless robot is dead or nearest robot is out of range
                 return (robot.State == RobotState.Alive) && (distance < Game.CollisionRange);
             });
         }

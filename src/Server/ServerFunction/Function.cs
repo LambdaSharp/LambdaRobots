@@ -86,7 +86,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
                 DirectHitRange = request.DirectHitRange ?? 5.0,
                 NearHitRange = request.NearHitRange ?? 20.0,
                 FarHitRange = request.FarHitRange ?? 40.0,
-                CollisionRange = request.CollisionRange ?? 2.0,
+                CollisionRange = request.CollisionRange ?? 5.0,
                 MinRobotStartDistance = request.MinRobotStartDistance ?? 100.0,
                 RobotTimeoutSeconds = request.RobotTimeoutSeconds ?? 15.0
             };

@@ -195,7 +195,8 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                             BoardHeight = game.BoardHeight,
                             MaxTurns = game.MaxTurns,
                             SecondsPerTurn = game.SecondsPerTurn
-                        }
+                        },
+                        Robot = robot
                     }),
                     FunctionName = lambdaArn,
                     InvocationType = InvocationType.RequestResponse

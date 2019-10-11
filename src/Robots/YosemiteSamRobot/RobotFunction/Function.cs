@@ -79,7 +79,7 @@ namespace Challenge.LambdaRobots.YosemiteSamRobot.RobotFunction {
             if(ReloadCoolDown == 0.0) {
 
                 // fire in a random direction
-                FireAngle(
+                FireMissile(
                     heading: Random.NextDouble() * 360.0,
                     distance: 50.0 + Random.NextDouble() * (Robot.MissileRange - 50.0)
                 );

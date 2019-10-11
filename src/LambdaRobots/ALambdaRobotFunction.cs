@@ -105,7 +105,7 @@ namespace Challenge.LambdaRobots {
             LogInfo($"Request:\n{SerializeJson(request)}");
 
             // check if there is a state object to load
-            var stateFile = Path.Combine(Path.GetTempPath(), $"state-{request.Game.Id}.json");
+            var stateFile = Path.Combine(Path.GetTempPath(), $"state-{request.Robot.Id.Replace(':', '-')}.json");
             if(File.Exists(stateFile)) {
                 try {
                     State = JsonConvert.DeserializeObject<TState>(await File.ReadAllTextAsync(stateFile));
@@ -179,7 +179,7 @@ namespace Challenge.LambdaRobots {
         /// </summary>
         /// <param name="heading">Heading in degrees where to fire the missile to</param>
         /// <param name="distance">Distance at which the missile impacts</param>
-        public void FireAngle(double heading, double distance) {
+        public void FireMissile(double heading, double distance) {
             _action.FireMissileHeading = heading;
             _action.FireMissileDistance = distance;
         }
@@ -189,10 +189,10 @@ namespace Challenge.LambdaRobots {
         /// </summary>
         /// <param name="x">Target horizontal coordinate</param>
         /// <param name="y">Target vertical coordinate</param>
-        public void FireCoordinates(double x, double y) {
-            var heading = AngleToCoordinates(x, y);
-            var distance = DistanceToCoordinates(x, y);
-            FireAngle(heading, distance);
+        public void FireMissileToXY(double x, double y) {
+            var heading = AngleToXY(x, y);
+            var distance = DistanceToXY(x, y);
+            FireMissile(heading, distance);
         }
 
         /// <summary>
@@ -215,10 +215,10 @@ namespace Challenge.LambdaRobots {
         /// The max resolution is limited to `Robot.ScannerResolution`.
         /// </summary>
         /// <param name="heading">Scan heading in degrees</param>
-        /// <param name="resolution">Scan resolution in degrees</param>
+        /// <param name="resolution">Scan +/- arc in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
-        public Task<double?> ScanAngleAsync(double heading, double resolution)
-            => new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Game.Id, Robot.Id).ScanEnemiesAsync(heading, resolution);
+        public Task<double?> ScanAsync(double heading, double resolution)
+            => new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Game.Id, Robot.Id).ScanAsync(heading, resolution);
 
         /// <summary>
         /// Determine angle in degrees relative to current robot position.
@@ -227,7 +227,7 @@ namespace Challenge.LambdaRobots {
         /// <param name="x">Target horizontal coordinate</param>
         /// <param name="y">Target vertical coordinate</param>
         /// <returns>Angle in degrees</returns>
-        public double AngleToCoordinates(double x, double y) => NormalizeAngle(Math.Atan2(x - X, y - Y) * 180.0 / Math.PI);
+        public double AngleToXY(double x, double y) => NormalizeAngle(Math.Atan2(x - X, y - Y) * 180.0 / Math.PI);
 
         /// <summary>
         /// Determine distance relative to current robot position.
@@ -235,7 +235,7 @@ namespace Challenge.LambdaRobots {
         /// <param name="x">Target horizontal coordinate</param>
         /// <param name="y">Target vertical coordinate</param>
         /// <returns>Distance to target</returns>
-        public double DistanceToCoordinates(double x, double y) {
+        public double DistanceToXY(double x, double y) {
             var deltaX = x - X;
             var deltaY = y - Y;
             return Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
@@ -254,18 +254,21 @@ namespace Challenge.LambdaRobots {
         }
 
         /// <summary>
-        /// Adjust speed and heading to move robot to specified heading and distance.
+        /// Adjust speed and heading to move robot to specified coordinates.
         /// </summary>
-        /// <param name="heading">Target heading in degrees</param>
-        /// <param name="distance">Target distance</param>
-        public void MoveToAngle(double heading, double distance) {
+        /// <param name="x">Target horizontal coordinate</param>
+        /// <param name="y">Target vertical coordinate</param>
+        /// <returns>Return `true` if arrived at target location</returns>
+        public bool MoveToXY(double x, double y) {
+            var heading = AngleToXY(x, y);
+            var distance = DistanceToXY(x, y);
 
             // check if robot is close enough to target location
             if(distance < 1.0) {
 
                 // close enough; stop moving
                 SetSpeed(0.0);
-                return;
+                return true;
             }
 
             // NOTE: the distance required to stop the robot from moving is obtained with the following formula:
@@ -291,13 +294,7 @@ namespace Challenge.LambdaRobots {
                 // adjust speed to max-travel-speed
                 SetSpeed(speed);
             }
+            return false;
         }
-
-        /// <summary>
-        /// Adjust speed and heading to move robot to specified coordinates.
-        /// </summary>
-        /// <param name="x">Target horizontal coordinate</param>
-        /// <param name="y">Target vertical coordinate</param>
-        public void MoveToCoordinates(double x, double y) => MoveToAngle(AngleToCoordinates(x, y), DistanceToCoordinates(x, y));
     }
 }

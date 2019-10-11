@@ -240,7 +240,7 @@ namespace Test.Challenge.LambdaRobots.Server {
             DirectHitRange = 5.0,
             NearHitRange = 20.0,
             FarHitRange = 40.0,
-            CollisionRange = 2.0,
+            CollisionRange = 5.0,
             MinRobotStartDistance = 100.0,
             RobotTimeoutSeconds = 10.0,
             TotalTurns = 0,
