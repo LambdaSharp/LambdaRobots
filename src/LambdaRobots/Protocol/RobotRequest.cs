@@ -28,17 +28,17 @@ using Newtonsoft.Json.Converters;
 namespace Challenge.LambdaRobots.Protocol {
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum RobotCommand {
+    public enum LambdaRobotCommand {
         Undefined,
         GetConfig,
         GetAction
     }
 
-    public class RobotRequest {
+    public class LambdaRobotRequest {
 
         //--- Properties ---
-        public RobotCommand Command { get; set; }
+        public LambdaRobotCommand Command { get; set; }
         public Robot Robot { get; set; }
-        public Game Game { get; set; }
+        public GameInfo Game { get; set; }
     }
 }

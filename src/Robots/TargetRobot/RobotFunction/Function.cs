@@ -25,19 +25,23 @@
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
 using Challenge.LambdaRobots.Protocol;
-using LambdaSharp;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
 namespace Challenge.LambdaRobots.TargetRobot.RobotFunction {
 
-    public class Function : ALambdaRobotFunction {
+    public class LambdaRobotState {
+
+        // NOTE: target robot has no state
+    }
+
+    public class Function : ALambdaRobotFunction<LambdaRobotState> {
 
         //--- Methods ---
-        public override async Task<RobotConfig> GetConfigAsync() {
-            return new RobotConfig {
-                Name = "CannonFodder"
+        public override async Task<LambdaRobotConfig> GetConfigAsync() {
+            return new LambdaRobotConfig {
+                Name = "Target"
             };
         }
 

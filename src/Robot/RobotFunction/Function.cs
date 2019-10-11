@@ -32,7 +32,12 @@ using LambdaSharp;
 
 namespace Challenge.LambdaRobots.Robot.RobotFunction {
 
-    public class Function : ALambdaRobotFunction {
+    public class LambdaRobotState {
+
+        // TODO: add any state the robot needs to track between invocations (must be serializable to JSON)
+    }
+
+    public class Function : ALambdaRobotFunction<LambdaRobotState> {
 
         //--- Properties ---
         public string Name { get; set; }
@@ -47,10 +52,10 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
             }
         }
 
-        public override async Task<RobotConfig> GetConfigAsync() {
+        public override async Task<LambdaRobotConfig> GetConfigAsync() {
 
             // TODO: this method is always invoked at the beginning of a match
-            return new RobotConfig {
+            return new LambdaRobotConfig {
                 Name = Name
             };
         }

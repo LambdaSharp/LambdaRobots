@@ -61,7 +61,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
     public class GameTurnNotification {
 
         //--- Properties ---
-        public ServerGame Game { get; set; }
+        public Game Game { get; set; }
     }
 
     public class Function : ALambdaFunction<FunctionRequest, FunctionResponse> {
@@ -183,13 +183,13 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
             };
         }
 
-        private async Task<RobotConfig> GetRobotConfigAsync(ServerGame game, Robot robot, string lambdaArn) {
+        private async Task<LambdaRobotConfig> GetRobotConfigAsync(Game game, Robot robot, string lambdaArn) {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
                 var getNameTask = _lambdaClient.InvokeAsync(new InvokeRequest {
-                    Payload = SerializeJson(new RobotRequest {
-                        Command = RobotCommand.GetConfig,
-                        Game = new Game {
+                    Payload = SerializeJson(new LambdaRobotRequest {
+                        Command = LambdaRobotCommand.GetConfig,
+                        Game = new GameInfo {
                             Id = game.Id,
                             BoardWidth = game.BoardWidth,
                             BoardHeight = game.BoardHeight,
@@ -207,7 +207,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                     return null;
                 }
                 var response = Encoding.UTF8.GetString(getNameTask.Result.Payload.ToArray());
-                var result = DeserializeJson<RobotResponse>(response);
+                var result = DeserializeJson<LambdaRobotResponse>(response);
                 LogInfo($"Robot {robot.Id} GetName responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
                 return result.RobotConfig;
             } catch(Exception e) {
@@ -216,13 +216,13 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
             }
         }
 
-        private async Task<RobotAction> GetRobotActionAsync(ServerGame game, Robot robot, string lambdaArn) {
+        private async Task<LambdaRobotAction> GetRobotActionAsync(Game game, Robot robot, string lambdaArn) {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
                 var getActionTask = _lambdaClient.InvokeAsync(new InvokeRequest {
-                    Payload = SerializeJson(new RobotRequest {
-                        Command = RobotCommand.GetAction,
-                        Game = new Game {
+                    Payload = SerializeJson(new LambdaRobotRequest {
+                        Command = LambdaRobotCommand.GetAction,
+                        Game = new GameInfo {
                             Id = game.Id,
                             BoardWidth = game.BoardWidth,
                             BoardHeight = game.BoardHeight,
@@ -242,7 +242,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                     return null;
                 }
                 var response = Encoding.UTF8.GetString(getActionTask.Result.Payload.ToArray());
-                var result = DeserializeJson<RobotResponse>(response);
+                var result = DeserializeJson<LambdaRobotResponse>(response);
                 LogInfo($"Robot {robot.Id} GetAction responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
                 return result.RobotAction;
             } catch(Exception e) {

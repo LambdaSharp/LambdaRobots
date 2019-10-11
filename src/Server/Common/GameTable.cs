@@ -37,7 +37,7 @@ namespace Challenge.LambdaRobots.Server {
         //--- Properties ---
         public string PK { get; set; }
         public string SK => "GAME";
-        public ServerGame Game { get; set; }
+        public Game Game { get; set; }
         public List<string> LambdaRobotArns { get; set; }
         public string GameLoopArn { get; set; }
         public string ConnectionId { get; set; }

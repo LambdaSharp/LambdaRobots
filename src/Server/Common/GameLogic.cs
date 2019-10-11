@@ -32,28 +32,28 @@ namespace Challenge.LambdaRobots.Server {
     public interface IGameDependencyProvider {
 
         //--- Properties ---
-        ServerGame Game { get; }
+        Game Game { get; }
 
         //--- Methods ---
         double NextRandomDouble();
-        Task<RobotConfig> GetRobotConfig(Robot robot);
-        Task<RobotAction> GetRobotAction(Robot robot);
+        Task<LambdaRobotConfig> GetRobotConfig(Robot robot);
+        Task<LambdaRobotAction> GetRobotAction(Robot robot);
     }
 
     public class GameDependencyProvider : IGameDependencyProvider {
 
         //--- Fields ---
-        private ServerGame _game;
+        private Game _game;
         private Random _random;
-        private readonly Func<Robot, Task<RobotConfig>> _getConfig;
-        private readonly Func<Robot, Task<RobotAction>> _getAction;
+        private readonly Func<Robot, Task<LambdaRobotConfig>> _getConfig;
+        private readonly Func<Robot, Task<LambdaRobotAction>> _getAction;
 
         //--- Constructors ---
         public GameDependencyProvider(
-            ServerGame game,
+            Game game,
             Random random,
-            Func<Robot, Task<RobotConfig>> getConfig,
-            Func<Robot, Task<RobotAction>> getAction
+            Func<Robot, Task<LambdaRobotConfig>> getConfig,
+            Func<Robot, Task<LambdaRobotAction>> getAction
         ) {
             _game = game ?? throw new ArgumentNullException(nameof(game));
             _random = random ?? throw new ArgumentNullException(nameof(random));
@@ -62,12 +62,12 @@ namespace Challenge.LambdaRobots.Server {
         }
 
         //--- Properties ---
-        public ServerGame Game => _game;
+        public Game Game => _game;
 
         //--- Methods ---
         public double NextRandomDouble() => _random.NextDouble();
-        public Task<RobotConfig> GetRobotConfig(Robot robot) => _getConfig(robot);
-        public Task<RobotAction> GetRobotAction(Robot robot) => _getAction(robot);
+        public Task<LambdaRobotConfig> GetRobotConfig(Robot robot) => _getConfig(robot);
+        public Task<LambdaRobotAction> GetRobotAction(Robot robot) => _getAction(robot);
     }
 
     public class GameLogic {
@@ -95,7 +95,7 @@ namespace Challenge.LambdaRobots.Server {
         }
 
         //--- Properties ---
-        public ServerGame Game => _provider.Game;
+        public Game Game => _provider.Game;
 
         //--- Methods ---
         public async Task StartAsync(int robotCount) {
@@ -304,7 +304,7 @@ namespace Challenge.LambdaRobots.Server {
             return result;
         }
 
-        private void ApplyRobotAction(Robot robot, RobotAction action) {
+        private void ApplyRobotAction(Robot robot, LambdaRobotAction action) {
 
             // reduce reload time if any is active
             if(robot.ReloadCoolDown > 0) {

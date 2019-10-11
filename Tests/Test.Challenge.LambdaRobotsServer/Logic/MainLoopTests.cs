@@ -39,7 +39,7 @@ namespace Test.Challenge.LambdaRobots.Server {
         //--- Fields ---
         private readonly ITestOutputHelper _output;
         private IGameDependencyProvider _provider;
-        private Dictionary<string, List<Func<RobotAction>>> _robotActions = new Dictionary<string, List<Func<RobotAction>>>();
+        private Dictionary<string, List<Func<LambdaRobotAction>>> _robotActions = new Dictionary<string, List<Func<LambdaRobotAction>>>();
 
         //--- Constructors ---
         public MainLoopTests(ITestOutputHelper output) {
@@ -47,7 +47,7 @@ namespace Test.Challenge.LambdaRobots.Server {
         }
 
         //--- Properties ---
-        private ServerGame Game => _provider.Game;
+        private Game Game => _provider.Game;
 
         //--- Methods ---
 
@@ -58,8 +58,8 @@ namespace Test.Challenge.LambdaRobots.Server {
             // arrange
             var robot = NewRobot("Bob", 500, 500);
             var logic = NewLogic(robot);
-            _robotActions["Bob"] = new List<Func<RobotAction>> {
-                () => new RobotAction {
+            _robotActions["Bob"] = new List<Func<LambdaRobotAction>> {
+                () => new LambdaRobotAction {
                     Heading = 0.0,
                     Speed = 100.0
                 }
@@ -80,8 +80,8 @@ namespace Test.Challenge.LambdaRobots.Server {
             // arrange
             var robot = NewRobot("Bob", 500, 500);
             var logic = NewLogic(robot);
-            _robotActions["Bob"] = new List<Func<RobotAction>> {
-                () => new RobotAction {
+            _robotActions["Bob"] = new List<Func<LambdaRobotAction>> {
+                () => new LambdaRobotAction {
                     Heading = 0.0,
                     Speed = 100.0
                 }
@@ -103,8 +103,8 @@ namespace Test.Challenge.LambdaRobots.Server {
             // arrange
             var robot = NewRobot("Bob", 500, 500);
             var logic = NewLogic(robot);
-            _robotActions["Bob"] = new List<Func<RobotAction>> {
-                () => new RobotAction {
+            _robotActions["Bob"] = new List<Func<LambdaRobotAction>> {
+                () => new LambdaRobotAction {
                     Heading = 90.0,
                     Speed = 100.0
                 }
@@ -220,7 +220,7 @@ namespace Test.Challenge.LambdaRobots.Server {
             // arrange
             var robot = NewRobot("Bob", 500, 500);
             var logic = NewLogic(robot);
-            _robotActions["Bob"] = new List<Func<RobotAction>> {
+            _robotActions["Bob"] = new List<Func<LambdaRobotAction>> {
                 () => null
             };
 
@@ -232,7 +232,7 @@ namespace Test.Challenge.LambdaRobots.Server {
         }
         #endregion
 
-        private ServerGame NewGame() => new ServerGame {
+        private Game NewGame() => new Game {
             Id = "Test",
             BoardWidth = 1000.0,
             BoardHeight = 1000.0,
@@ -290,7 +290,7 @@ namespace Test.Challenge.LambdaRobots.Server {
             _provider = new GameDependencyProvider(
                 game,
                 new Random(100),
-                async robot => new RobotConfig {
+                async robot => new LambdaRobotConfig {
                     Name = robot.Id
                 },
                 async robot => {
@@ -301,7 +301,7 @@ namespace Test.Challenge.LambdaRobots.Server {
                         actions.RemoveAt(0);
                         return action();
                     }
-                    return new RobotAction();
+                    return new LambdaRobotAction();
                 }
             );
             return new GameLogic(_provider);

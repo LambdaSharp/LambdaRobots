@@ -40,6 +40,6 @@ namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
     public class StopGameResponse {
 
         //--- Properties ---
-        public ServerGame Game { get; set; }
+        public Game Game { get; set; }
     }
 }

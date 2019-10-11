@@ -23,7 +23,7 @@
  */
 
 namespace Challenge.LambdaRobots {
-    public class Game {
+    public class GameInfo {
 
         //--- Properties ---
 

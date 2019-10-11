@@ -23,14 +23,16 @@
  */
 
 using System;
+using System.IO;
 using System.Threading.Tasks;
 using Challenge.LambdaRobots.Api;
 using Challenge.LambdaRobots.Protocol;
 using LambdaSharp;
+using Newtonsoft.Json;
 
 namespace Challenge.LambdaRobots {
 
-    public abstract class ALambdaRobotFunction : ALambdaFunction<RobotRequest, RobotResponse> {
+    public abstract class ALambdaRobotFunction<TState> : ALambdaFunction<LambdaRobotRequest, LambdaRobotResponse> where TState : class {
 
         //--- Class Fields ---
 
@@ -40,7 +42,7 @@ namespace Challenge.LambdaRobots {
         public static Random Random { get ; private set; } = new Random();
 
         //--- Fields ---
-        private RobotAction _action;
+        private LambdaRobotAction _action;
 
         //--- Properties ---
 
@@ -52,7 +54,7 @@ namespace Challenge.LambdaRobots {
         /// <summary>
         /// Game data structure describing the state and characteristics of the game;
         /// </summary>
-        public Challenge.LambdaRobots.Game Game { get; set; }
+        public Challenge.LambdaRobots.GameInfo Game { get; set; }
 
         /// <summary>
         /// Horizontal position of robot. Value is between `0` and `GameBoardWidth`.
@@ -84,28 +86,46 @@ namespace Challenge.LambdaRobots {
         /// </summary>
         public double ReloadCoolDown => Robot.ReloadCoolDown;
 
+        /// <summary>
+        /// Robot state is automatically saved and loaded for each invocation when available.
+        /// </summary>
+        public TState State { get; set; }
+
         //--- Abstract Methods ---
-        public abstract Task<RobotConfig> GetConfigAsync();
+        public abstract Task<LambdaRobotConfig> GetConfigAsync();
         public abstract Task GetActionAsync();
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) { }
 
-        public override sealed async Task<RobotResponse> ProcessMessageAsync(RobotRequest request) {
-            LogInfo($"Request:\n{SerializeJson(request)}");
+        public override sealed async Task<LambdaRobotResponse> ProcessMessageAsync(LambdaRobotRequest request) {
 
             // NOTE (2019-10-03, bjorg): this method dispatches to other methods based on the incoming
             //  request; most likely, there is nothing to change here.
-            RobotResponse response;
+            LogInfo($"Request:\n{SerializeJson(request)}");
+
+            // check if there is a state object to load
+            var stateFile = Path.Combine(Path.GetTempPath(), $"state-{request.Game.Id}.json");
+            if(File.Exists(stateFile)) {
+                try {
+                    State = JsonConvert.DeserializeObject<TState>(await File.ReadAllTextAsync(stateFile));
+                } catch(Exception e) {
+                    LogErrorAsWarning(e, $"unable to load state file: {stateFile}");
+                    State = null;
+                }
+            }
+
+            // dispatch to specific method based on request command
+            LambdaRobotResponse response;
             switch(request.Command) {
-            case RobotCommand.GetConfig:
+            case LambdaRobotCommand.GetConfig:
 
                 // robot configuration request
-                response = new RobotResponse {
+                response = new LambdaRobotResponse {
                     RobotConfig = await GetConfigAsync()
                 };
                 break;
-            case RobotCommand.GetAction:
+            case LambdaRobotCommand.GetAction:
 
                 // robot action request
                 try {
@@ -115,13 +135,13 @@ namespace Challenge.LambdaRobots {
                     Robot = request.Robot;
 
                     // initialize a default empty action
-                    _action = new RobotAction();
+                    _action = new LambdaRobotAction();
 
                     // get robot action
                     await GetActionAsync();
 
                     // generate response
-                    response = new RobotResponse {
+                    response = new LambdaRobotResponse {
                         RobotAction = _action
                     };
                 } finally {
@@ -133,6 +153,23 @@ namespace Challenge.LambdaRobots {
                 // unrecognized request
                 throw new ApplicationException($"unexpected request: '{request.Command}'");
             }
+
+            // check if there is a state object to save
+            if(State != null) {
+                try {
+                    await File.WriteAllTextAsync(stateFile, JsonConvert.SerializeObject(State));
+                } catch(Exception e) {
+                    LogErrorAsWarning(e, $"unable to save state file: {stateFile}");
+                }
+            } else if(File.Exists(stateFile)) {
+                try {
+                    File.Delete(stateFile);
+                } catch(Exception e) {
+                    LogErrorAsWarning(e, $"unable to delete state file: {stateFile}");
+                }
+            }
+
+            // log response and return
             LogInfo($"Response:\n{SerializeJson(response)}");
             return response;
         }

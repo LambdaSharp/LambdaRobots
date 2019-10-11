@@ -24,20 +24,20 @@
 
 namespace Challenge.LambdaRobots.Protocol {
 
-    public class RobotResponse {
+    public class LambdaRobotResponse {
 
         //--- Properties ---
-        public RobotConfig RobotConfig { get; set; }
-        public RobotAction RobotAction { get; set; }
+        public LambdaRobotConfig RobotConfig { get; set; }
+        public LambdaRobotAction RobotAction { get; set; }
     }
 
-    public class RobotConfig  {
+    public class LambdaRobotConfig  {
 
         //--- Properties ---
         public string Name { get; set; }
     }
 
-    public class RobotAction {
+    public class LambdaRobotAction {
 
         //--- Properties ---
         public double? Speed { get; set; }

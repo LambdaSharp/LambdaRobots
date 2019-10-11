@@ -40,6 +40,6 @@ namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
         //--- Properties ---
 
         [JsonRequired]
-        public ServerGame Game { get; set; }
+        public Game Game { get; set; }
     }
 }

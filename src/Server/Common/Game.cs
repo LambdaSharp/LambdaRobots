@@ -38,7 +38,7 @@ namespace Challenge.LambdaRobots.Server {
         Error
     }
 
-    public class ServerGame {
+    public class Game {
 
         //--- Fields ---
         public string Id;

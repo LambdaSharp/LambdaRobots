@@ -76,7 +76,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             LogInfo($"Starting a new game for ConnectionId={CurrentRequest.RequestContext.ConnectionId}");
 
             // create a new game
-            var game = new ServerGame {
+            var game = new Game {
                 Id = Guid.NewGuid().ToString("N"),
                 State = GameState.Start,
                 BoardWidth = request.BoardWidth ?? 1000.0,
