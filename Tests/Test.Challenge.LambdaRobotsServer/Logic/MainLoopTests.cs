@@ -244,7 +244,8 @@ namespace Test.Challenge.LambdaRobots.Server {
             MinRobotStartDistance = 100.0,
             RobotTimeoutSeconds = 10.0,
             TotalTurns = 0,
-            MaxTurns = 300
+            MaxTurns = 300,
+            MaxBuildPoints = 8
         };
 
         private Robot NewRobot(string id, double x, double y) => new Robot {
@@ -267,8 +268,8 @@ namespace Test.Challenge.LambdaRobots.Server {
             Acceleration = 10.0,
             Deceleration = 20.0,
             MaxTurnSpeed = 50.0,
-            ScannerRange = 600.0,
-            ScannerResolution = 10.0,
+            RadarRange = 600.0,
+            RadarMaxResolution = 10.0,
             MaxDamage = 100.0,
             CollisionDamage = 2.0,
             DirectHitDamage = 8.0,
@@ -290,7 +291,7 @@ namespace Test.Challenge.LambdaRobots.Server {
             _provider = new GameDependencyProvider(
                 game,
                 new Random(100),
-                async robot => new LambdaRobotConfig {
+                async robot => new LambdaRobotBuild {
                     Name = robot.Id
                 },
                 async robot => {

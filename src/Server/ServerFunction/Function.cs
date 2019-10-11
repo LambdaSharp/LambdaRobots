@@ -83,6 +83,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
                 BoardHeight = request.BoardHeight ?? 1000.0,
                 SecondsPerTurn = request.SecondsPerTurn ?? 0.5,
                 MaxTurns = request.MaxTurns ?? 300,
+                MaxBuildPoints = request.MaxBuildPoints ?? 8,
                 DirectHitRange = request.DirectHitRange ?? 5.0,
                 NearHitRange = request.NearHitRange ?? 20.0,
                 FarHitRange = request.FarHitRange ?? 40.0,
@@ -174,7 +175,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             var gameLogic = new GameLogic(new GameDependencyProvider(
                 gameRecord.Game,
                 _random,
-                r => throw new NotImplementedException("not implementation for GetConfig"),
+                r => throw new NotImplementedException("not implementation for GetBuild"),
                 r => throw new NotImplementedException("not implementation for GetAction")
             ));
 

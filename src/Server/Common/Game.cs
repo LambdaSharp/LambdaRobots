@@ -61,6 +61,7 @@ namespace Challenge.LambdaRobots.Server {
         public double MinRobotStartDistance;
         public double RobotTimeoutSeconds;
         public int MaxTurns;
+        public int MaxBuildPoints;
     }
 
     public class Message {

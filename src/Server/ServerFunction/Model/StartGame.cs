@@ -41,6 +41,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
         public double? BoardHeight { get; set; }
         public double? SecondsPerTurn { get; set; }
         public int? MaxTurns { get; set; }
+        public int? MaxBuildPoints { get; set; }
         public double? DirectHitRange { get; set; }
         public double? NearHitRange { get; set; }
         public double? FarHitRange { get; set; }
