@@ -24,6 +24,70 @@
         <input type="text" placeholder="lambda function arn" name="robots" />
         <button primary id="btnStartGame">Start Game!</button>
         <button id="btnClear">Clear Saved Config</button>
+        <h3>Advance Configuration</h3>
+        <table>
+          <tr>
+            <td>
+              <input type="number" placeholder="Board Width" id="BoardWidth" />
+            </td>
+            <td>
+              <input
+                type="number"
+                placeholder="Board Height"
+                id="BoardHeight"
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                placeholder="Seconds Per Turn"
+                id="SecondsPerTurn"
+              />
+            </td>
+            <td>
+              <input type="number" placeholder="Max Turns" id="MaxTurns" />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input
+                type="number"
+                placeholder="Direct Hit Range"
+                id="DirectHitRange"
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                placeholder="Near Hit Range"
+                id="NearHitRange"
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                placeholder="Far Hit Range"
+                id="FarHitRange"
+              />
+            </td>
+            <td>
+              <input
+                type="number"
+                placeholder="Collision Range"
+                id="CollisionRange"
+              />
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <input
+                type="number"
+                placeholder="Robot Timeout Seconds"
+                id="RobotTimeoutSeconds"
+              />
+            </td>
+          </tr>
+        </table>
       </section>
     </div>
     <div id="gameBoardStatsContainer">

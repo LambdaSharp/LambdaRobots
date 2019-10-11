@@ -67,9 +67,7 @@ function startGame() {
     Action: "start",
     RobotArns: robotArns,
     BoardWidth: 1000,
-    BoardHeight: 1000,
-    MaxTurns: 150,
-    DirectHitRange: 200
+    BoardHeight: 1000
   };
   wsClient.doSend(JSON.stringify(request));
 }
@@ -142,10 +140,10 @@ function updateRobotStats(robots) {
     const robotTr1 = createElement("tr");
     robotTr1.appendChild(createElement("td", `Damage: ${robot.Damage}`));
     robotTr1.appendChild(
-      createElement("td", `Collision Damage: ${robot.CollisionDamage}`)
+      createElement("td", `Total Damage Dealt: ${robot.TotalDamageDealt}`)
     );
     robotTr1.appendChild(
-      createElement("td", `Total Damage Dealt: ${robot.TotalDamageDealt}`)
+      createElement("td", `Reload Cool Down: ${robot.ReloadCoolDown}`)
     );
     robotPrimaryStatsContainer.appendChild(robotTr1);
     const robotTr2 = createElement("tr");
