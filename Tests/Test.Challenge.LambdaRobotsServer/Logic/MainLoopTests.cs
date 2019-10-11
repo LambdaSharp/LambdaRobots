@@ -289,7 +289,6 @@ namespace Test.Challenge.LambdaRobots.Server {
             game.Robots.AddRange(robots);
             _provider = new GameDependencyProvider(
                 game,
-                new DateTime(2019, 09, 27, 14, 30, 0),
                 new Random(100),
                 async robot => new RobotConfig {
                     Name = robot.Id

@@ -101,7 +101,6 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
             var game = gameRecord.Game;
             var logic = new GameLogic(new GameDependencyProvider(
                 gameRecord.Game,
-                DateTime.UtcNow,
                 _random,
                 robot => GetRobotConfigAsync(game, robot, gameRecord.LambdaRobotArns[gameRecord.Game.Robots.IndexOf(robot)]),
                 robot => GetRobotActionAsync(game, robot, gameRecord.LambdaRobotArns[gameRecord.Game.Robots.IndexOf(robot)])

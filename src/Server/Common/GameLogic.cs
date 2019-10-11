@@ -32,7 +32,6 @@ namespace Challenge.LambdaRobots.Server {
     public interface IGameDependencyProvider {
 
         //--- Properties ---
-        DateTime UtcNow { get; }
         ServerGame Game { get; }
 
         //--- Methods ---
@@ -45,7 +44,6 @@ namespace Challenge.LambdaRobots.Server {
 
         //--- Fields ---
         private ServerGame _game;
-        private DateTime _utcNow;
         private Random _random;
         private readonly Func<Robot, Task<RobotConfig>> _getConfig;
         private readonly Func<Robot, Task<RobotAction>> _getAction;
@@ -53,20 +51,17 @@ namespace Challenge.LambdaRobots.Server {
         //--- Constructors ---
         public GameDependencyProvider(
             ServerGame game,
-            DateTime utcNow,
             Random random,
             Func<Robot, Task<RobotConfig>> getConfig,
             Func<Robot, Task<RobotAction>> getAction
         ) {
             _game = game ?? throw new ArgumentNullException(nameof(game));
-            _utcNow = utcNow;
             _random = random ?? throw new ArgumentNullException(nameof(random));
             _getConfig = getConfig ?? throw new ArgumentNullException(nameof(getConfig));
             _getAction = getAction ?? throw new ArgumentNullException(nameof(getAction));
         }
 
         //--- Properties ---
-        public DateTime UtcNow => _utcNow;
         public ServerGame Game => _game;
 
         //--- Methods ---
@@ -100,7 +95,6 @@ namespace Challenge.LambdaRobots.Server {
         }
 
         //--- Properties ---
-        public DateTime UtcNow => _provider.UtcNow;
         public ServerGame Game => _provider.Game;
 
         //--- Methods ---
@@ -123,7 +117,7 @@ namespace Challenge.LambdaRobots.Server {
                     Heading = 0.0,
                     Damage = 0.0,
                     ReloadCoolDown = 0.0,
-                    TimeOfDeath = null,
+                    TimeOfDeathGameTurn = 0,
                     TotalDamageDealt = 0.0,
                     TotalKills = 0,
                     TotalMissileFiredCount = 0,
@@ -490,7 +484,7 @@ namespace Challenge.LambdaRobots.Server {
 
         private void AddMessage(string text) {
             Game.Messages.Add(new Message {
-                Timestamp = UtcNow,
+                GameTurn = Game.TotalTurns,
                 Text = text
             });
         }
@@ -572,7 +566,7 @@ namespace Challenge.LambdaRobots.Server {
             if(robot.Damage >= robot.MaxDamage) {
                 robot.Damage = robot.MaxDamage;
                 robot.State = RobotState.Dead;
-                robot.TimeOfDeath = UtcNow;
+                robot.TimeOfDeathGameTurn = Game.TotalTurns;
                 return true;
             }
             return false;

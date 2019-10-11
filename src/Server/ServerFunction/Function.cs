@@ -152,8 +152,9 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
 
             // update game state to indicated it was stopped
             gameRecord.Game.State = GameState.Finished;
+            ++gameRecord.Game.TotalTurns;
             gameRecord.Game.Messages.Add(new Message {
-                Timestamp = DateTime.UtcNow,
+                GameTurn = gameRecord.Game.TotalTurns,
                 Text = "Game stopped."
             });
 
@@ -172,7 +173,6 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             }
             var gameLogic = new GameLogic(new GameDependencyProvider(
                 gameRecord.Game,
-                DateTime.UtcNow,
                 _random,
                 r => throw new NotImplementedException("not implementation for GetConfig"),
                 r => throw new NotImplementedException("not implementation for GetAction")

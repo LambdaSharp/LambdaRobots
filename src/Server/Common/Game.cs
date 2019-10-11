@@ -66,7 +66,7 @@ namespace Challenge.LambdaRobots.Server {
     public class Message {
 
         //--- Fields ---
-        public DateTime Timestamp;
+        public int GameTurn;
         public string Text;
     }
 
