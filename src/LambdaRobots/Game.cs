@@ -53,6 +53,12 @@ namespace Challenge.LambdaRobots {
         public int MaxTurns { get; set; }
 
         /// <summary>
+        /// Maximum number of build points a robot can use.
+        /// </summary>
+        /// <value></value>
+        public int MaxBuildPoints { get; set; }
+
+        /// <summary>
         /// URL for Game API.
         /// </summary>
         /// <value></value>

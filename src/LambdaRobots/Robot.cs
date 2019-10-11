@@ -67,8 +67,8 @@ namespace Challenge.LambdaRobots {
         public double Acceleration;
         public double Deceleration;
         public double MaxTurnSpeed;
-        public double ScannerRange;
-        public double ScannerResolution;
+        public double RadarRange;
+        public double RadarMaxResolution;
         public double MaxDamage;
         public double CollisionDamage;
         public double DirectHitDamage;

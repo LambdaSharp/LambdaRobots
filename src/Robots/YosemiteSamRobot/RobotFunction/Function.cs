@@ -39,11 +39,13 @@ namespace Challenge.LambdaRobots.YosemiteSamRobot.RobotFunction {
     public class Function : ALambdaRobotFunction<LambdaRobotState> {
 
         //--- Methods ---
-        public override async Task<LambdaRobotConfig> GetConfigAsync() {
+        public override async Task<LambdaRobotBuild> GetBuildAsync() {
 
             // TODO: this method is always invoked at the beginning of a match
-            return new LambdaRobotConfig {
-                Name = "Yosemite Sam"
+            return new LambdaRobotBuild {
+                Name = "Yosemite Sam",
+                Engine = LambdaRobotEngine.ExtraLarge,
+                Missile = LambdaRobotMissile.Dart
             };
         }
 

@@ -102,7 +102,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
             var logic = new GameLogic(new GameDependencyProvider(
                 gameRecord.Game,
                 _random,
-                robot => GetRobotConfigAsync(game, robot, gameRecord.LambdaRobotArns[gameRecord.Game.Robots.IndexOf(robot)]),
+                robot => GetRobotBuildAsync(game, robot, gameRecord.LambdaRobotArns[gameRecord.Game.Robots.IndexOf(robot)]),
                 robot => GetRobotActionAsync(game, robot, gameRecord.LambdaRobotArns[gameRecord.Game.Robots.IndexOf(robot)])
             ));
 
@@ -183,17 +183,18 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
             };
         }
 
-        private async Task<LambdaRobotConfig> GetRobotConfigAsync(Game game, Robot robot, string lambdaArn) {
+        private async Task<LambdaRobotBuild> GetRobotBuildAsync(Game game, Robot robot, string lambdaArn) {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
                 var getNameTask = _lambdaClient.InvokeAsync(new InvokeRequest {
                     Payload = SerializeJson(new LambdaRobotRequest {
-                        Command = LambdaRobotCommand.GetConfig,
+                        Command = LambdaRobotCommand.GetBuild,
                         Game = new GameInfo {
                             Id = game.Id,
                             BoardWidth = game.BoardWidth,
                             BoardHeight = game.BoardHeight,
                             MaxTurns = game.MaxTurns,
+                            MaxBuildPoints = game.MaxBuildPoints,
                             SecondsPerTurn = game.SecondsPerTurn
                         },
                         Robot = robot
@@ -210,7 +211,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                 var response = Encoding.UTF8.GetString(getNameTask.Result.Payload.ToArray());
                 var result = DeserializeJson<LambdaRobotResponse>(response);
                 LogInfo($"Robot {robot.Id} GetName responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
-                return result.RobotConfig;
+                return result.RobotBuild;
             } catch(Exception e) {
                 LogErrorAsWarning(e, $"Robot {robot.Id} GetName failed (arn: {lambdaArn})");
                 return null;
@@ -228,6 +229,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
                             BoardWidth = game.BoardWidth,
                             BoardHeight = game.BoardHeight,
                             MaxTurns = game.MaxTurns,
+                            MaxBuildPoints = game.MaxBuildPoints,
                             SecondsPerTurn = game.SecondsPerTurn,
                             ApiUrl = _gameApiUrl
                         },

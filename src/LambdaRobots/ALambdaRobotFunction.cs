@@ -86,13 +86,15 @@ namespace Challenge.LambdaRobots {
         /// </summary>
         public double ReloadCoolDown => Robot.ReloadCoolDown;
 
+        public double BreakingDistance => (Speed * Speed) / (2.0 * Robot.Deceleration);
+
         /// <summary>
         /// Robot state is automatically saved and loaded for each invocation when available.
         /// </summary>
         public TState State { get; set; }
 
         //--- Abstract Methods ---
-        public abstract Task<LambdaRobotConfig> GetConfigAsync();
+        public abstract Task<LambdaRobotBuild> GetBuildAsync();
         public abstract Task GetActionAsync();
 
         //--- Methods ---
@@ -118,11 +120,11 @@ namespace Challenge.LambdaRobots {
             // dispatch to specific method based on request command
             LambdaRobotResponse response;
             switch(request.Command) {
-            case LambdaRobotCommand.GetConfig:
+            case LambdaRobotCommand.GetBuild:
 
                 // robot configuration request
                 response = new LambdaRobotResponse {
-                    RobotConfig = await GetConfigAsync()
+                    RobotBuild = await GetBuildAsync()
                 };
                 break;
             case LambdaRobotCommand.GetAction:

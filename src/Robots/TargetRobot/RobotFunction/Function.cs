@@ -39,8 +39,8 @@ namespace Challenge.LambdaRobots.TargetRobot.RobotFunction {
     public class Function : ALambdaRobotFunction<LambdaRobotState> {
 
         //--- Methods ---
-        public override async Task<LambdaRobotConfig> GetConfigAsync() {
-            return new LambdaRobotConfig {
+        public override async Task<LambdaRobotBuild> GetBuildAsync() {
+            return new LambdaRobotBuild {
                 Name = "Target"
             };
         }

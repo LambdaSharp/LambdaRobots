@@ -24,6 +24,7 @@
 
 using System;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using Challenge.LambdaRobots.Protocol;
 
@@ -36,7 +37,7 @@ namespace Challenge.LambdaRobots.Server {
 
         //--- Methods ---
         double NextRandomDouble();
-        Task<LambdaRobotConfig> GetRobotConfig(Robot robot);
+        Task<LambdaRobotBuild> GetRobotBuild(Robot robot);
         Task<LambdaRobotAction> GetRobotAction(Robot robot);
     }
 
@@ -45,19 +46,19 @@ namespace Challenge.LambdaRobots.Server {
         //--- Fields ---
         private Game _game;
         private Random _random;
-        private readonly Func<Robot, Task<LambdaRobotConfig>> _getConfig;
+        private readonly Func<Robot, Task<LambdaRobotBuild>> _getBuild;
         private readonly Func<Robot, Task<LambdaRobotAction>> _getAction;
 
         //--- Constructors ---
         public GameDependencyProvider(
             Game game,
             Random random,
-            Func<Robot, Task<LambdaRobotConfig>> getConfig,
+            Func<Robot, Task<LambdaRobotBuild>> getBuild,
             Func<Robot, Task<LambdaRobotAction>> getAction
         ) {
             _game = game ?? throw new ArgumentNullException(nameof(game));
             _random = random ?? throw new ArgumentNullException(nameof(random));
-            _getConfig = getConfig ?? throw new ArgumentNullException(nameof(getConfig));
+            _getBuild = getBuild ?? throw new ArgumentNullException(nameof(getBuild));
             _getAction = getAction ?? throw new ArgumentNullException(nameof(getAction));
         }
 
@@ -66,7 +67,7 @@ namespace Challenge.LambdaRobots.Server {
 
         //--- Methods ---
         public double NextRandomDouble() => _random.NextDouble();
-        public Task<LambdaRobotConfig> GetRobotConfig(Robot robot) => _getConfig(robot);
+        public Task<LambdaRobotBuild> GetRobotBuild(Robot robot) => _getBuild(robot);
         public Task<LambdaRobotAction> GetRobotAction(Robot robot) => _getAction(robot);
     }
 
@@ -133,8 +134,8 @@ namespace Challenge.LambdaRobots.Server {
                     Acceleration = 10.0,
                     Deceleration = 20.0,
                     MaxTurnSpeed = 50.0,
-                    ScannerRange = 600.0,
-                    ScannerResolution = 10.0,
+                    RadarRange = 600.0,
+                    RadarMaxResolution = 10.0,
                     MaxDamage = 100.0,
                     CollisionDamage = 2.0,
                     DirectHitDamage = 8.0,
@@ -142,7 +143,7 @@ namespace Challenge.LambdaRobots.Server {
                     FarHitDamage = 2.0,
 
                     // missile characteristics
-                    MissileReloadCooldown = 3.0,
+                    MissileReloadCooldown = 2.0,
                     MissileSpeed = 150.0,
                     MissileRange = 700.0,
                     MissileDirectHitDamageBonus = 3.0,
@@ -152,15 +153,189 @@ namespace Challenge.LambdaRobots.Server {
             }
 
             // get configuration for all robots
-            await Task.WhenAll(Game.Robots.Select(async robot => {
-                var config = await _provider.GetRobotConfig(robot);
-                robot.Name = config?.Name ?? robot.Id.Split(':').Last();
+            var messages = (await Task.WhenAll(Game.Robots.Select(async robot => {
+                var config = await _provider.GetRobotBuild(robot);
+                robot.Name = config?.Name ?? "???";
                 if(config == null) {
-                    robot.State = RobotState.Dead;
-                    AddMessage($"{robot.Name} was disqualified by failure to initialize");
+                    return $"{robot.Name} was disqualified due to failure to initialize";
                 }
-                return true;
-            }));
+
+                // read robot configuration
+                var disqualified = false;
+                var buildPoints = 0;
+                var buildDescription = new StringBuilder();
+
+                // read radar configuration
+                buildPoints += (int)config.Radar;
+                buildDescription.Append($"{config.Radar} Radar");
+                switch(config.Radar) {
+                case LambdaRobotRadar.UltraShortRange:
+                    robot.RadarRange = 200.0;
+                    robot.RadarMaxResolution = 45.0;
+                    break;
+                case LambdaRobotRadar.ShortRange:
+                    robot.RadarRange = 400.0;
+                    robot.RadarMaxResolution = 20.0;
+                    break;
+                case LambdaRobotRadar.MidRange:
+                    robot.RadarRange = 600.0;
+                    robot.RadarMaxResolution = 10.0;
+                    break;
+                case LambdaRobotRadar.LongRange:
+                    robot.RadarRange = 800.0;
+                    robot.RadarMaxResolution = 8.0;
+                    break;
+                case LambdaRobotRadar.UltraLongRange:
+                    robot.RadarRange = 1000.0;
+                    robot.RadarMaxResolution = 5.0;
+                    break;
+                default:
+                    disqualified = true;
+                    break;
+                }
+
+                // read engine configuration
+                buildPoints += (int)config.Engine;
+                buildDescription.Append($", {config.Engine} Engine");
+                switch(config.Engine) {
+                case LambdaRobotEngine.Economy:
+                    robot.MaxSpeed = 60.0;
+                    robot.Acceleration = 7.0;
+                    break;
+                case LambdaRobotEngine.Compact:
+                    robot.MaxSpeed = 80.0;
+                    robot.Acceleration = 8.0;
+                    break;
+                case LambdaRobotEngine.Standard:
+                    robot.MaxSpeed = 100.0;
+                    robot.Acceleration = 10.0;
+                    break;
+                case LambdaRobotEngine.Large:
+                    robot.MaxSpeed = 120.0;
+                    robot.Acceleration = 12.0;
+                    break;
+                case LambdaRobotEngine.ExtraLarge:
+                    robot.MaxSpeed = 140.0;
+                    robot.Acceleration = 13.0;
+                    break;
+                default:
+                    disqualified = true;
+                    break;
+                }
+
+                // read armor configuration
+                buildPoints += (int)config.Armor;
+                buildDescription.Append($", {config.Armor} Armor");
+                switch(config.Armor) {
+                case LambdaRobotArmor.UltraLight:
+                    robot.DirectHitDamage = 50.0;
+                    robot.NearHitDamage = 25.0;
+                    robot.FarHitDamage = 12.0;
+                    robot.CollisionDamage = 10.0;
+                    robot.MaxSpeed += 35.0;
+                    robot.Deceleration = 30.0;
+                    break;
+                case LambdaRobotArmor.Light:
+                    robot.DirectHitDamage = 16.0;
+                    robot.NearHitDamage = 8.0;
+                    robot.FarHitDamage = 4.0;
+                    robot.CollisionDamage = 3.0;
+                    robot.MaxSpeed += 25.0;
+                    robot.Deceleration = 25.0;
+                    break;
+                case LambdaRobotArmor.Medium:
+                    robot.DirectHitDamage = 8.0;
+                    robot.NearHitDamage = 4.0;
+                    robot.FarHitDamage = 2.0;
+                    robot.CollisionDamage = 2.0;
+                    robot.MaxSpeed += 0.0;
+                    robot.Deceleration = 20.0;
+                    break;
+                case LambdaRobotArmor.Heavy:
+                    robot.DirectHitDamage = 4.0;
+                    robot.NearHitDamage = 2.0;
+                    robot.FarHitDamage = 1.0;
+                    robot.CollisionDamage = 1.0;
+                    robot.MaxSpeed += -25.0;
+                    robot.Deceleration = 15.0;
+                    break;
+                case LambdaRobotArmor.UltraHeavy:
+                    robot.DirectHitDamage = 2.0;
+                    robot.NearHitDamage = 1.0;
+                    robot.FarHitDamage = 0.0;
+                    robot.CollisionDamage = 1.0;
+                    robot.MaxSpeed += -45.0;
+                    robot.Deceleration = 10.0;
+                    break;
+                default:
+                    disqualified = true;
+                    break;
+                }
+
+                // read missile configuration
+                buildPoints += (int)config.Missile;
+                buildDescription.Append($", {config.Missile} Missile");
+                switch(config.Missile) {
+                case LambdaRobotMissile.Dart:
+                    robot.MissileRange = 350.0;
+                    robot.MissileSpeed = 250.0;
+                    robot.MissileDirectHitDamageBonus = 0.0;
+                    robot.MissileNearHitDamageBonus = 0.0;
+                    robot.MissileFarHitDamageBonus = 0.0;
+                    robot.MissileReloadCooldown = 0.0;
+                    break;
+                case LambdaRobotMissile.Arrow:
+                    robot.MissileRange = 500.0;
+                    robot.MissileSpeed = 200.0;
+                    robot.MissileDirectHitDamageBonus = 1.0;
+                    robot.MissileNearHitDamageBonus = 1.0;
+                    robot.MissileFarHitDamageBonus = 0.0;
+                    robot.MissileReloadCooldown = 1.0;
+                    break;
+                case LambdaRobotMissile.Javelin:
+                    robot.MissileRange = 700.0;
+                    robot.MissileSpeed = 150.0;
+                    robot.MissileDirectHitDamageBonus = 3.0;
+                    robot.MissileNearHitDamageBonus = 2.0;
+                    robot.MissileFarHitDamageBonus = 1.0;
+                    robot.MissileReloadCooldown = 2.0;
+                    break;
+                case LambdaRobotMissile.Cannon:
+                    robot.MissileRange = 900.0;
+                    robot.MissileSpeed = 100.0;
+                    robot.MissileDirectHitDamageBonus = 6.0;
+                    robot.MissileNearHitDamageBonus = 4.0;
+                    robot.MissileFarHitDamageBonus = 2.0;
+                    robot.MissileReloadCooldown = 3.0;
+                    break;
+                case LambdaRobotMissile.BFG:
+                    robot.MissileRange = 1200.0;
+                    robot.MissileSpeed = 75.0;
+                    robot.MissileDirectHitDamageBonus = 12.0;
+                    robot.MissileNearHitDamageBonus = 8.0;
+                    robot.MissileFarHitDamageBonus = 4.0;
+                    robot.MissileReloadCooldown = 5.0;
+                    break;
+                default:
+                    disqualified = true;
+                    break;
+                }
+
+                // check if robot respected the max build points
+                if(buildPoints > Game.MaxBuildPoints) {
+                    disqualified = true;
+                }
+
+                // check if robot is disqualified due to bad build
+                if(disqualified) {
+                    robot.State = RobotState.Dead;
+                    return $"{robot.Name} was disqualified due to bad configuration ({buildDescription}: {buildPoints} points)";
+                }
+                return $"{robot.Name} has joined the battle ({buildDescription}: {buildPoints} points)";
+            }))).ToList();
+            foreach(var message in messages) {
+                AddMessage(message);
+            }
 
             // place robots on playfield
             var marginWidth = Game.BoardWidth * 0.1;
@@ -270,7 +445,7 @@ namespace Challenge.LambdaRobots.Server {
 
         public double? ScanRobots(Robot robot, double heading, double resolution) {
             double? result = null;
-            resolution = MinMax(0.0, resolution, robot.ScannerResolution);
+            resolution = MinMax(0.0, resolution, robot.RadarMaxResolution);
             FindRobotsByDistance(robot.X, robot.Y, (other, distance) => {
 
                 // skip ourselves
@@ -283,7 +458,7 @@ namespace Challenge.LambdaRobots.Server {
                 var deltaY = other.Y - robot.Y;
 
                 // check if other robot is beyond scan range
-                if(distance > robot.ScannerRange) {
+                if(distance > robot.RadarRange) {
 
                     // no need to enumerate more
                     return false;

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * MIT License
  *
  * Copyright (c) 2019 LambdaSharp
@@ -28,17 +28,49 @@ using Newtonsoft.Json.Converters;
 namespace Challenge.LambdaRobots.Protocol {
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum LambdaRobotCommand {
-        Undefined,
-        GetBuild,
-        GetAction
+    public enum LambdaRobotRadar {
+        UltraShortRange,
+        ShortRange,
+        MidRange,
+        LongRange,
+        UltraLongRange
     }
 
-    public class LambdaRobotRequest {
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum LambdaRobotEngine {
+        Economy,
+        Compact,
+        Standard,
+        Large,
+        ExtraLarge
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum LambdaRobotArmor {
+        UltraLight,
+        Light,
+        Medium,
+        Heavy,
+        UltraHeavy
+    }
+
+    [JsonConverter(typeof(StringEnumConverter))]
+    public enum LambdaRobotMissile {
+        Dart,
+        Arrow,
+        Javelin,
+        Cannon,
+        BFG
+    }
+
+    public class LambdaRobotBuild  {
 
         //--- Properties ---
-        public LambdaRobotCommand Command { get; set; }
-        public Robot Robot { get; set; }
-        public GameInfo Game { get; set; }
+        public string Name { get; set; }
+        public LambdaRobotRadar Radar { get; set; } = LambdaRobotRadar.MidRange;
+        public LambdaRobotEngine Engine { get; set; } = LambdaRobotEngine.Standard;
+        public LambdaRobotArmor Armor { get; set; } = LambdaRobotArmor.Medium;
+        public LambdaRobotMissile Missile { get; set; } = LambdaRobotMissile.Javelin;
     }
 }

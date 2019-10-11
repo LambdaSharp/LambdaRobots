@@ -52,10 +52,10 @@ namespace Challenge.LambdaRobots.Robot.RobotFunction {
             }
         }
 
-        public override async Task<LambdaRobotConfig> GetConfigAsync() {
+        public override async Task<LambdaRobotBuild> GetBuildAsync() {
 
             // TODO: this method is always invoked at the beginning of a match
-            return new LambdaRobotConfig {
+            return new LambdaRobotBuild {
                 Name = Name
             };
         }
