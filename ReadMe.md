@@ -70,3 +70,47 @@ The most commonly needed properties are readily available as properties from the
 #### `double AngleTo(double x, double y)`
 #### `double DistanceTo(double x, double y)`
 
+## Configuration
+
+8 points allocated by default as follows.
+
+### Radar
+
+|Radar Type      |Radar Range |Radar Resolution|Cost|
+|----------------|------------|----------------|----|
+|UltraShortRange |200 meters  |45 degrees      |0   |
+|ShortRange      |400 meters  |20 degrees      |1   |
+|**MidRange (*)**|600 meters  |10 degrees      |2   |
+|LongRange       |800 meters  |8 degrees       |3   |
+|UltraLongRange  |1,000 meters|5 degrees       |4   |
+
+### Engine
+
+|Engine Type     |Max. Speed |Acceleration|Cost|
+|----------------|-----------|------------|----|
+|Economy         |60 m/s     |7 m/s^2     |0   |
+|Compact         |80 m/s     |8 m/s^2     |1   |
+|**Standard (*)**|100 m/s    |10 m/s^2    |2   |
+|Large           |120 m/s    |12 m/s^2    |3   |
+|ExtraLarge      |140 m/s    |13 m/s^2    |4   |
+
+### Armor
+
+|Armor Type    |Direct Hit|Near Hit|Far Hit|Collision|Max. Speed |Deceleration  |Cost|
+|--------------|----------|--------|-------|---------|-----------|--------------|----|
+|UltraLight    |50        |25      |12     |10       |+35 m/s    |30 m/s^2      |0   |
+|Light         |16        |8       |4      |3        |+25 m/s    |25 m/s^2      |1   |
+|**Medium (*)**|8         |4       |2      |2        |-          |20 m/s^2      |2   |
+|Heavy         |4         |2       |1      |1        |-25 m/s    |15 m/s^2      |3   |
+|UltraHeavy    |2         |1       |0      |1        |-45 m/s    |10 m/s^2      |4   |
+
+### Missile
+
+|Missile Type   |Max. Range  |Speed  |Direct Hit Bonus|Near Hit Bonus|Far Hit Bonus|Cooldown|Cost|
+|---------------|------------|-------|----------------|--------------|-------------|--------|----|
+|Dart           |350 meters  |250 m/s|0               |0             |0            |0 sec   |0   |
+|Arrow          |500 meters  |200 m/s|1               |1             |0            |1 sec   |1   |
+|**Javelin (*)**|700 meters  |150 m/s|3               |2             |1            |2 sec   |2   |
+|Cannon         |900 meters  |100 m/s|6               |4             |2            |3 sec   |3   |
+|BFG            |1,200 meters|75 m/s |12              |8             |4            |5 sec   |4   |
+
