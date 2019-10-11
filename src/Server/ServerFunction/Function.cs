@@ -81,13 +81,13 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
                 State = GameState.Start,
                 BoardWidth = request.BoardWidth ?? 1000.0,
                 BoardHeight = request.BoardHeight ?? 1000.0,
-                SecondsPerTurn = request.SecondsPerTurn ?? 1.0,
+                SecondsPerTurn = request.SecondsPerTurn ?? 0.5,
                 MaxTurns = request.MaxTurns ?? 300,
                 DirectHitRange = request.DirectHitRange ?? 5.0,
                 NearHitRange = request.NearHitRange ?? 20.0,
                 FarHitRange = request.FarHitRange ?? 40.0,
-                CollisionRange = request.CollisionRange ?? 5.0,
-                MinRobotStartDistance = request.MinRobotStartDistance ?? 100.0,
+                CollisionRange = request.CollisionRange ?? 8.0,
+                MinRobotStartDistance = request.MinRobotStartDistance ?? 200.0,
                 RobotTimeoutSeconds = request.RobotTimeoutSeconds ?? 15.0
             };
 

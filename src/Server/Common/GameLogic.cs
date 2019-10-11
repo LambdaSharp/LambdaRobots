@@ -142,8 +142,8 @@ namespace Challenge.LambdaRobots.Server {
                     FarHitDamage = 2.0,
 
                     // missile characteristics
-                    MissileReloadCooldown = 5.0,
-                    MissileSpeed = 50.0,
+                    MissileReloadCooldown = 3.0,
+                    MissileSpeed = 150.0,
                     MissileRange = 700.0,
                     MissileDirectHitDamageBonus = 3.0,
                     MissileNearHitDamageBonus = 2.1,

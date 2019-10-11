@@ -28,7 +28,7 @@ export default class GameBoard {
     }
     clearTimeout(this._spinnerInterval);
     if (gameStat.Game.State === "NextTurn") {
-      this._robots(gameStat.Game.Robots);
+      this._robots(gameStat.Game, gameStat.Game.Robots);
       this._missiles(gameStat.Game, gameStat.Game.Missiles);
       return;
     }
@@ -38,9 +38,12 @@ export default class GameBoard {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
-  _robots(robots) {
+  _robots(game, robots) {
+    this.context.save();
     this.context.font = "16px Arial";
     this.context.fillStyle = "black";
+    this.context.textAlign = "center";
+    this.context.textBaseline = "middle";
     for (let index = 0; index < robots.length; index++) {
       const robot = robots[index];
       this.context.fillText(
@@ -48,7 +51,14 @@ export default class GameBoard {
         Math.round(robot.X),
         Math.round(robot.Y)
       );
+
+      // draw circle around robot with collision radius
+      this.context.beginPath();
+      this.context.strokeStyle = "blue";
+      this.context.arc(Math.round(robot.X), Math.round(robot.Y), Math.round(game.CollisionRange), 0, 2 * Math.PI);
+      this.context.stroke();
     }
+    this.context.restore();
   }
 
   _missiles(game, missiles) {
