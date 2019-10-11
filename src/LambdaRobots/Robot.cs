@@ -58,7 +58,6 @@ namespace Challenge.LambdaRobots {
         public double TotalTravelDistance;
         public int TotalMissileFiredCount;
         public int TotalMissileHitCount;
-        public int TotalScanCount;
         public int TotalKills;
         public double TotalDamageDealt;
         public DateTime? TimeOfDeath;
@@ -77,7 +76,7 @@ namespace Challenge.LambdaRobots {
         public double FarHitDamage;
 
         // missile characteristics
-        public double MissileReloadDelay;
+        public double MissileReloadCooldown;
         public double MissileSpeed;
         public double MissileRange;
         public double MissileDirectHitDamageBonus;

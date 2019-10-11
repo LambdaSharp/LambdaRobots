@@ -128,7 +128,6 @@ namespace Challenge.LambdaRobots.Server {
                     TotalKills = 0,
                     TotalMissileFiredCount = 0,
                     TotalMissileHitCount = 0,
-                    TotalScanCount = 0,
                     TotalTravelDistance = 0.0,
 
                     // action
@@ -149,7 +148,7 @@ namespace Challenge.LambdaRobots.Server {
                     FarHitDamage = 2.0,
 
                     // missile characteristics
-                    MissileReloadDelay = 2.0,
+                    MissileReloadCooldown = 5.0,
                     MissileSpeed = 50.0,
                     MissileRange = 700.0,
                     MissileDirectHitDamageBonus = 3.0,
@@ -312,6 +311,13 @@ namespace Challenge.LambdaRobots.Server {
         }
 
         private void ApplyRobotAction(Robot robot, RobotAction action) {
+
+            // reduce reload time if any is active
+            if(robot.ReloadCoolDown > 0) {
+                robot.ReloadCoolDown = Math.Max(0.0, robot.ReloadCoolDown - Game.SecondsPerTurn);
+            }
+
+            // check if any actions need to be applied
             if(action == null) {
 
                 // robot didn't respond with an action; consider it dead
@@ -329,7 +335,7 @@ namespace Challenge.LambdaRobots.Server {
 
                 // update robot state
                 ++robot.TotalMissileFiredCount;
-                robot.ReloadCoolDown = robot.MissileReloadDelay;
+                robot.ReloadCoolDown = robot.MissileReloadCooldown;
 
                 // add missile
                 var missile = new RobotMissile {
@@ -424,11 +430,6 @@ namespace Challenge.LambdaRobots.Server {
         }
 
         private void MoveRobot(Robot robot) {
-
-            // reduce reload time if any is active
-            if(robot.ReloadCoolDown > 0) {
-                robot.ReloadCoolDown = Math.Max(0.0, robot.ReloadCoolDown - Game.SecondsPerTurn);
-            }
 
             // compute new speed
             if(robot.TargetSpeed > robot.Speed) {
