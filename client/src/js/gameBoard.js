@@ -2,6 +2,7 @@ export default class GameBoard {
   constructor(gameBoardContainerElement) {
     this.gameBoardContainerElement = gameBoardContainerElement;
     this.canvas = document.createElement("canvas");
+    this.canvas.className = "game-board";
     this.canvas.width = 1000;
     this.canvas.height = 1000;
     gameBoardContainerElement.appendChild(this.canvas);
@@ -32,6 +33,9 @@ export default class GameBoard {
       this._missiles(gameStat.Game, gameStat.Game.Missiles);
       return;
     }
+    if (gameStat.Game.State === "Finished") {
+      this._gameOver();
+    }
   }
 
   _clear() {
@@ -40,8 +44,8 @@ export default class GameBoard {
 
   _robots(game, robots) {
     this.context.save();
-    this.context.font = "16px Arial";
-    this.context.fillStyle = "black";
+    this.context.font = "16px 'Press Start 2P'";
+    this.context.fillStyle = "white";
     this.context.textAlign = "center";
     this.context.textBaseline = "middle";
     for (let index = 0; index < robots.length; index++) {
@@ -55,7 +59,13 @@ export default class GameBoard {
       // draw circle around robot with collision radius
       this.context.beginPath();
       this.context.strokeStyle = "blue";
-      this.context.arc(Math.round(robot.X), Math.round(robot.Y), Math.round(game.CollisionRange), 0, 2 * Math.PI);
+      this.context.arc(
+        Math.round(robot.X),
+        Math.round(robot.Y),
+        Math.round(game.CollisionRange),
+        0,
+        2 * Math.PI
+      );
       this.context.stroke();
     }
     this.context.restore();
@@ -66,28 +76,48 @@ export default class GameBoard {
       const missile = missiles[index];
       this.context.save();
       this.context.beginPath();
-      switch(missile.State) {
-      case "Flying":
-        this.context.moveTo(Math.round(missile.X), Math.round(missile.Y));
-        const lineLength = 12;
-        this.context.lineTo(
-          Math.round(
-            missile.X + Math.sin((missile.Heading * Math.PI) / 180) * lineLength
-          ),
-          Math.round(
-            missile.Y + Math.cos((missile.Heading * Math.PI) / 180) * lineLength
-          )
-        );
-        break;
-      case "ExplodingDirect":
-        this.context.arc(Math.round(missile.X), Math.round(missile.Y), Math.round(game.DirectHitRange), 0, 2 * Math.PI);
-        break;
-      case "ExplodingNear":
-        this.context.arc(Math.round(missile.X), Math.round(missile.Y), Math.round(game.NearHitRange), 0, 2 * Math.PI);
-        break;
-      case "ExplodingFar":
-        this.context.arc(Math.round(missile.X), Math.round(missile.Y), Math.round(game.FarHitRange), 0, 2 * Math.PI);
-        break;
+      switch (missile.State) {
+        case "Flying":
+          this.context.moveTo(Math.round(missile.X), Math.round(missile.Y));
+          const lineLength = 12;
+          this.context.lineTo(
+            Math.round(
+              missile.X +
+                Math.sin((missile.Heading * Math.PI) / 180) * lineLength
+            ),
+            Math.round(
+              missile.Y +
+                Math.cos((missile.Heading * Math.PI) / 180) * lineLength
+            )
+          );
+          break;
+        case "ExplodingDirect":
+          this.context.arc(
+            Math.round(missile.X),
+            Math.round(missile.Y),
+            Math.round(game.DirectHitRange),
+            0,
+            2 * Math.PI
+          );
+          break;
+        case "ExplodingNear":
+          this.context.arc(
+            Math.round(missile.X),
+            Math.round(missile.Y),
+            Math.round(game.NearHitRange),
+            0,
+            2 * Math.PI
+          );
+          break;
+        case "ExplodingFar":
+          this.context.arc(
+            Math.round(missile.X),
+            Math.round(missile.Y),
+            Math.round(game.FarHitRange),
+            0,
+            2 * Math.PI
+          );
+          break;
       }
       this.context.strokeStyle = "red";
       this.context.lineWidth = 2;
@@ -112,9 +142,28 @@ export default class GameBoard {
       ctx.moveTo(this.canvas.width / 10, 0);
       ctx.lineTo(this.canvas.width / 4, 0);
       ctx.lineWidth = this.canvas.width / 30;
-      ctx.strokeStyle = "rgba(0, 0, 0," + i / lines + ")";
+      ctx.strokeStyle = "rgba(255, 255, 255," + i / lines + ")";
       ctx.stroke();
     }
+    ctx.restore();
+  }
+
+  _gameOver() {
+    const ctx = this.canvas.getContext("2d");
+    ctx.save();
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    ctx.font = "100px 'Press Start 2P'";
+
+    // Create gradient
+    var gradient = ctx.createLinearGradient(0, 0, this.canvas.width, 0);
+    gradient.addColorStop("0", " green");
+    gradient.addColorStop("0.5", "blue");
+    gradient.addColorStop("1.0", "red");
+    // Fill with gradient
+    ctx.fillStyle = gradient;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("Game Over", this.canvas.width / 2, this.canvas.height / 2);
     ctx.restore();
   }
 }

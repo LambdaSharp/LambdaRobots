@@ -5,6 +5,18 @@ body {
   margin: 0 auto;
   padding: 1%;
 }
+
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+button {
+  font-family: "Press Start 2P";
+}
+
 #gameBoardContainer {
   border: 1px solid #000000;
 }
@@ -23,4 +35,8 @@ body {
   max-height: 1000px;
   overflow: auto;
   padding: 1%;
+}
+
+.game-board {
+  background-color: black;
 }
