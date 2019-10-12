@@ -89,3 +89,10 @@ summary::-webkit-details-marker {
 summary:focus {
   outline-style: none;
 }
+
+table:not([class]) td,
+table:not([class]) th,
+table[xx] td,
+table[xx] th {
+  border-width: 0 !important;
+}
