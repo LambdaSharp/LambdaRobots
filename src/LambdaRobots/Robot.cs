@@ -60,6 +60,7 @@ namespace Challenge.LambdaRobots {
         public int TotalMissileHitCount;
         public int TotalKills;
         public double TotalDamageDealt;
+        public int TotalCollisions;
         public int TimeOfDeathGameTurn;
 
         // robot characteristics

@@ -124,6 +124,7 @@ namespace Challenge.LambdaRobots.Server {
                     TotalMissileFiredCount = 0,
                     TotalMissileHitCount = 0,
                     TotalTravelDistance = 0.0,
+                    TotalCollisions = 0,
 
                     // action
                     TargetHeading = 0.0,
@@ -342,7 +343,7 @@ namespace Challenge.LambdaRobots.Server {
             var marginHeight = Game.BoardHeight * 0.1;
             var attempts = 0;
         again:
-            if(attempts >= 10) {
+            if(attempts >= 100) {
                 throw new ApplicationException($"unable to place all robots with minimum separation of {Game.MinRobotStartDistance:N2}");
             }
 
@@ -521,7 +522,6 @@ namespace Challenge.LambdaRobots.Server {
                     FarHitDamageBonus = robot.MissileFarHitDamageBonus
                 };
                 Game.Missiles.Add(missile);
-                AddMessage($"{robot.Name} fired missile towards heading {missile.Heading:N0} with range {missile.Range:N0}");
             }
         }
 
@@ -638,9 +638,12 @@ namespace Challenge.LambdaRobots.Server {
                 out robot.TotalTravelDistance,
                 out collision
             );
+
+            // check for collision with wall
             if(collision) {
                 robot.Speed = 0.0;
                 robot.TargetSpeed = 0.0;
+                ++robot.TotalCollisions;
                 if(Damage(robot, robot.CollisionDamage)) {
                     AddMessage($"{robot.Name} was destroyed by wall collision");
                     return;
@@ -654,6 +657,7 @@ namespace Challenge.LambdaRobots.Server {
                 if((other.Id != robot.Id) && (distance < Game.CollisionRange)) {
                     robot.Speed = 0.0;
                     robot.TargetSpeed = 0.0;
+                    ++robot.TotalCollisions;
                     if(Damage(robot, robot.CollisionDamage)) {
                         AddMessage($"{robot.Name} was destroyed by collision with {other.Name}");
                     } else {
