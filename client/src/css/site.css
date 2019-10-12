@@ -67,11 +67,12 @@ input[type="submit"] {
 
 .tooltip .tooltiptext {
   visibility: hidden;
-  width: 600px;
+  min-width: 300px;
+  max-width: 700px;
   background-color: black;
+  padding: 10px;
   color: #fff;
   border-radius: 6px;
-  padding: 5px 0;
   font-family: "Arial";
   font-size: 12px;
   /* Position the tooltip */
@@ -96,3 +97,11 @@ table[xx] td,
 table[xx] th {
   border-width: 0 !important;
 }
+
+.robot-dead {
+  background-color: lightgray;
+}
+ h4 {
+   display: inline-block;
+  
+ }

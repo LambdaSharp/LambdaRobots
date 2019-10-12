@@ -1,5 +1,6 @@
 import WebSocketClient from "./webSocketClient.js";
 import GameBoard from "./gameBoard.js";
+import { html, render } from "https://unpkg.com/lit-html?module";
 
 const mainMenu = document.getElementById("mainMenuContainer");
 const gameBoardStatsContainer = document.getElementById(
@@ -33,21 +34,21 @@ async function init() {
   document.getElementById("btnStartGame").addEventListener("click", () => {
     startGameUi();
     gameBoardClient.Repaint(null);
-    setTimeout(() => {
-      startGame();
-    }, 500);
+    setTimeout(() => startGame(), 500);
   });
-  document.getElementById("btnStopGame").addEventListener("click", () => {
-    stopGame();
-  });
+  document
+    .getElementById("btnStopGame")
+    .addEventListener("click", () => stopGame());
   document.getElementById("btnClear").addEventListener("click", () => {
     localStorage.clear();
     window.location.href = "/";
   });
   document.getElementById("btnReset").addEventListener("click", () => {
+    stopGame();
     resetGameUi();
   });
-  fillRobotArnsFromLocalStorage();
+  restoreRobotArns();
+  restoreAdvanceConfig();
 }
 
 async function getConfig() {
@@ -65,22 +66,25 @@ function startGame() {
   localStorage.setItem("robotArns", JSON.stringify(robotArns));
   const request = {
     Action: "start",
-    RobotArns: robotArns,
-    BoardWidth: 1000,
-    BoardHeight: 1000
+    RobotArns: robotArns
   };
-  wsClient.doSend(JSON.stringify(request));
+  const requestWithConfig = Object.assign(request, getAdvanceConfig());
+  wsClient.doSend(JSON.stringify(requestWithConfig));
 }
 
 function stopGame() {
-  const request = {
-    Action: "stop",
-    GameId: sessionStorage.getItem("gameId")
-  };
-  wsClient.doSend(JSON.stringify(request));
+  try {
+    const request = {
+      Action: "stop",
+      GameId: sessionStorage.getItem("gameId")
+    };
+    wsClient.doSend(JSON.stringify(request));
+  } catch (error) {
+    console.warn("unable to stop the game: " + error);
+  }
 }
 
-function fillRobotArnsFromLocalStorage() {
+function restoreRobotArns() {
   const robotArns = JSON.parse(localStorage.getItem("robotArns")) || [];
   const robotArnsElements = [].slice.call(document.getElementsByName("robots"));
   for (let index = 0; index < robotArns.length; index++) {
@@ -100,7 +104,6 @@ function startGameUi() {
   messagesUi([]);
   mainMenu.style.display = "none";
   gameBoardStatsContainer.style.display = "block";
-  document.getElementById("btnReset").disabled = true;
   document.getElementById("btnStopGame").disabled = false;
 }
 
@@ -112,7 +115,6 @@ function stopGameUi() {
 function resetGameUi() {
   mainMenu.style.display = "block";
   gameBoardStatsContainer.style.display = "none";
-  document.getElementById("btnReset").disabled = true;
   document.getElementById("btnStopGame").disabled = false;
 }
 
@@ -127,75 +129,135 @@ function messagesUi(messages) {
 }
 
 function updateRobotStats(robots) {
+  // https://lit-html.polymer-project.org/guide/template-reference
   const robotsStats = document.getElementById("robotsStats");
-  robotsStats.innerText = "";
-  for (let index = 0; index < robots.length; index++) {
-    const robot = robots[index];
-    const robotContainer = createElement("div");
-    if (robot.State !== "Alive") {
-      robotContainer.style.backgroundColor = "lightgray";
+  let robotTemplates = [];
+  robots = robots.map(function(robot) {
+    robot.Index = Number(robot.Id.split(":R")[1]);
+    return robot;
+  });
+  let currentRobotPositions = determineRobotLeadingPosition(robots);
+  robots
+    .sort((a, b) => a.Index - b.Index)
+    .forEach(robot => {
+      const currentPosition = currentRobotPositions.find(
+        x => x.Id === robot.Id
+      );
+      let robotTemplate = html`
+        <details class="${robot.State !== "Alive" ? "robot-dead" : ""}">
+          <summary>
+            <h4>
+              ${currentPosition.Medal} ${robot.Name} (R${robot.Index})
+              <span class="tooltip">
+                🛈
+                <pre class="tooltiptext">${JSON.stringify(robot, null, 2)}</pre>
+              </span>
+            </h4>
+          </summary>
+          <table>
+            <tr>
+              <td>Damage:${robot.Damage}</td>
+              <td>Total Damage Dealt: ${robot.TotalDamageDealt}</td>
+              <td>Reload Cool Down: ${robot.ReloadCoolDown}</td>
+            </tr>
+            <tr>
+              <td>Missile Fire #: ${robot.TotalMissileFiredCount}</td>
+              <td>Missile Hit #: ${robot.TotalMissileHitCount}</td>
+              <td>Total Kills: ${robot.TotalKills}</td>
+            </tr>
+            <tr>
+              <td>X: ${Math.round(robot.X)}</td>
+              <td>Y: ${Math.round(robot.Y)}</td>
+              <td>Speed: ${robot.Speed}</td>
+            </tr>
+            <tr>
+              <td>Heading: ${Math.round(robot.Heading)}</td>
+              <td>Target Heading: ${Math.round(robot.TargetHeading)}</td>
+              <td>
+                Total Travel Distance: ${Math.round(robot.TotalTravelDistance)}
+              </td>
+            </tr>
+          </table>
+        </details>
+      `;
+      robotTemplates.push(robotTemplate);
+    });
+  render(
+    html`
+      ${robotTemplates}
+    `,
+    robotsStats
+  );
+}
+
+function getAdvanceConfig() {
+  var config = {
+    BoardWidth: Number(document.getElementById("BoardWidth").value),
+    BoardHeight: Number(document.getElementById("BoardHeight").value),
+    SecondsPerTurn: Number(document.getElementById("SecondsPerTurn").value),
+    MaxTurns: Number(document.getElementById("MaxTurns").value),
+    DirectHitRange: Number(document.getElementById("DirectHitRange").value),
+    NearHitRange: Number(document.getElementById("NearHitRange").value),
+    FarHitRange: Number(document.getElementById("FarHitRange").value),
+    CollisionRange: Number(document.getElementById("CollisionRange").value),
+    RobotTimeoutSeconds: Number(
+      document.getElementById("RobotTimeoutSeconds").value
+    )
+  };
+
+  // remove properties with zero value
+  Object.keys(config).forEach(key => config[key] === 0 && delete config[key]);
+  localStorage.setItem("advanceConfig", JSON.stringify(config));
+  return config;
+}
+
+function restoreAdvanceConfig() {
+  const config = JSON.parse(localStorage.getItem("advanceConfig"));
+  if (config) {
+    Object.keys(config).forEach(key => {
+      document.getElementById(key).value = config[key];
+    });
+  }
+}
+
+function determineRobotLeadingPosition(robots) {
+  const leadingRobots = robots.sort((a, b) => {
+    if (a.State !== "Alive") {
+      return 1;
     }
-
-    const robotHeader = createElement("h3");
-    robotHeader.appendChild(createElement("span", `${robot.Name} (R${index})`));
-    const toolTipIcon = createElement("span", `🛈`);
-    toolTipIcon.className = "tooltip";
-    const robotPrimaryAllStats = createElement(
-      "pre",
-      JSON.stringify(robot, null, 2)
-    );
-    robotPrimaryAllStats.className = "tooltiptext";
-    toolTipIcon.appendChild(robotPrimaryAllStats);
-    robotHeader.appendChild(toolTipIcon);
-    robotContainer.appendChild(robotHeader);
-    const robotPrimaryStatsContainer = createElement("table");
-    const robotTr1 = createElement("tr");
-    robotTr1.appendChild(createElement("td", `Damage: ${robot.Damage}`));
-    robotTr1.appendChild(
-      createElement("td", `Total Damage Dealt: ${robot.TotalDamageDealt}`)
-    );
-    robotTr1.appendChild(
-      createElement("td", `Reload Cool Down: ${robot.ReloadCoolDown}`)
-    );
-    robotPrimaryStatsContainer.appendChild(robotTr1);
-    const robotTr2 = createElement("tr");
-    robotTr2.appendChild(
-      createElement("td", `Missile Fire #: ${robot.TotalMissileFiredCount}`)
-    );
-    robotTr2.appendChild(
-      createElement("td", `Missile Hit #: ${robot.TotalMissileHitCount}`)
-    );
-    robotTr2.appendChild(
-      createElement("td", `Total Kills: ${robot.TotalKills}`)
-    );
-    robotPrimaryStatsContainer.appendChild(robotTr2);
-    const robotTr3 = createElement("tr");
-    robotTr3.appendChild(createElement("td", `X: ${Math.round(robot.X)}`));
-    robotTr3.appendChild(createElement("td", `Y: ${Math.round(robot.Y)}`));
-    robotTr3.appendChild(createElement("td", `Speed: ${robot.Speed}`));
-    robotPrimaryStatsContainer.appendChild(robotTr3);
-    const robotTr4 = createElement("tr");
-    robotTr4.appendChild(createElement("td", `Heading: ${Math.round(robot.Heading)}`));
-    robotTr4.appendChild(createElement("td", `Target Heading: ${Math.round(robot.TargetHeading)}`));
-    robotTr4.appendChild(
-      createElement(
-        "td",
-        `Total Travel Distance: ${Math.round(robot.TotalTravelDistance)}`
-      )
-    );
-    robotPrimaryStatsContainer.appendChild(robotTr4);
-    robotContainer.appendChild(robotPrimaryStatsContainer);
-    robotsStats.appendChild(robotContainer);
+    if (a.TotalKills < b.TotalKills) {
+      return -1;
+    } else if (a.TotalKills > b.TotalKills) {
+      return 1;
+    }
+    if (a.Damage < b.Damage) {
+      return -1;
+    } else if (a.Damage > b.Damage) {
+      return 1;
+    } else {
+      // nothing to split them
+      return 0;
+    }
+  });
+  let botMedals = [];
+  for (let index = 0; index < leadingRobots.length; index++) {
+    const robot = leadingRobots[index];
+    botMedals.push({ Id: robot.Id, Medal: giveMedal(index), Position: index });
   }
+  return botMedals;
 }
 
-function createElement(tag, text = "") {
-  const element = document.createElement(tag);
-  if (text && text.length > 0) {
-    element.appendChild(document.createTextNode(text));
+function giveMedal(position) {
+  switch (position) {
+    case 0:
+      return "🥇";
+    case 1:
+      return "🥈";
+    case 2:
+      return "🥉";
+    default:
+      return "🏅";
   }
-  return element;
 }
-
 
 window.addEventListener("load", init, false);
