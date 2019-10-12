@@ -38,6 +38,7 @@ namespace Challenge.LambdaRobots {
     public class Robot {
 
         //--- Fields ---
+        public int Index;
         public string Id;
         public string Name;
 

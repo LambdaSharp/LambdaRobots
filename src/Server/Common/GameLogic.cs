@@ -110,6 +110,7 @@ namespace Challenge.LambdaRobots.Server {
                 Game.Robots.Add(new Robot {
 
                     // robot state
+                    Index = i,
                     Id = $"{Game.Id}:R{i}",
                     State = RobotState.Alive,
                     X = 0.0,
@@ -158,7 +159,7 @@ namespace Challenge.LambdaRobots.Server {
                 var config = await _provider.GetRobotBuild(robot);
                 robot.Name = config?.Name ?? "???";
                 if(config == null) {
-                    return $"{robot.Name} was disqualified due to failure to initialize";
+                    return $"{robot.Name} (R{robot.Index}) was disqualified due to failure to initialize";
                 }
 
                 // read robot configuration
@@ -330,9 +331,9 @@ namespace Challenge.LambdaRobots.Server {
                 // check if robot is disqualified due to bad build
                 if(disqualified) {
                     robot.State = RobotState.Dead;
-                    return $"{robot.Name} was disqualified due to bad configuration ({buildDescription}: {buildPoints} points)";
+                    return $"{robot.Name} (R{robot.Index}) was disqualified due to bad configuration ({buildDescription}: {buildPoints} points)";
                 }
-                return $"{robot.Name} has joined the battle ({buildDescription}: {buildPoints} points)";
+                return $"{robot.Name} (R{robot.Index}) has joined the battle ({buildDescription}: {buildPoints} points)";
             }))).ToList();
             foreach(var message in messages) {
                 AddMessage(message);
@@ -492,7 +493,7 @@ namespace Challenge.LambdaRobots.Server {
 
                 // robot didn't respond with an action; consider it dead
                 robot.State = RobotState.Dead;
-                AddMessage($"{robot.Name} was disqualified by lack of action");
+                AddMessage($"{robot.Name} (R{robot.Index}) was disqualified by lack of action");
                 return;
             }
 
@@ -587,17 +588,17 @@ namespace Challenge.LambdaRobots.Server {
 
                         // check if robot inflicted damage to itself
                         if(robot.Id == from.Id) {
-                            AddMessage($"{robot.Name} killed itself");
+                            AddMessage($"{robot.Name} (R{robot.Index}) killed itself");
                         } else {
-                            AddMessage($"{robot.Name} was killed by {from.Name}");
+                            AddMessage($"{robot.Name} (R{robot.Index}) was killed by {from.Name}");
                         }
                     } else {
 
                         // check if robot inflicted damage to itself
                         if(robot.Id == from.Id) {
-                            AddMessage($"{robot.Name} caused damage {damage:N0} to itself");
+                            AddMessage($"{robot.Name} (R{robot.Index}) caused {damage:N0} damage to itself");
                         } else {
-                            AddMessage($"{robot.Name} was damaged {damage:N0} by {from.Name}");
+                            AddMessage($"{robot.Name} (R{robot.Index}) received {damage:N0} damage from {from.Name} (R{from.Index})");
                         }
                     }
                 }
@@ -620,7 +621,7 @@ namespace Challenge.LambdaRobots.Server {
                     robot.Heading = robot.TargetHeading;
                 } else {
                     robot.TargetSpeed = 0;
-                    AddMessage($"{robot.Name} stopped by sudden turn");
+                    AddMessage($"{robot.Name} (R{robot.Index}) stopped by sudden turn");
                 }
             }
 
@@ -645,10 +646,10 @@ namespace Challenge.LambdaRobots.Server {
                 robot.TargetSpeed = 0.0;
                 ++robot.TotalCollisions;
                 if(Damage(robot, robot.CollisionDamage)) {
-                    AddMessage($"{robot.Name} was destroyed by wall collision");
+                    AddMessage($"{robot.Name} (R{robot.Index}) was destroyed by wall collision");
                     return;
                 } else {
-                    AddMessage($"{robot.Name} was damaged {robot.CollisionDamage:N0} by wall collision");
+                    AddMessage($"{robot.Name} (R{robot.Index}) received {robot.CollisionDamage:N0} damage by wall collision");
                 }
             }
 
@@ -659,9 +660,9 @@ namespace Challenge.LambdaRobots.Server {
                     robot.TargetSpeed = 0.0;
                     ++robot.TotalCollisions;
                     if(Damage(robot, robot.CollisionDamage)) {
-                        AddMessage($"{robot.Name} was destroyed by collision with {other.Name}");
+                        AddMessage($"{robot.Name} (R{robot.Index}) was destroyed by collision with {other.Name}");
                     } else {
-                        AddMessage($"{robot.Name} was damaged {robot.CollisionDamage:N0} by collision with {other.Name}");
+                        AddMessage($"{robot.Name} (R{robot.Index}) was damaged {robot.CollisionDamage:N0} by collision with {other.Name} (R{other.Index})");
                     }
                 }
 
