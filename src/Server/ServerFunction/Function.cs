@@ -29,6 +29,7 @@ using Amazon.DynamoDBv2;
 using Amazon.Lambda;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using Amazon.Lambda.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 using Challenge.LambdaRobots.Api.Model;
@@ -52,6 +53,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
         private string _gameStateMachine;
         private IAmazonStepFunctions _stepFunctionsClient;
         private IAmazonLambda _lambdaClient;
+        private string _gameTurnAsyncFunctionArn;
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
@@ -62,6 +64,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             _gameStateMachine = config.ReadText("GameLoopStateMachine");
             _stepFunctionsClient = new AmazonStepFunctionsClient();
             _lambdaClient = new AmazonLambdaClient();
+            _gameTurnAsyncFunctionArn = config.ReadText("GameTurnAsyncFunction");
         }
 
         public async Task OpenConnectionAsync(APIGatewayProxyRequest request, string username = null) {
@@ -92,13 +95,22 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
                 RobotTimeoutSeconds = request.RobotTimeoutSeconds ?? 15.0
             };
 
-            // store game record
-            await _table.CreateAsync(new GameRecord {
+            var gameRecord = new GameRecord {
                 PK = game.Id,
                 Game = game,
                 LambdaRobotArns = request.RobotArns,
                 ConnectionId = CurrentRequest.RequestContext.ConnectionId
+            };
+#if true
+            LogInfo($"Kicking off Game Turn lambda: Name={_gameTurnAsyncFunctionArn}");
+            await _lambdaClient.InvokeAsync(new InvokeRequest {
+                Payload = SerializeJson(gameRecord),
+                FunctionName = _gameTurnAsyncFunctionArn,
+                InvocationType = InvocationType.Event
             });
+#else
+            // store game record
+            await _table.CreateAsync(gameRecord);
 
             // kick off game step function
             var startGameId = $"LambdaRobotsGame-{game.Id}";
@@ -119,6 +131,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             }, new[] {
                 nameof(GameRecord.GameLoopArn)
             });
+#endif
 
             // return with kicked off game
             return new StartGameResponse {

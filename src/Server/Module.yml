@@ -48,6 +48,12 @@ Items:
     Memory: 256
     Timeout: 30
 
+  - Function: GameTurnAsyncFunction
+    Scope: ServerFunction
+    Description: Function for computing the next game turn (async version)
+    Memory: 256
+    Timeout: 30
+
   - Resource: GameLoopStateMachine
     Scope: ServerFunction
     Type: AWS::StepFunctions::StateMachine
@@ -75,7 +81,7 @@ Items:
               - Effect: Allow
                 Action:
                   - lambda:InvokeFunction
-                Resource: "*"
+                Resource: !GetAtt GameTurnFunction.Arn
 
   - Resource: GameLoopStateMachineStartStopPolicy
     Type: AWS::IAM::Policy
@@ -151,7 +157,7 @@ Items:
 
   - Variable: RestApiUrl
     Description: REST API URL
-    Scope: public, GameTurnFunction
+    Scope: public, GameTurnFunction, GameTurnAsyncFunction
     Value: !Ref Module::RestApi::Url
 
   - Variable: WebsiteUrl
