@@ -132,12 +132,6 @@ namespace Challenge.LambdaRobots.Server {
             } catch(Exception e) {
                 _logger.LogErrorAsWarning(e, "PostToConnectionAsync() failed");
             }
-
-            // check if we need to invoke the next game turn
-            if(game.State == GameState.NextTurn) {
-
-                // TODO: invoke yourself!
-            }
             return gameRecord;
         }
 
