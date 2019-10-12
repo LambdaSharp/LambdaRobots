@@ -182,6 +182,7 @@ namespace Challenge.LambdaRobots {
         /// <param name="heading">Heading in degrees where to fire the missile to</param>
         /// <param name="distance">Distance at which the missile impacts</param>
         public void FireMissile(double heading, double distance) {
+            LogInfo($"Fire Missile: Heading = {NormalizeAngle(heading):N0}, Distance = {distance:N0}");
             _action.FireMissileHeading = heading;
             _action.FireMissileDistance = distance;
         }
@@ -202,14 +203,20 @@ namespace Challenge.LambdaRobots {
         /// to avoid a sudden stop.
         /// </summary>
         /// <param name="heading">Target robot heading in degrees</param>
-        public void SetHeading(double heading) => _action.Heading = heading;
+        public void SetHeading(double heading) {
+            LogInfo($"Set Heading = {NormalizeAngle(heading):N0}");
+            _action.Heading = heading;
+        }
 
         /// <summary>
         /// Set the speed for the robot. Speed is adjusted according to `Robot.Acceleration`
         /// and `Robot.Deceleration` characteristics.
         /// </summary>
         /// <param name="speed">Target robot speed</param>
-        public void SetSpeed(double speed) => _action.Speed = speed;
+        public void SetSpeed(double speed) {
+            LogInfo($"Set Speed = {speed:N0}");
+            _action.Speed = speed;
+        }
 
         /// <summary>
         /// Scan the game board in a given heading and resolution. The resolution
@@ -219,8 +226,10 @@ namespace Challenge.LambdaRobots {
         /// <param name="heading">Scan heading in degrees</param>
         /// <param name="resolution">Scan +/- arc in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
-        public Task<double?> ScanAsync(double heading, double resolution)
-            => new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Game.Id, Robot.Id).ScanAsync(heading, resolution);
+        public Task<double?> ScanAsync(double heading, double resolution) {
+            LogInfo($"Scan: Heading = {NormalizeAngle(heading):N0}, Resolution = {resolution:N0}");
+            return new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Game.Id, Robot.Id).ScanAsync(heading, resolution);
+        }
 
         /// <summary>
         /// Determine angle in degrees relative to current robot position.
