@@ -52,8 +52,8 @@ namespace Challenge.LambdaRobots.YosemiteSamRobot.RobotFunction {
         public override async Task GetActionAsync() {
 
             // check if robot needs to accelerate
-            if(Speed < 40.0) {
-                SetSpeed(40.0);
+            if(Speed == 0.0) {
+                SetSpeed(Robot.MaxTurnSpeed);
                 SetHeading(Random.NextDouble() * 360.0);
             }
 
