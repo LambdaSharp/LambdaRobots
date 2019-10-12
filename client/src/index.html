@@ -26,78 +26,73 @@
         <input type="text" placeholder="lambda function arn" name="robots" />
         <input type="text" placeholder="lambda function arn" name="robots" />
         <input type="text" placeholder="lambda function arn" name="robots" />
-        <br/>
+        <br />
         <details>
           <summary>Advance Configuration</summary>
           <table>
             <tr>
               <td>
-                <input
-                  type="number"
-                  placeholder="Board Width"
-                  id="BoardWidth"
-                />
+                <label>
+                  BoardWidth
+                  <input type="number" placeholder="1000" id="BoardWidth" />
+                </label>
               </td>
               <td>
-                <input
-                  type="number"
-                  placeholder="Board Height"
-                  id="BoardHeight"
-                />
+                <label>
+                  Board Height
+                  <input type="number" placeholder="1000" id="BoardHeight" />
+                </label>
               </td>
               <td>
-                <input
-                  type="number"
-                  placeholder="Seconds Per Turn"
-                  id="SecondsPerTurn"
-                />
+                <label>
+                  Seconds Per Turn
+                  <input type="number" id="SecondsPerTurn" />
+                </label>
               </td>
               <td>
-                <input type="number" placeholder="Max Turns" id="MaxTurns" />
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <input
-                  type="number"
-                  placeholder="Direct Hit Range"
-                  id="DirectHitRange"
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  placeholder="Near Hit Range"
-                  id="NearHitRange"
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  placeholder="Far Hit Range"
-                  id="FarHitRange"
-                />
-              </td>
-              <td>
-                <input
-                  type="number"
-                  placeholder="Collision Range"
-                  id="CollisionRange"
-                />
+                <label>
+                  Max Turns
+                  <input type="number" id="MaxTurns" />
+                </label>
               </td>
             </tr>
             <tr>
               <td>
-                <input
-                  type="number"
-                  placeholder="Robot Timeout Seconds"
-                  id="RobotTimeoutSeconds"
-                />
+                <label>
+                  Direct Hit Range
+                  <input type="number" id="DirectHitRange" />
+                </label>
+              </td>
+              <td>
+                <label>
+                  Near Hit Range
+                  <input type="number" id="NearHitRange" />
+                </label>
+              </td>
+              <td>
+                <label>
+                  Far Hit Range
+                  <input type="number" id="FarHitRange" />
+                </label>
+              </td>
+              <td>
+                <label>
+                  Collision Range
+                  <input type="number" id="CollisionRange" />
+                </label>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label>
+                  Robot Timeout Seconds
+                  <input type="number" id="RobotTimeoutSeconds" />
+                </label>
               </td>
             </tr>
           </table>
         </details>
-        <br/>
+        <br />
         <button primary id="btnStartGame">Start Game!</button>
         <button id="btnClear">Clear Saved Config</button>
       </section>
