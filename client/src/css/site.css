@@ -4,6 +4,11 @@ body {
   height: 100;
   margin: 0 auto;
   padding: 1%;
+  background-color: lightgray;
+}
+
+h1 {
+  color: black;
 }
 
 html,
@@ -18,7 +23,7 @@ button {
 }
 
 #gameBoardContainer {
-  border: 1px solid #000000;
+  border: 1px solid darkgray;
 }
 #gameBoardStatsContainer,
 #leaderBoardContainer {
@@ -29,14 +34,58 @@ button {
   display: flex;
 }
 #statsBox {
-  border: 1px solid #000000;
+  border: 1px solid darkgray;
   border-left: none;
   min-width: 400px;
   max-height: 1000px;
   overflow: auto;
   padding: 1%;
+  background-color: white;
+}
+#robotsStats > div > table {
+  font-size: 90%;
 }
 
 .game-board {
+  background-color: #1e1e1e;
+}
+
+[btn],
+button:not([class]),
+button[xx],
+input[type="submit"] {
+  background: #1e1e1e !important;
+  border: darkgray !important;
+  color: white !important;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 600px;
   background-color: black;
+  color: #fff;
+  border-radius: 6px;
+  padding: 5px 0;
+  font-family: "Arial";
+  font-size: 12px;
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+/* Optional styling */
+summary::-webkit-details-marker {
+  font-size: 140%;
+}
+summary:focus {
+  outline-style: none;
 }

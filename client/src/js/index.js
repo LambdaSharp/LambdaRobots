@@ -120,7 +120,9 @@ function messagesUi(messages) {
   const messagesElement = document.getElementById("statsBoxMessages");
   messagesElement.innerText = "";
   messages.reverse().forEach(message => {
-    messagesElement.appendChild(document.createTextNode(`${message.Text}\n`));
+    messagesElement.appendChild(
+      document.createTextNode(`#${message.GameTurn} ${message.Text}\n`)
+    );
   });
 }
 
@@ -133,9 +135,19 @@ function updateRobotStats(robots) {
     if (robot.State !== "Alive") {
       robotContainer.style.backgroundColor = "lightgray";
     }
-    robotContainer.appendChild(
-      createElement("h3", `${robot.Name} (R${index})`)
+
+    const robotHeader = createElement("h3");
+    robotHeader.appendChild(createElement("span", `${robot.Name} (R${index})`));
+    const toolTipIcon = createElement("span", `🛈`);
+    toolTipIcon.className = "tooltip";
+    const robotPrimaryAllStats = createElement(
+      "pre",
+      JSON.stringify(robot, null, 2)
     );
+    robotPrimaryAllStats.className = "tooltiptext";
+    toolTipIcon.appendChild(robotPrimaryAllStats);
+    robotHeader.appendChild(toolTipIcon);
+    robotContainer.appendChild(robotHeader);
     const robotPrimaryStatsContainer = createElement("table");
     const robotTr1 = createElement("tr");
     robotTr1.appendChild(createElement("td", `Damage: ${robot.Damage}`));
@@ -160,27 +172,30 @@ function updateRobotStats(robots) {
     const robotTr3 = createElement("tr");
     robotTr3.appendChild(createElement("td", `X: ${Math.round(robot.X)}`));
     robotTr3.appendChild(createElement("td", `Y: ${Math.round(robot.Y)}`));
-    robotTr3.appendChild(
+    robotTr3.appendChild(createElement("td", `Speed: ${robot.Speed}`));
+    robotPrimaryStatsContainer.appendChild(robotTr3);
+    const robotTr4 = createElement("tr");
+    robotTr4.appendChild(createElement("td", `Heading: ${Math.round(robot.Heading)}`));
+    robotTr4.appendChild(createElement("td", `Target Heading: ${Math.round(robot.TargetHeading)}`));
+    robotTr4.appendChild(
       createElement(
         "td",
         `Total Travel Distance: ${Math.round(robot.TotalTravelDistance)}`
       )
     );
-    robotPrimaryStatsContainer.appendChild(robotTr3);
-    const robotPrimaryAllStats = createElement("pre");
-    robotPrimaryAllStats.innerText = JSON.stringify(robot, null, 2);
+    robotPrimaryStatsContainer.appendChild(robotTr4);
     robotContainer.appendChild(robotPrimaryStatsContainer);
-    //robotContainer.appendChild(robotPrimaryAllStats);
     robotsStats.appendChild(robotContainer);
   }
 }
 
 function createElement(tag, text = "") {
   const element = document.createElement(tag);
-  if (text.length > 0) {
+  if (text && text.length > 0) {
     element.appendChild(document.createTextNode(text));
   }
   return element;
 }
+
 
 window.addEventListener("load", init, false);
