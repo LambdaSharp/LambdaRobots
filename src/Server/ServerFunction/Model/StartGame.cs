@@ -27,6 +27,11 @@ using Newtonsoft.Json;
 
 namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
 
+    public enum GameLoopType {
+        StepFunction,
+        Recursive
+    }
+
     public class StartGameRequest {
 
         //--- Properties ---
@@ -37,6 +42,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
         public List<string> RobotArns { get; set; } = new List<string>();
 
         // optional board initialization settings
+        public GameLoopType GameLoopType { get; set; } = GameLoopType.StepFunction;
         public double? BoardWidth { get; set; }
         public double? BoardHeight { get; set; }
         public double? SecondsPerTurn { get; set; }

@@ -94,44 +94,51 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
                 MinRobotStartDistance = request.MinRobotStartDistance ?? 50.0,
                 RobotTimeoutSeconds = request.RobotTimeoutSeconds ?? 15.0
             };
-
             var gameRecord = new GameRecord {
                 PK = game.Id,
                 Game = game,
                 LambdaRobotArns = request.RobotArns,
                 ConnectionId = CurrentRequest.RequestContext.ConnectionId
             };
-#if true
-            LogInfo($"Kicking off Game Turn lambda: Name={_gameTurnAsyncFunctionArn}");
-            await _lambdaClient.InvokeAsync(new InvokeRequest {
-                Payload = SerializeJson(gameRecord),
-                FunctionName = _gameTurnAsyncFunctionArn,
-                InvocationType = InvocationType.Event
-            });
-#else
-            // store game record
-            await _table.CreateAsync(gameRecord);
 
-            // kick off game step function
-            var startGameId = $"LambdaRobotsGame-{game.Id}";
-            LogInfo($"Kicking off Step Function: Name={startGameId}");
-            var startGame = await _stepFunctionsClient.StartExecutionAsync(new StartExecutionRequest {
-                StateMachineArn = _gameStateMachine,
-                Name = startGameId,
-                Input = SerializeJson(new {
-                    GameId = game.Id,
-                    State = game.State
-                })
-            });
+            // dispatch game loop
+            switch(request.GameLoopType) {
+            case GameLoopType.Recursive:
+                LogInfo($"Kicking off Game Turn lambda: Name={_gameTurnAsyncFunctionArn}");
+                await _lambdaClient.InvokeAsync(new InvokeRequest {
+                    Payload = SerializeJson(gameRecord),
+                    FunctionName = _gameTurnAsyncFunctionArn,
+                    InvocationType = InvocationType.Event
+                });
+                break;
+            case GameLoopType.StepFunction:
 
-            // update execution ARN for game record
-            await _table.UpdateAsync(new GameRecord {
-                PK = game.Id,
-                GameLoopArn = startGame.ExecutionArn
-            }, new[] {
-                nameof(GameRecord.GameLoopArn)
-            });
-#endif
+                // store game record
+                await _table.CreateAsync(gameRecord);
+
+                // kick off game step function
+                var startGameId = $"LambdaRobotsGame-{game.Id}";
+                LogInfo($"Kicking off Step Function: Name={startGameId}");
+                var startGame = await _stepFunctionsClient.StartExecutionAsync(new StartExecutionRequest {
+                    StateMachineArn = _gameStateMachine,
+                    Name = startGameId,
+                    Input = SerializeJson(new {
+                        GameId = game.Id,
+                        State = game.State
+                    })
+                });
+
+                // update execution ARN for game record
+                await _table.UpdateAsync(new GameRecord {
+                    PK = game.Id,
+                    GameLoopArn = startGame.ExecutionArn
+                }, new[] {
+                    nameof(GameRecord.GameLoopArn)
+                });
+                break;
+            default:
+                throw new ApplicationException($"unsupported GameLoopType={request.GameLoopType}");
+            }
 
             // return with kicked off game
             return new StartGameResponse {
