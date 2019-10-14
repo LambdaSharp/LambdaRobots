@@ -79,7 +79,7 @@ namespace Challenge.LambdaRobots {
 
         // missile characteristics
         public double MissileReloadCooldown;
-        public double MissileSpeed;
+        public double MissileVelocity;
         public double MissileRange;
         public double MissileDirectHitDamageBonus;
         public double MissileNearHitDamageBonus;

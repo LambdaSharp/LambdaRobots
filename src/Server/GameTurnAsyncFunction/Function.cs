@@ -25,6 +25,7 @@
 using System;
 using System.Threading.Tasks;
 using Amazon.ApiGatewayManagementApi;
+using Amazon.DynamoDBv2;
 using Amazon.Lambda;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Model;
@@ -42,6 +43,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnAsyncFunction {
 
         //--- Fields ---
         private IAmazonLambda _lambdaClient;
+        private GameTable _table;
         private GameTurnLogic _logic;
 
         //--- Methods ---
@@ -49,6 +51,10 @@ namespace Challenge.LambdaRobots.Server.GameTurnAsyncFunction {
 
             // initialize Lambda function
             _lambdaClient = new AmazonLambdaClient();
+            _table = new GameTable(
+                config.ReadDynamoDBTableName("GameTable"),
+                new AmazonDynamoDBClient()
+            );
             _logic = new GameTurnLogic(
                 this,
                 _lambdaClient,
@@ -62,6 +68,19 @@ namespace Challenge.LambdaRobots.Server.GameTurnAsyncFunction {
 
         public override async Task<GameRecord> ProcessMessageAsync(GameRecord request) {
             await _logic.ComputeNextTurnAsync(request);
+            var game = request.Game;
+
+            // check if we need to update or delete the game from the game table
+            if(game.State == GameState.NextTurn) {
+                LogInfo($"Storing game: ID = {game.Id}");
+                await _table.UpdateAsync(new GameRecord {
+                    PK = game.Id,
+                    Game = game
+                }, new[] { nameof(GameRecord.Game) });
+            } else {
+                LogInfo($"Deleting game: ID = {game.Id}");
+                await _table.DeleteAsync<GameRecord>(game.Id);
+            }
 
             // check if we need to invoke the next game turn
             if(request.Game.State == GameState.NextTurn) {

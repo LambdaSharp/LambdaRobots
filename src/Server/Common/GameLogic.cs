@@ -146,7 +146,7 @@ namespace Challenge.LambdaRobots.Server {
 
                     // missile characteristics
                     MissileReloadCooldown = 2.0,
-                    MissileSpeed = 150.0,
+                    MissileVelocity = 150.0,
                     MissileRange = 700.0,
                     MissileDirectHitDamageBonus = 3.0,
                     MissileNearHitDamageBonus = 2.1,
@@ -280,7 +280,7 @@ namespace Challenge.LambdaRobots.Server {
                 switch(config.Missile) {
                 case LambdaRobotMissile.Dart:
                     robot.MissileRange = 350.0;
-                    robot.MissileSpeed = 250.0;
+                    robot.MissileVelocity = 250.0;
                     robot.MissileDirectHitDamageBonus = 0.0;
                     robot.MissileNearHitDamageBonus = 0.0;
                     robot.MissileFarHitDamageBonus = 0.0;
@@ -288,7 +288,7 @@ namespace Challenge.LambdaRobots.Server {
                     break;
                 case LambdaRobotMissile.Arrow:
                     robot.MissileRange = 500.0;
-                    robot.MissileSpeed = 200.0;
+                    robot.MissileVelocity = 200.0;
                     robot.MissileDirectHitDamageBonus = 1.0;
                     robot.MissileNearHitDamageBonus = 1.0;
                     robot.MissileFarHitDamageBonus = 0.0;
@@ -296,7 +296,7 @@ namespace Challenge.LambdaRobots.Server {
                     break;
                 case LambdaRobotMissile.Javelin:
                     robot.MissileRange = 700.0;
-                    robot.MissileSpeed = 150.0;
+                    robot.MissileVelocity = 150.0;
                     robot.MissileDirectHitDamageBonus = 3.0;
                     robot.MissileNearHitDamageBonus = 2.0;
                     robot.MissileFarHitDamageBonus = 1.0;
@@ -304,7 +304,7 @@ namespace Challenge.LambdaRobots.Server {
                     break;
                 case LambdaRobotMissile.Cannon:
                     robot.MissileRange = 900.0;
-                    robot.MissileSpeed = 100.0;
+                    robot.MissileVelocity = 100.0;
                     robot.MissileDirectHitDamageBonus = 6.0;
                     robot.MissileNearHitDamageBonus = 4.0;
                     robot.MissileFarHitDamageBonus = 2.0;
@@ -312,7 +312,7 @@ namespace Challenge.LambdaRobots.Server {
                     break;
                 case LambdaRobotMissile.BFG:
                     robot.MissileRange = 1200.0;
-                    robot.MissileSpeed = 75.0;
+                    robot.MissileVelocity = 75.0;
                     robot.MissileDirectHitDamageBonus = 12.0;
                     robot.MissileNearHitDamageBonus = 8.0;
                     robot.MissileFarHitDamageBonus = 4.0;
@@ -447,7 +447,7 @@ namespace Challenge.LambdaRobots.Server {
 
         public double? ScanRobots(Robot robot, double heading, double resolution) {
             double? result = null;
-            resolution = MinMax(0.0, resolution, robot.RadarMaxResolution);
+            resolution = MinMax(0.01, resolution, robot.RadarMaxResolution);
             FindRobotsByDistance(robot.X, robot.Y, (other, distance) => {
 
                 // skip ourselves
@@ -468,7 +468,7 @@ namespace Challenge.LambdaRobots.Server {
 
                 // check if delta angle is within resolution limit
                 var angle = Math.Atan2(deltaX, deltaY) * 180.0 / Math.PI;
-                if(NormalizeAngle(Math.Abs(heading - angle)) <= resolution) {
+                if(Math.Abs(NormalizeAngle(heading - angle)) <= resolution) {
 
                     // found a robot within range and resolution; stop enumerating
                     result = distance;
@@ -515,7 +515,7 @@ namespace Challenge.LambdaRobots.Server {
                     State = MissileState.Flying,
                     X = robot.X,
                     Y = robot.Y,
-                    Speed = robot.MissileSpeed,
+                    Speed = robot.MissileVelocity,
                     Heading = NormalizeAngle(action.FireMissileHeading ?? robot.Heading),
                     Range = MinMax(0.0, action.FireMissileDistance ?? robot.MissileRange, robot.MissileRange),
                     DirectHitDamageBonus = robot.MissileDirectHitDamageBonus,
@@ -608,13 +608,6 @@ namespace Challenge.LambdaRobots.Server {
 
         private void MoveRobot(Robot robot) {
 
-            // compute new speed
-            if(robot.TargetSpeed > robot.Speed) {
-                robot.Speed = Math.Min(robot.TargetSpeed, robot.Speed + robot.Acceleration * Game.SecondsPerTurn);
-            } else if(robot.TargetSpeed < robot.Speed) {
-                robot.Speed = Math.Max(robot.TargetSpeed, robot.Speed - robot.Deceleration * Game.SecondsPerTurn);
-            }
-
             // compute new heading
             if(robot.Heading != robot.TargetHeading) {
                 if(robot.Speed <= robot.MaxTurnSpeed) {
@@ -625,13 +618,22 @@ namespace Challenge.LambdaRobots.Server {
                 }
             }
 
+            // compute new speed
+            var oldSpeed = robot.Speed;
+            if(robot.TargetSpeed > robot.Speed) {
+                robot.Speed = Math.Min(robot.TargetSpeed, robot.Speed + robot.Acceleration * Game.SecondsPerTurn);
+            } else if(robot.TargetSpeed < robot.Speed) {
+                robot.Speed = Math.Max(robot.TargetSpeed, robot.Speed - robot.Deceleration * Game.SecondsPerTurn);
+            }
+            var effectiveSpeed = (robot.Speed + oldSpeed) / 2.0;
+
             // move robot
             bool collision;
             Move(
                 robot.X,
                 robot.Y,
                 robot.TotalTravelDistance,
-                robot.Speed,
+                effectiveSpeed,
                 robot.Heading,
                 double.MaxValue,
                 out robot.X,
