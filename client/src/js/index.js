@@ -200,10 +200,10 @@ function getAdvanceConfig() {
     NearHitRange: Number(document.getElementById("NearHitRange").value),
     FarHitRange: Number(document.getElementById("FarHitRange").value),
     CollisionRange: Number(document.getElementById("CollisionRange").value),
-    RobotTimeoutSeconds: Number(document.getElementById("RobotTimeoutSeconds").value),
-
-    // TODO: make configurable
-    GameLoopType: "Recursive" // or "StepFunction"
+    RobotTimeoutSeconds: Number(
+      document.getElementById("RobotTimeoutSeconds").value
+    ),
+    GameLoopType: document.getElementById("GameLoopType").value
   };
 
   // remove properties with zero value
