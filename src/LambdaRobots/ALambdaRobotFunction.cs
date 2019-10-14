@@ -32,7 +32,7 @@ using Newtonsoft.Json;
 
 namespace Challenge.LambdaRobots {
 
-    public abstract class ALambdaRobotFunction<TState> : ALambdaFunction<LambdaRobotRequest, LambdaRobotResponse> where TState : class {
+    public abstract class ALambdaRobotFunction<TState> : ALambdaFunction<LambdaRobotRequest, LambdaRobotResponse> where TState : class, new() {
 
         //--- Class Fields ---
 
@@ -57,12 +57,12 @@ namespace Challenge.LambdaRobots {
         public Challenge.LambdaRobots.GameInfo Game { get; set; }
 
         /// <summary>
-        /// Horizontal position of robot. Value is between `0` and `GameBoardWidth`.
+        /// Horizontal position of robot. Value is between `0` and `Game.BoardWidth`.
         /// </summary>
         public double X => Robot.X;
 
         /// <summary>
-        /// Vertical position of robot. Value is between `0` and `GameBoardHeight`.
+        /// Vertical position of robot. Value is between `0` and `Game.BoardHeight`.
         /// </summary>
         public double Y => Robot.Y;
 
@@ -113,9 +113,12 @@ namespace Challenge.LambdaRobots {
                     State = JsonConvert.DeserializeObject<TState>(await File.ReadAllTextAsync(stateFile));
                 } catch(Exception e) {
                     LogErrorAsWarning(e, $"unable to load state file: {stateFile}");
-                    State = null;
                 }
             }
+            if(State == null) {
+                State = new TState();
+            }
+            LogInfo($"Starting State:\n{SerializeJson(State)}");
 
             // dispatch to specific method based on request command
             LambdaRobotResponse response;
@@ -172,6 +175,7 @@ namespace Challenge.LambdaRobots {
             }
 
             // log response and return
+            LogInfo($"Final State:\n{SerializeJson(State)}");
             LogInfo($"Response:\n{SerializeJson(response)}");
             return response;
         }
@@ -182,7 +186,7 @@ namespace Challenge.LambdaRobots {
         /// <param name="heading">Heading in degrees where to fire the missile to</param>
         /// <param name="distance">Distance at which the missile impacts</param>
         public void FireMissile(double heading, double distance) {
-            LogInfo($"Fire Missile: Heading = {NormalizeAngle(heading):N0}, Distance = {distance:N0}");
+            LogInfo($"Fire Missile: Heading = {NormalizeAngle(heading):N2}, Distance = {distance:N2}");
             _action.FireMissileHeading = heading;
             _action.FireMissileDistance = distance;
         }
@@ -214,7 +218,7 @@ namespace Challenge.LambdaRobots {
         /// </summary>
         /// <param name="speed">Target robot speed</param>
         public void SetSpeed(double speed) {
-            LogInfo($"Set Speed = {speed:N0}");
+            LogInfo($"Set Speed = {speed:N2}");
             _action.Speed = speed;
         }
 
@@ -226,9 +230,13 @@ namespace Challenge.LambdaRobots {
         /// <param name="heading">Scan heading in degrees</param>
         /// <param name="resolution">Scan +/- arc in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
-        public Task<double?> ScanAsync(double heading, double resolution) {
-            LogInfo($"Scan: Heading = {NormalizeAngle(heading):N0}, Resolution = {resolution:N0}");
-            return new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Game.Id, Robot.Id).ScanAsync(heading, resolution);
+        public async Task<double?> ScanAsync(double heading, double resolution) {
+            var response = await new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Game.Id, Robot.Id).ScanAsync(heading, resolution);
+            var result = (response.Success && response.Found)
+                ? (double?)response.Distance
+                : null;
+            LogInfo($"Scan: Heading = {NormalizeAngle(heading):N2}, Resolution = {resolution:N2}, Found = {result?.ToString("N2") ?? "(null)"} [Success = {response.Success}]");
+            return result;
         }
 
         /// <summary>
@@ -258,7 +266,7 @@ namespace Challenge.LambdaRobots {
         /// <param name="angle">Angle in degrees to normalize</param>
         /// <returns>Angle in degrees</returns>
         public double NormalizeAngle(double angle) {
-            var result = angle % 360;
+            var result = angle % 360.0;
             return (result < -180.0)
                 ? (result + 360.0)
                 : result;
@@ -273,6 +281,7 @@ namespace Challenge.LambdaRobots {
         public bool MoveToXY(double x, double y) {
             var heading = AngleToXY(x, y);
             var distance = DistanceToXY(x, y);
+            LogInfo($"Move To: X = {x:N2}, Y = {y:N2}, Heading = {heading:N2}, Distance = {distance:N2}");
 
             // check if robot is close enough to target location
             if(distance < 1.0) {
@@ -285,21 +294,20 @@ namespace Challenge.LambdaRobots {
             // NOTE: the distance required to stop the robot from moving is obtained with the following formula:
             //      Distance = Speed^2 / 2*Deceleration
             //  solving for Speed, gives us the maximum travel speed to avoid overshooting our target
-            var speed = Math.Sqrt(distance * 2.0 * Robot.Deceleration);
+            var speed = Math.Sqrt(distance * 2.0 * Robot.Deceleration) * Game.SecondsPerTurn;
 
             // check if angle needs to be adjusted
-            if(Math.Abs(Heading - heading) < 0.1) {
+            if(Math.Abs(NormalizeAngle(Heading - heading)) > 0.1) {
 
                 // check if robot is moving slow enough to turn
                 if(Speed <= Robot.MaxTurnSpeed) {
 
                     // adjust heading towards target
                     SetHeading(heading);
-                } else {
-
-                    // adjust speed to either max-turn-speed or max-travel-speed, whichever is lower
-                    SetSpeed(Math.Min(Robot.MaxTurnSpeed, speed));
                 }
+
+                // adjust speed to either max-turn-speed or max-travel-speed, whichever is lower
+                SetSpeed(Math.Min(Robot.MaxTurnSpeed, speed));
             } else {
 
                 // adjust speed to max-travel-speed

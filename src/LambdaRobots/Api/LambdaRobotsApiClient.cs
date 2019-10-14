@@ -57,7 +57,7 @@ namespace Challenge.LambdaRobots.Api {
         /// <param name="heading">Scan heading in degrees</param>
         /// <param name="resolution">Scan resolution in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
-        public async Task<double?> ScanAsync(double heading, double resolution) {
+        public async Task<(bool Success, bool Found, double Distance)> ScanAsync(double heading, double resolution) {
 
             // issue scan request to game API
             var postTask = _httpClient.PostAsync($"{_gameApi}/scan", new StringContent(JsonConvert.SerializeObject(new ScanEnemiesRequest {
@@ -69,13 +69,13 @@ namespace Challenge.LambdaRobots.Api {
 
             // wait for response or timeout
             if(await Task.WhenAny(postTask, Task.Delay(TimeSpan.FromSeconds(1.0))) != postTask) {
-                return null;
+                return (Success: false, Found: false, Distance: 0.0);
             }
 
             // deserialize scan response
             var httpResponseText = await postTask.Result.Content.ReadAsStringAsync();
             var response = JsonConvert.DeserializeObject<ScanEnemiesResponse>(httpResponseText);
-            return response.Found ? response.Distance : (double?)null;
+            return (Success: true, Found: response.Found, Distance: response.Distance);
         }
     }
 }
