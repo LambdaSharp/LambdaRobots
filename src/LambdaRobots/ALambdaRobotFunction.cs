@@ -235,7 +235,7 @@ namespace Challenge.LambdaRobots {
             var result = (response.Success && response.Found)
                 ? (double?)response.Distance
                 : null;
-            LogInfo($"Scan: Heading = {NormalizeAngle(heading):N2}, Resolution = {resolution:N2}, Found = {result?.ToString("N2") ?? "(null)"} [Success = {response.Success}]");
+            LogInfo($"Scan: Heading = {heading:N2}, Resolution = {resolution:N2}, Found = {result?.ToString("N2") ?? "(null)"} [Success = {response.Success}]");
             return result;
         }
 

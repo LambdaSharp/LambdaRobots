@@ -206,12 +206,22 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             }
 
             // find nearest enemy within scan resolution
-            var distanceFound = gameLogic.ScanRobots(robot, request.Heading, request.Resolution);
-            LogInfo($"Scanning: Heading = {request.Heading:N2}, Resolution = {request.Resolution:N2}, Found = {distanceFound.HasValue}, Distance = {distanceFound?.ToString("N2") ?? "(null)"}");
-            return new ScanEnemiesResponse {
-                Found = distanceFound.HasValue,
-                Distance = distanceFound.GetValueOrDefault()
-            };
+            var found = gameLogic.ScanRobots(robot, request.Heading, request.Resolution);
+            if(found != null) {
+                var distance = GameLogic.Distance(robot.X, robot.Y, found.X, found.Y);
+                var angle = GameLogic.NormalizeAngle(Math.Atan2(found.X - robot.X, found.Y - robot.Y) * 180.0 / Math.PI);
+                LogInfo($"Scanning: Heading = {request.Heading:N2}, Resolution = {request.Resolution:N2}, Found = R{found.Index}, Distance = {distance:N2}, Angle = {angle:N2}");
+                return new ScanEnemiesResponse {
+                    Found = true,
+                    Distance = distance
+                };
+            } else {
+               LogInfo($"Scanning: Heading = {request.Heading:N2}, Resolution = {request.Resolution:N2}, Found = nothing");
+                return new ScanEnemiesResponse {
+                    Found = false,
+                    Distance = 0.0
+                };
+            }
         }
     }
 }

@@ -74,13 +74,13 @@ namespace Challenge.LambdaRobots.Server {
     public class GameLogic {
 
         //--- Class Methods ---
-        private static double Distance(double x1, double y1, double x2, double y2)
+        public static double Distance(double x1, double y1, double x2, double y2)
             => Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 
-        private static double MinMax(double min, double value, double max)
+        public static double MinMax(double min, double value, double max)
             => Math.Max(min, Math.Min(max, value));
 
-        private static double NormalizeAngle(double angle) {
+        public static double NormalizeAngle(double angle) {
             var result = angle % 360;
             return (result < -180.0)
                 ? (result + 360.0)
@@ -445,8 +445,8 @@ namespace Challenge.LambdaRobots.Server {
             }
         }
 
-        public double? ScanRobots(Robot robot, double heading, double resolution) {
-            double? result = null;
+        public Robot ScanRobots(Robot robot, double heading, double resolution) {
+            Robot result = null;
             resolution = MinMax(0.01, resolution, robot.RadarMaxResolution);
             FindRobotsByDistance(robot.X, robot.Y, (other, distance) => {
 
@@ -471,7 +471,7 @@ namespace Challenge.LambdaRobots.Server {
                 if(Math.Abs(NormalizeAngle(heading - angle)) <= resolution) {
 
                     // found a robot within range and resolution; stop enumerating
-                    result = distance;
+                    result = other;
                     return false;
                 }
 
