@@ -101,7 +101,11 @@ table[xx] th {
 .robot-dead {
   background-color: lightgray;
 }
- h4 {
-   display: inline-block;
-  
- }
+h4 {
+  display: inline-block;
+}
+
+select:not([class]),
+select[xx] {
+  padding: 0 !important;
+}
