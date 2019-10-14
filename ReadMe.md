@@ -106,11 +106,11 @@ The most commonly needed properties are readily available as properties from the
 
 ### Missile
 
-|Missile Type   |Max. Range  |Speed  |Direct Hit Bonus|Near Hit Bonus|Far Hit Bonus|Cooldown|Cost|
-|---------------|------------|-------|----------------|--------------|-------------|--------|----|
-|Dart           |350 meters  |250 m/s|0               |0             |0            |0 sec   |0   |
-|Arrow          |500 meters  |200 m/s|1               |1             |0            |1 sec   |1   |
-|**Javelin (*)**|700 meters  |150 m/s|3               |2             |1            |2 sec   |2   |
-|Cannon         |900 meters  |100 m/s|6               |4             |2            |3 sec   |3   |
-|BFG            |1,200 meters|75 m/s |12              |8             |4            |5 sec   |4   |
+|Missile Type   |Max. Range  |Velocity|Direct Hit Bonus|Near Hit Bonus|Far Hit Bonus|Cooldown|Cost|
+|---------------|------------|--------|----------------|--------------|-------------|--------|----|
+|Dart           |350 meters  |250 m/s |0               |0             |0            |0 sec   |0   |
+|Arrow          |500 meters  |200 m/s |1               |1             |0            |1 sec   |1   |
+|**Javelin (*)**|700 meters  |150 m/s |3               |2             |1            |2 sec   |2   |
+|Cannon         |900 meters  |100 m/s |6               |4             |2            |3 sec   |3   |
+|BFG            |1,200 meters|75 m/s  |12              |8             |4            |5 sec   |4   |
 
