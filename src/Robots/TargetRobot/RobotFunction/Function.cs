@@ -41,7 +41,11 @@ namespace Challenge.LambdaRobots.TargetRobot.RobotFunction {
         //--- Methods ---
         public override async Task<LambdaRobotBuild> GetBuildAsync() {
             return new LambdaRobotBuild {
-                Name = "Target"
+                Name = "TargetBot",
+                Armor = LambdaRobotArmor.Medium,
+                Engine = LambdaRobotEngine.Economy,
+                Missile = LambdaRobotMissile.Dart,
+                Radar = LambdaRobotRadar.UltraShortRange
             };
         }
 
