@@ -203,7 +203,7 @@ function getAdvanceConfig() {
     RobotTimeoutSeconds: Number(document.getElementById("RobotTimeoutSeconds").value),
 
     // TODO: make configurable
-    GameLoopType = "Recursive" // or "StepFunction"
+    GameLoopType: "Recursive" // or "StepFunction"
   };
 
   // remove properties with zero value
