@@ -53,7 +53,7 @@ export default class GameBoard {
       this.context.fillText(
         index,
         Math.round(robot.X),
-        Math.round(robot.Y)
+        Math.round(this.canvas.height - robot.Y)
       );
 
       // draw circle around robot with collision radius
@@ -75,6 +75,10 @@ export default class GameBoard {
     for (let index = 0; index < missiles.length; index++) {
       const missile = missiles[index];
       this.context.save();
+
+      //(x,y) should start on the bottom left - https://stackoverflow.com/a/7707406/2414540
+      this.context.translate(0, this.canvas.height);
+      this.context.scale(1, -1);
       this.context.beginPath();
       switch (missile.State) {
         case "Flying":
