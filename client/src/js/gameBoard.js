@@ -50,23 +50,25 @@ export default class GameBoard {
     this.context.textBaseline = "middle";
     for (let index = 0; index < robots.length; index++) {
       const robot = robots[index];
-      this.context.fillText(
-        index,
-        Math.round(robot.X),
-        Math.round(this.canvas.height - robot.Y)
-      );
+      if(robot.State === "Alive") {
+        this.context.fillText(
+          index,
+          Math.round(robot.X),
+          Math.round(this.canvas.height - robot.Y)
+        );
 
-      // draw circle around robot with collision radius
-      // this.context.beginPath();
-      // this.context.strokeStyle = "yellow";
-      // this.context.arc(
-      //   Math.round(robot.X),
-      //   Math.round(robot.Y),
-      //   Math.round(game.CollisionRange),
-      //   0,
-      //   2 * Math.PI
-      // );
-      // this.context.stroke();
+        // draw circle around robot with collision radius
+        // this.context.beginPath();
+        // this.context.strokeStyle = "yellow";
+        // this.context.arc(
+        //   Math.round(robot.X),
+        //   Math.round(robot.Y),
+        //   Math.round(game.CollisionRange),
+        //   0,
+        //   2 * Math.PI
+        // );
+        // this.context.stroke();
+      }
     }
     this.context.restore();
   }
