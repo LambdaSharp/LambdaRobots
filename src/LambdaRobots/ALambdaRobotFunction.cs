@@ -25,6 +25,7 @@
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using Amazon.DynamoDBv2;
 using Challenge.LambdaRobots.Api;
 using Challenge.LambdaRobots.Protocol;
 using LambdaSharp;
@@ -33,6 +34,16 @@ using Newtonsoft.Json;
 namespace Challenge.LambdaRobots {
 
     public abstract class ALambdaRobotFunction<TState> : ALambdaFunction<LambdaRobotRequest, LambdaRobotResponse> where TState : class, new() {
+
+        //--- Types ---
+        public class RobotStateRecord : IDynamoTableSingletonRecord {
+
+            //--- Properties ---
+            public string PK { get; set; }
+            public string SK => "ROBOT-STATE";
+            public TState State { get; set; }
+            public long Expire { get; set; }
+        }
 
         //--- Class Fields ---
 
@@ -43,6 +54,7 @@ namespace Challenge.LambdaRobots {
 
         //--- Fields ---
         private LambdaRobotAction _action;
+        private DynamoTable _table;
 
         //--- Properties ---
 
@@ -98,7 +110,12 @@ namespace Challenge.LambdaRobots {
         public abstract Task GetActionAsync();
 
         //--- Methods ---
-        public override async Task InitializeAsync(LambdaConfig config) { }
+        public override async Task InitializeAsync(LambdaConfig config) {
+            _table = new DynamoTable(
+                config.ReadDynamoDBTableName("RobotStateTable"),
+                new AmazonDynamoDBClient()
+            );
+        }
 
         public override sealed async Task<LambdaRobotResponse> ProcessMessageAsync(LambdaRobotRequest request) {
 
@@ -107,17 +124,15 @@ namespace Challenge.LambdaRobots {
             LogInfo($"Request:\n{SerializeJson(request)}");
 
             // check if there is a state object to load
-            var stateFile = Path.Combine(Path.GetTempPath(), $"state-{request.Robot.Id.Replace(':', '-')}.json");
-            if(File.Exists(stateFile)) {
-                try {
-                    State = JsonConvert.DeserializeObject<TState>(await File.ReadAllTextAsync(stateFile));
-                } catch(Exception e) {
-                    LogErrorAsWarning(e, $"unable to load state file: {stateFile}");
-                }
+            var robotStateRecord = await _table.GetAsync<RobotStateRecord>(request.Robot.Id);
+            if(robotStateRecord == null) {
+                robotStateRecord = new RobotStateRecord {
+                    PK = request.Robot.Id,
+                    State = new TState(),
+                    Expire = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds()
+                };
             }
-            if(State == null) {
-                State = new TState();
-            }
+            State = robotStateRecord.State;
             LogInfo($"Starting State:\n{SerializeJson(State)}");
 
             // dispatch to specific method based on request command
@@ -160,19 +175,8 @@ namespace Challenge.LambdaRobots {
             }
 
             // check if there is a state object to save
-            if(State != null) {
-                try {
-                    await File.WriteAllTextAsync(stateFile, JsonConvert.SerializeObject(State));
-                } catch(Exception e) {
-                    LogErrorAsWarning(e, $"unable to save state file: {stateFile}");
-                }
-            } else if(File.Exists(stateFile)) {
-                try {
-                    File.Delete(stateFile);
-                } catch(Exception e) {
-                    LogErrorAsWarning(e, $"unable to delete state file: {stateFile}");
-                }
-            }
+            robotStateRecord.Expire = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds();
+            await _table.CreateOrUpdateAsync(robotStateRecord);
 
             // log response and return
             LogInfo($"Final State:\n{SerializeJson(State)}");
@@ -284,7 +288,7 @@ namespace Challenge.LambdaRobots {
             LogInfo($"Move To: X = {x:N2}, Y = {y:N2}, Heading = {heading:N2}, Distance = {distance:N2}");
 
             // check if robot is close enough to target location
-            if(distance < 1.0) {
+            if(distance <= Game.CollisionRange) {
 
                 // close enough; stop moving
                 SetSpeed(0.0);

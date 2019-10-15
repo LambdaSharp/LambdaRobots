@@ -149,7 +149,8 @@ namespace Challenge.LambdaRobots.Server {
                             NearHitRange = game.NearHitRange,
                             FarHitRange = game.FarHitRange,
                             CollisionRange = game.CollisionRange,
-                            MaxTurns = game.MaxTurns,
+                            GameTurn = game.TotalTurns,
+                            MaxGameTurns = game.MaxTurns,
                             MaxBuildPoints = game.MaxBuildPoints,
                             SecondsPerTurn = game.SecondsPerTurn
                         },
@@ -188,7 +189,8 @@ namespace Challenge.LambdaRobots.Server {
                             NearHitRange = game.NearHitRange,
                             FarHitRange = game.FarHitRange,
                             CollisionRange = game.CollisionRange,
-                            MaxTurns = game.MaxTurns,
+                            GameTurn = game.TotalTurns,
+                            MaxGameTurns = game.MaxTurns,
                             MaxBuildPoints = game.MaxBuildPoints,
                             SecondsPerTurn = game.SecondsPerTurn,
                             ApiUrl = _gameApiUrl

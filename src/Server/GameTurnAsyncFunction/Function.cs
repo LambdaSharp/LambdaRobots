@@ -43,7 +43,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnAsyncFunction {
 
         //--- Fields ---
         private IAmazonLambda _lambdaClient;
-        private GameTable _table;
+        private DynamoTable _table;
         private GameTurnLogic _logic;
 
         //--- Methods ---
@@ -51,7 +51,7 @@ namespace Challenge.LambdaRobots.Server.GameTurnAsyncFunction {
 
             // initialize Lambda function
             _lambdaClient = new AmazonLambdaClient();
-            _table = new GameTable(
+            _table = new DynamoTable(
                 config.ReadDynamoDBTableName("GameTable"),
                 new AmazonDynamoDBClient()
             );
@@ -67,6 +67,14 @@ namespace Challenge.LambdaRobots.Server.GameTurnAsyncFunction {
         }
 
         public override async Task<GameRecord> ProcessMessageAsync(GameRecord request) {
+            LogInfo($"Loading game state: ID = {request.Game.Id}");
+            var gameRecord = await _table.GetAsync<GameRecord>(request.Game.Id);
+            if(gameRecord == null) {
+
+                // game must have been stopped
+                return request;
+            }
+
             await _logic.ComputeNextTurnAsync(request);
             var game = request.Game;
 

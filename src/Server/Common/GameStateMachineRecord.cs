@@ -22,36 +22,13 @@
  * SOFTWARE.
  */
 
-using System.Threading.Tasks;
-using Amazon.Lambda.Core;
-using Challenge.LambdaRobots.Protocol;
+namespace Challenge.LambdaRobots.Server {
 
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
+    public class GameStateMachineRecord : IDynamoTableSingletonRecord {
 
-namespace Challenge.LambdaRobots.TargetRobot.RobotFunction {
-
-    public class LambdaRobotState {
-
-        // NOTE: target robot has no state
-    }
-
-    public class Function : ALambdaRobotFunction<LambdaRobotState> {
-
-        //--- Methods ---
-        public override async Task<LambdaRobotBuild> GetBuildAsync() {
-            return new LambdaRobotBuild {
-                Name = "Target",
-                Armor = LambdaRobotArmor.Medium,
-                Engine = LambdaRobotEngine.Economy,
-                Missile = LambdaRobotMissile.Dart,
-                Radar = LambdaRobotRadar.UltraShortRange
-            };
-        }
-
-        public override async Task GetActionAsync() {
-
-            // NOTE: target robot is stationary and doesn't do anything
-        }
+        //--- Properties ---
+        public string PK { get; set; }
+        public string SK => "STATE-MACHINE";
+        public string StateMachineArn { get; set; }
     }
 }

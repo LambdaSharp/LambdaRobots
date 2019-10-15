@@ -48,9 +48,35 @@ namespace Challenge.LambdaRobots {
         public double SecondsPerTurn { get; set; }
 
         /// <summary>
+        /// Distance for missile impact to count as direct hit.
+        /// </summary>
+        public double DirectHitRange;
+
+        /// <summary>
+        /// Distance for missile impact to count as near hit.
+        /// </summary>
+        public double NearHitRange;
+
+        /// <summary>
+        /// Distance for missile impact to count as far hit.
+        /// </summary>
+        public double FarHitRange;
+
+        /// <summary>
+        /// Distance between robots to count as a collision.
+        /// </summary>
+        public double CollisionRange;
+
+        /// <summary>
+        /// Current game turn. Starts at 1.
+        /// </summary>
+        /// <value></value>
+        public int GameTurn { get; set; }
+
+        /// <summary>
         /// Maximum number of turns before the game ends in a draw.
         /// </summary>
-        public int MaxTurns { get; set; }
+        public int MaxGameTurns { get; set; }
 
         /// <summary>
         /// Maximum number of build points a robot can use.

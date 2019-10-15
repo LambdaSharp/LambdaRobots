@@ -82,8 +82,10 @@ namespace Challenge.LambdaRobots.Server {
 
         public static double NormalizeAngle(double angle) {
             var result = angle % 360;
-            return (result < -180.0)
+            return (result <= -180.0)
                 ? (result + 360.0)
+                : (result > 180.0)
+                ? (result - 360.0)
                 : result;
         }
 
@@ -159,6 +161,7 @@ namespace Challenge.LambdaRobots.Server {
                 var config = await _provider.GetRobotBuild(robot);
                 robot.Name = config?.Name ?? "???";
                 if(config == null) {
+                    robot.State = RobotState.Dead;
                     return $"{robot.Name} (R{robot.Index}) was disqualified due to failure to initialize";
                 }
 
@@ -551,20 +554,24 @@ namespace Challenge.LambdaRobots.Server {
 
                 // compute damage dealt by missile
                 double damage = 0.0;
+                string damageType = null;
                 switch(missile.State) {
                 case MissileState.ExplodingDirect:
                     if(distance <= Game.DirectHitRange) {
                         damage = robot.DirectHitDamage + missile.DirectHitDamageBonus;
+                        damageType = "direct";
                     }
                     break;
                 case MissileState.ExplodingNear:
                     if(distance <= Game.NearHitRange) {
                         damage = robot.NearHitDamage + missile.NearHitDamageBonus;
+                        damageType = "near";
                     }
                     break;
                 case MissileState.ExplodingFar:
                     if(distance <= Game.FarHitRange) {
                         damage = robot.FarHitDamage + missile.FarHitDamageBonus;
+                        damageType = "far";
                     }
                     break;
                 }
@@ -596,9 +603,9 @@ namespace Challenge.LambdaRobots.Server {
 
                         // check if robot inflicted damage to itself
                         if(robot.Id == from.Id) {
-                            AddMessage($"{robot.Name} (R{robot.Index}) caused {damage:N0} damage to itself");
+                            AddMessage($"{robot.Name} (R{robot.Index}) caused {damage:N0} {damageType} damage to itself");
                         } else {
-                            AddMessage($"{robot.Name} (R{robot.Index}) received {damage:N0} damage from {from.Name} (R{from.Index})");
+                            AddMessage($"{robot.Name} (R{robot.Index}) received {damage:N0} {damageType} damage from {from.Name} (R{from.Index})");
                         }
                     }
                 }
@@ -614,6 +621,7 @@ namespace Challenge.LambdaRobots.Server {
                     robot.Heading = robot.TargetHeading;
                 } else {
                     robot.TargetSpeed = 0;
+                    robot.Heading = robot.TargetHeading;
                     AddMessage($"{robot.Name} (R{robot.Index}) stopped by sudden turn");
                 }
             }
@@ -745,6 +753,7 @@ namespace Challenge.LambdaRobots.Server {
                     Distance = Distance(robot.X, robot.Y, x, y)
                 })
                 .OrderBy(tuple => tuple.Distance)
+                .ToList()
             ) {
                 if(!callback(robotWithDistance.Robot, robotWithDistance.Distance)) {
                     break;

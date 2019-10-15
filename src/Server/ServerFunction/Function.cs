@@ -49,7 +49,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
         private static Random _random = new Random();
 
         //--- Fields ---
-        private GameTable _table;
+        private DynamoTable _table;
         private string _gameStateMachine;
         private IAmazonStepFunctions _stepFunctionsClient;
         private IAmazonLambda _lambdaClient;
@@ -57,7 +57,7 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
-            _table = new GameTable(
+            _table = new DynamoTable(
                 config.ReadDynamoDBTableName("GameTable"),
                 new AmazonDynamoDBClient()
             );
@@ -210,13 +210,13 @@ namespace Challenge.LambdaRobots.Server.ServerFunction {
             if(found != null) {
                 var distance = GameLogic.Distance(robot.X, robot.Y, found.X, found.Y);
                 var angle = GameLogic.NormalizeAngle(Math.Atan2(found.X - robot.X, found.Y - robot.Y) * 180.0 / Math.PI);
-                LogInfo($"Scanning: Heading = {request.Heading:N2}, Resolution = {request.Resolution:N2}, Found = R{found.Index}, Distance = {distance:N2}, Angle = {angle:N2}");
+                LogInfo($"Scanning: Heading = {GameLogic.NormalizeAngle(request.Heading):N2}, Resolution = {request.Resolution:N2}, Found = R{found.Index}, Distance = {distance:N2}, Angle = {angle:N2}");
                 return new ScanEnemiesResponse {
                     Found = true,
                     Distance = distance
                 };
             } else {
-               LogInfo($"Scanning: Heading = {request.Heading:N2}, Resolution = {request.Resolution:N2}, Found = nothing");
+               LogInfo($"Scanning: Heading = {GameLogic.NormalizeAngle(request.Heading):N2}, Resolution = {request.Resolution:N2}, Found = nothing");
                 return new ScanEnemiesResponse {
                     Found = false,
                     Distance = 0.0

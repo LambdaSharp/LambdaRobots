@@ -3,24 +3,40 @@ Description: Robot that runs around randomly firing missiles in all directions
 Version: 1.0-DEV
 Items:
 
-  - Parameter: AwsAccountId
-    Section: Robot Settings
-    Label: Optional AWS account ID to allow robot lambda bo be invoked from another account (leave empty to disable cross-account invocations)
-
   - Function: RobotFunction
     Memory: 256
     Timeout: 30
 
   - Resource: RobotInvocationPermission
-    If: !Not [ !Equals [ !Ref AwsAccountId, "" ]]
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
       FunctionName: !Ref RobotFunction
-      Principal: !Ref AwsAccountId
+      Principal: "*"
 
   - Variable: RobotArn
     Description: Lambda function ARN
     Scope: public
     Value: !GetAtt RobotFunction.Arn
 
+  - Resource: RobotStateTable
+    Description: Table for holding the state of the robot
+    Scope: all
+    Type: AWS::DynamoDB::Table
+    Allow: ReadWrite
+    Scope: all
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: PK
+          AttributeType: S
+        - AttributeName: SK
+          AttributeType: S
+      KeySchema:
+        - AttributeName: PK
+          KeyType: HASH
+        - AttributeName: SK
+          KeyType: RANGE
+      TimeToLiveSpecification:
+        AttributeName: Expire
+        Enabled: true

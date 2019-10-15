@@ -30,55 +30,36 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using Newtonsoft.Json;
 
-namespace Challenge.LambdaRobots.Server {
+namespace Challenge.LambdaRobots {
 
-    public class GameRecord : IGameTableSingletonRecord {
+    public interface IDynamoTableRecord { }
 
-        //--- Properties ---
-        public string PK { get; set; }
-        public string SK => "GAME";
-        public Game Game { get; set; }
-        public List<string> LambdaRobotArns { get; set; }
-        public string GameLoopArn { get; set; }
-        public string ConnectionId { get; set; }
-    }
-
-    public class GameStateMachineRecord : IGameTableSingletonRecord {
-
-        //--- Properties ---
-        public string PK { get; set; }
-        public string SK => "STATE-MACHINE";
-        public string StateMachineArn { get; set; }
-    }
-
-    public interface IGameTableRecord { }
-
-    public interface IGameTableSingletonRecord : IGameTableRecord {
+    public interface IDynamoTableSingletonRecord : IDynamoTableRecord {
 
         //--- Properties ---
         string SK { get; }
     }
 
-    public interface IGameTableMultiRecord : IGameTableRecord {
+    public interface IGameTableMultiRecord : IDynamoTableRecord {
 
         //--- Properties ---
         string SKPrefix { get; }
     }
 
-    public class GameTable {
+    public class DynamoTable {
 
         //--- Fields ---
         private readonly IAmazonDynamoDB _dynamoDbClient;
         private readonly Table _table;
 
         //--- Constructors ---
-        public GameTable(string tableName, IAmazonDynamoDB dynamoDbClient) {
+        public DynamoTable(string tableName, IAmazonDynamoDB dynamoDbClient) {
             _dynamoDbClient = dynamoDbClient ?? throw new ArgumentNullException(nameof(dynamoDbClient));
             _table = Table.LoadTable(_dynamoDbClient, tableName ?? throw new ArgumentNullException(nameof(tableName)));
         }
 
         //--- Methods ---
-        public async Task CreateAsync<T>(T record) where T : IGameTableRecord {
+        public async Task CreateAsync<T>(T record) where T : IDynamoTableRecord {
             await _table.PutItemAsync(Document.FromJson(JsonConvert.SerializeObject(record)), new PutItemOperationConfig {
                 ConditionalExpression = new Expression {
                     ExpressionStatement = "attribute_not_exists(PK)"
@@ -86,7 +67,7 @@ namespace Challenge.LambdaRobots.Server {
             });
         }
 
-        public async Task UpdateAsync<T>(T record) where T : IGameTableRecord {
+        public async Task UpdateAsync<T>(T record) where T : IDynamoTableRecord {
             await _table.PutItemAsync(Document.FromJson(JsonConvert.SerializeObject(record)), new PutItemOperationConfig {
                 ConditionalExpression = new Expression {
                     ExpressionStatement = "attribute_exists(PK)"
@@ -94,7 +75,7 @@ namespace Challenge.LambdaRobots.Server {
             });
         }
 
-        public async Task UpdateAsync<T>(T record, IEnumerable<string> columnsToUpdate) where T : IGameTableRecord {
+        public async Task UpdateAsync<T>(T record, IEnumerable<string> columnsToUpdate) where T : IDynamoTableRecord {
             var document = Document.FromJson(JsonConvert.SerializeObject(record));
             if(columnsToUpdate.Any()) {
                 foreach(var key in document.Keys.Where(key => (key != "PK") && (key != "SK") && !columnsToUpdate.Contains(key)).ToList()) {
@@ -106,10 +87,10 @@ namespace Challenge.LambdaRobots.Server {
 
         public Task CreateOrUpdateAsync<T>(T record) => _table.PutItemAsync(Document.FromJson(JsonConvert.SerializeObject(record)));
 
-        public Task<T> GetAsync<T>(string pk) where T : IGameTableSingletonRecord, new()
+        public Task<T> GetAsync<T>(string pk) where T : IDynamoTableSingletonRecord, new()
             => GetAsync<T>(pk, new T().SK);
 
-        public async Task<T> GetAsync<T>(string pk, string sk) where T : IGameTableRecord {
+        public async Task<T> GetAsync<T>(string pk, string sk) where T : IDynamoTableRecord {
             var record = await _table.GetItemAsync(new Dictionary<string, DynamoDBEntry> {
                 ["PK"] = pk,
                 ["SK"] = sk
@@ -119,7 +100,7 @@ namespace Challenge.LambdaRobots.Server {
                 : default;
         }
 
-        public Task DeleteAsync<T>(string pk) where T : IGameTableSingletonRecord, new()
+        public Task DeleteAsync<T>(string pk) where T : IDynamoTableSingletonRecord, new()
             => DeleteAsync(pk, new T().SK);
 
         public Task DeleteAsync(string pk, string sk)

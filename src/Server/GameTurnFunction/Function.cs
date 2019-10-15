@@ -58,14 +58,14 @@ namespace Challenge.LambdaRobots.Server.GameTurnFunction {
         private static Random _random = new Random();
 
         //--- Fields ---
-        private GameTable _table;
+        private DynamoTable _table;
         private GameTurnLogic _logic;
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
 
             // initialize Lambda function
-            _table = new GameTable(
+            _table = new DynamoTable(
                 config.ReadDynamoDBTableName("GameTable"),
                 new AmazonDynamoDBClient()
             );

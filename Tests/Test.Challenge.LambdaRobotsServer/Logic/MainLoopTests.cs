@@ -69,9 +69,9 @@ namespace Test.Challenge.LambdaRobots.Server {
             logic.NextTurnAsync().Wait();
 
             // assert
-            robot.X.Should().Be(500);
-            robot.Y.Should().Be(510);
-            robot.Speed.Should().Be(10);
+            robot.X.Should().Be(500.0);
+            robot.Y.Should().Be(505.0);
+            robot.Speed.Should().Be(10.0);
         }
 
         [Fact]
@@ -92,9 +92,9 @@ namespace Test.Challenge.LambdaRobots.Server {
             logic.NextTurnAsync().Wait();
 
             // assert
-            robot.X.Should().Be(500);
-            robot.Y.Should().Be(530);
-            robot.Speed.Should().Be(20);
+            robot.X.Should().Be(500.0);
+            robot.Y.Should().Be(520.0);
+            robot.Speed.Should().Be(20.0);
         }
 
         [Fact]
@@ -114,9 +114,9 @@ namespace Test.Challenge.LambdaRobots.Server {
             logic.NextTurnAsync().Wait();
 
             // assert
-            robot.X.Should().Be(510);
-            robot.Y.Should().Be(500);
-            robot.Speed.Should().Be(10);
+            robot.X.Should().Be(505.0);
+            robot.Y.Should().Be(500.0);
+            robot.Speed.Should().Be(10.0);
         }
         #endregion
 
@@ -141,7 +141,7 @@ namespace Test.Challenge.LambdaRobots.Server {
             robot.Speed.Should().Be(0.0);
             robot.Damage.Should().Be(robot.CollisionDamage);
             Game.Messages.Count.Should().Be(2);
-            Game.Messages[0].Text.Should().Be("Bob was damaged 2 by wall collision");
+            Game.Messages[0].Text.Should().Be("Bob (R0) received 2 damage by wall collision");
             Game.Messages[1].Text.Should().Be("Bob is victorious! Game Over.");
         }
 
@@ -160,8 +160,8 @@ namespace Test.Challenge.LambdaRobots.Server {
             bob.Damage.Should().Be(bob.CollisionDamage);
             dave.Damage.Should().Be(dave.CollisionDamage);
             Game.Messages.Count.Should().Be(2);
-            Game.Messages[0].Text.Should().Be("Bob was damaged 2 by collision with Dave");
-            Game.Messages[1].Text.Should().Be("Dave was damaged 2 by collision with Bob");
+            Game.Messages[0].Text.Should().Be("Bob (R0) was damaged 2 by collision with Dave (R1)");
+            Game.Messages[1].Text.Should().Be("Dave (R1) was damaged 2 by collision with Bob (R0)");
         }
         #endregion
 
@@ -175,11 +175,11 @@ namespace Test.Challenge.LambdaRobots.Server {
             var logic = NewLogic(bob, dave);
 
             // act
-            var distance = logic.ScanRobots(bob, 45.0, 10.0);
+            var robot = logic.ScanRobots(bob, 45.0, 10.0);
 
             // assert
-            distance.Should().NotBe(null);
-            distance.Should().BeInRange(140.0, 142.0);
+            robot.Should().NotBe(null);
+            robot.Name.Should().Be(dave.Name);
         }
 
         [Fact]
@@ -191,10 +191,10 @@ namespace Test.Challenge.LambdaRobots.Server {
             var logic = NewLogic(bob, dave);
 
             // act
-            var distance = logic.ScanRobots(bob, 45.0, 10.0);
+            var robot = logic.ScanRobots(bob, 45.0, 10.0);
 
             // assert
-            distance.Should().Be(null);
+            robot.Should().Be(null);
         }
 
         [Fact]
@@ -206,10 +206,10 @@ namespace Test.Challenge.LambdaRobots.Server {
             var logic = NewLogic(bob, dave);
 
             // act
-            var distance = logic.ScanRobots(bob, 45.0, 10.0);
+            var robot = logic.ScanRobots(bob, 45.0, 10.0);
 
             // assert
-            distance.Should().Be(null);
+            robot.Should().Be(null);
         }
         #endregion
 
@@ -288,6 +288,9 @@ namespace Test.Challenge.LambdaRobots.Server {
         private GameLogic NewLogic(params Robot[] robots) {
             var game = NewGame();
             game.Robots.AddRange(robots);
+            for(var i = 0; i < game.Robots.Count; ++i) {
+                game.Robots[i].Index = i;
+            }
             _provider = new GameDependencyProvider(
                 game,
                 new Random(100),
