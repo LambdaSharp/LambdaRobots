@@ -1,5 +1,5 @@
-Module: LambdaRobots.YosemiteSamRobot
-Description: Robot that runs around randomly firing missiles in all directions
+Module: LambdaRobots.HotShotRobot
+Description: Robot focused on taking its targets down as quickly as possible
 Version: 1.0-DEV
 Items:
 
@@ -40,3 +40,5 @@ Items:
       TimeToLiveSpecification:
         AttributeName: Expire
         Enabled: true
+
+

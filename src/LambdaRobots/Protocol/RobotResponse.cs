@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-namespace Challenge.LambdaRobots.Protocol {
+namespace LambdaRobots.Protocol {
 
     public class LambdaRobotResponse {
 

@@ -8,7 +8,7 @@ In λ-Robots (pronounced _Lambda Robots_), you program a battle robot that parti
 
 **Option 1. Direct-Deploy**
 ```bash
-lash deploy Challenge.LambdaRobots.Server@lambdasharp
+lash deploy LambdaRobots.Server@lambdasharp
 ```
 
 **Option 2. Compile and Deploy**

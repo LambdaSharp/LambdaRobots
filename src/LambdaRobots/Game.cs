@@ -22,7 +22,8 @@
  * SOFTWARE.
  */
 
-namespace Challenge.LambdaRobots {
+namespace LambdaRobots {
+
     public class GameInfo {
 
         //--- Properties ---

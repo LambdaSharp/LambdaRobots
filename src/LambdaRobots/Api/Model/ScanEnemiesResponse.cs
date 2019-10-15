@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-namespace Challenge.LambdaRobots.Api.Model {
+namespace LambdaRobots.Api.Model {
 
     public class ScanEnemiesResponse {
 

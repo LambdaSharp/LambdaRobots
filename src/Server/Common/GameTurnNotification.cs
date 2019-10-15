@@ -24,7 +24,7 @@
 
 using Amazon.Lambda.Core;
 
-namespace Challenge.LambdaRobots.Server {
+namespace LambdaRobots.Server {
 
     public class GameTurnNotification {
 

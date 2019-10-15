@@ -26,12 +26,12 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
-using Challenge.LambdaRobots.Api;
-using Challenge.LambdaRobots.Protocol;
+using LambdaRobots.Api;
+using LambdaRobots.Protocol;
 using LambdaSharp;
 using Newtonsoft.Json;
 
-namespace Challenge.LambdaRobots {
+namespace LambdaRobots {
 
     public abstract class ALambdaRobotFunction<TState> : ALambdaFunction<LambdaRobotRequest, LambdaRobotResponse> where TState : class, new() {
 
@@ -61,12 +61,12 @@ namespace Challenge.LambdaRobots {
         /// <summary>
         /// Robot data structure describing the state and characteristics of the robot.
         /// </summary>
-        public Challenge.LambdaRobots.Robot Robot { get; set; }
+        public LambdaRobots.Robot Robot { get; set; }
 
         /// <summary>
         /// Game data structure describing the state and characteristics of the game;
         /// </summary>
-        public Challenge.LambdaRobots.GameInfo Game { get; set; }
+        public LambdaRobots.GameInfo Game { get; set; }
 
         /// <summary>
         /// Horizontal position of robot. Value is between `0` and `Game.BoardWidth`.

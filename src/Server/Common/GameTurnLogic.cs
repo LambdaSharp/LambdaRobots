@@ -27,7 +27,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.Lambda;
 using Amazon.Lambda.Model;
-using Challenge.LambdaRobots.Protocol;
+using LambdaRobots.Protocol;
 using Newtonsoft.Json;
 using LambdaSharp.Logger;
 using System.Collections.Generic;
@@ -37,7 +37,7 @@ using Amazon.Runtime;
 using System.Linq;
 using Amazon.ApiGatewayManagementApi;
 
-namespace Challenge.LambdaRobots.Server {
+namespace LambdaRobots.Server {
 
     public class GameTurnLogic {
 

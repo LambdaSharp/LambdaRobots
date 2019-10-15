@@ -26,9 +26,9 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Challenge.LambdaRobots.Protocol;
+using LambdaRobots.Protocol;
 
-namespace Challenge.LambdaRobots.Server {
+namespace LambdaRobots.Server {
 
     public interface IGameDependencyProvider {
 

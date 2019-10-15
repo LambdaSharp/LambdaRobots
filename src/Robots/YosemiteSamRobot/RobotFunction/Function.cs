@@ -24,12 +24,12 @@
 
 using System.Threading.Tasks;
 using Amazon.Lambda.Core;
-using Challenge.LambdaRobots.Protocol;
+using LambdaRobots.Protocol;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
-namespace Challenge.LambdaRobots.YosemiteSamRobot.RobotFunction {
+namespace LambdaRobots.YosemiteSamRobot.RobotFunction {
 
     public class LambdaRobotState {
 

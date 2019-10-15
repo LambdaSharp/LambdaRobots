@@ -26,7 +26,7 @@ using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Challenge.LambdaRobots {
+namespace LambdaRobots {
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum RobotState {

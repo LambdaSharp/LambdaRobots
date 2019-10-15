@@ -4,7 +4,7 @@
     <Deterministic>true</Deterministic>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <RootNamespace>Challenge.LambdaRobots.Robot.RobotFunction</RootNamespace>
+    <RootNamespace>LambdaRobots.HotShotRobot.RobotFunction</RootNamespace>
     <AWSProjectType>Lambda</AWSProjectType>
     <NoWarn>CS1998</NoWarn>
   </PropertyGroup>
@@ -13,7 +13,7 @@
     <PackageReference Include="Amazon.Lambda.Serialization.Json" Version="1.5.0"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../LambdaRobots/LambdaRobots.csproj" />
+    <ProjectReference Include="../../../LambdaRobots/LambdaRobots.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp" Version="0.7.0.*"/>

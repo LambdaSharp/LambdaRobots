@@ -25,7 +25,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Challenge.LambdaRobots.Protocol {
+namespace LambdaRobots.Protocol {
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum LambdaRobotCommand {

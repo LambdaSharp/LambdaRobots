@@ -25,7 +25,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json;
 
-namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
+namespace LambdaRobots.Server.ServerFunction.Model {
 
     public enum GameLoopType {
         StepFunction,

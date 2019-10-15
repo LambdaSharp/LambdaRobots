@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-namespace Challenge.LambdaRobots.Server {
+namespace LambdaRobots.Server {
 
     public class GameStateMachineRecord : IDynamoTableSingletonRecord {
 

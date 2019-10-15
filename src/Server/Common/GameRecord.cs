@@ -24,7 +24,7 @@
 
 using System.Collections.Generic;
 
-namespace Challenge.LambdaRobots.Server {
+namespace LambdaRobots.Server {
 
     public class GameRecord : IDynamoTableSingletonRecord {
 

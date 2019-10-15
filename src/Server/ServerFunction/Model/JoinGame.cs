@@ -22,10 +22,10 @@
  * SOFTWARE.
  */
 
-using Challenge.LambdaRobots.Server;
+using LambdaRobots.Server;
 using Newtonsoft.Json;
 
-namespace Challenge.LambdaRobots.Server.ServerFunction.Model {
+namespace LambdaRobots.Server.ServerFunction.Model {
 
     public class JoinGameRequest {
 

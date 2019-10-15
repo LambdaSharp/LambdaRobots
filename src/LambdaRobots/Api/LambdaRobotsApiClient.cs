@@ -26,10 +26,10 @@ using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Challenge.LambdaRobots.Api.Model;
+using LambdaRobots.Api.Model;
 using Newtonsoft.Json;
 
-namespace Challenge.LambdaRobots.Api {
+namespace LambdaRobots.Api {
 
     public class LambdaRobotsApiClient {
 

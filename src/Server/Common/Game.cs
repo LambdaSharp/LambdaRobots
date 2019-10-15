@@ -27,7 +27,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace Challenge.LambdaRobots.Server {
+namespace LambdaRobots.Server {
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum GameState {

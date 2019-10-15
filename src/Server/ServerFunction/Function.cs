@@ -32,16 +32,16 @@ using Amazon.Lambda.Core;
 using Amazon.Lambda.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
-using Challenge.LambdaRobots.Api.Model;
-using Challenge.LambdaRobots.Server;
-using Challenge.LambdaRobots.Server.ServerFunction.Model;
+using LambdaRobots.Api.Model;
+using LambdaRobots.Server;
+using LambdaRobots.Server.ServerFunction.Model;
 using LambdaSharp;
 using LambdaSharp.ApiGateway;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
 
-namespace Challenge.LambdaRobots.Server.ServerFunction {
+namespace LambdaRobots.Server.ServerFunction {
 
     public class Function : ALambdaApiGatewayFunction {
 

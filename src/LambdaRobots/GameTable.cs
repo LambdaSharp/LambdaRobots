@@ -30,7 +30,7 @@ using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
 using Newtonsoft.Json;
 
-namespace Challenge.LambdaRobots {
+namespace LambdaRobots {
 
     public interface IDynamoTableRecord { }
 

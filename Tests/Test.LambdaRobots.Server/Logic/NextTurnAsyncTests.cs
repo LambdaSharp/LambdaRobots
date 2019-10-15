@@ -1,4 +1,4 @@
-/*
+﻿/*
  * MIT License
  *
  * Copyright (c) 2019 LambdaSharp
@@ -24,30 +24,22 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using Challenge.LambdaRobots;
-using Challenge.LambdaRobots.Protocol;
-using Challenge.LambdaRobots.Server;
+using LambdaRobots;
+using LambdaRobots.Protocol;
+using LambdaRobots.Server;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Test.Challenge.LambdaRobots.Server {
+namespace Test.LambdaRobots.Server {
 
-    public class MainLoopTests {
+    public class NextTurnAsyncTests : _Init {
 
         //--- Fields ---
         private readonly ITestOutputHelper _output;
-        private IGameDependencyProvider _provider;
-        private Dictionary<string, List<Func<LambdaRobotAction>>> _robotActions = new Dictionary<string, List<Func<LambdaRobotAction>>>();
 
         //--- Constructors ---
-        public MainLoopTests(ITestOutputHelper output) {
-            _output = output;
-        }
-
-        //--- Properties ---
-        private Game Game => _provider.Game;
+        public NextTurnAsyncTests(ITestOutputHelper output) => _output = output;
 
         //--- Methods ---
 
@@ -165,53 +157,6 @@ namespace Test.Challenge.LambdaRobots.Server {
         }
         #endregion
 
-        #region *** Scan Tests ***
-        [Fact]
-        public void ScanRobotInRange() {
-
-            // arrange
-            var bob = NewRobot("Bob", 500.0, 500.0);
-            var dave = NewRobot("Dave", 600.0, 600.0);
-            var logic = NewLogic(bob, dave);
-
-            // act
-            var robot = logic.ScanRobots(bob, 45.0, 10.0);
-
-            // assert
-            robot.Should().NotBe(null);
-            robot.Name.Should().Be(dave.Name);
-        }
-
-        [Fact]
-        public void ScanRobotOutOfRange() {
-
-            // arrange
-            var bob = NewRobot("Bob", 100.0, 100.0);
-            var dave = NewRobot("Dave", 800.0, 800.0);
-            var logic = NewLogic(bob, dave);
-
-            // act
-            var robot = logic.ScanRobots(bob, 45.0, 10.0);
-
-            // assert
-            robot.Should().Be(null);
-        }
-
-        [Fact]
-        public void ScanRobotOutOfResolution() {
-
-            // arrange
-            var bob = NewRobot("Bob", 500.0, 500.0);
-            var dave = NewRobot("Dave", 600.0, 500.0);
-            var logic = NewLogic(bob, dave);
-
-            // act
-            var robot = logic.ScanRobots(bob, 45.0, 10.0);
-
-            // assert
-            robot.Should().Be(null);
-        }
-        #endregion
 
         #region *** Disqualification Tests ***
         [Fact]
@@ -231,84 +176,5 @@ namespace Test.Challenge.LambdaRobots.Server {
             robot.State.Should().Be(RobotState.Dead);
         }
         #endregion
-
-        private Game NewGame() => new Game {
-            Id = "Test",
-            BoardWidth = 1000.0,
-            BoardHeight = 1000.0,
-            SecondsPerTurn = 1.0,
-            DirectHitRange = 5.0,
-            NearHitRange = 20.0,
-            FarHitRange = 40.0,
-            CollisionRange = 5.0,
-            MinRobotStartDistance = 100.0,
-            RobotTimeoutSeconds = 10.0,
-            TotalTurns = 0,
-            MaxTurns = 300,
-            MaxBuildPoints = 8
-        };
-
-        private Robot NewRobot(string id, double x, double y) => new Robot {
-
-            // robot state
-            Id = id,
-            Name = id,
-            State = RobotState.Alive,
-            X = x,
-            Y = y,
-            Speed = 0.0,
-            Heading = 0.0,
-            TotalTravelDistance = 0.0,
-            Damage = 0.0,
-            ReloadCoolDown = 0.0,
-            TotalMissileFiredCount = 0,
-
-            // robot characteristics
-            MaxSpeed = 100.0,
-            Acceleration = 10.0,
-            Deceleration = 20.0,
-            MaxTurnSpeed = 50.0,
-            RadarRange = 600.0,
-            RadarMaxResolution = 10.0,
-            MaxDamage = 100.0,
-            CollisionDamage = 2.0,
-            DirectHitDamage = 8.0,
-            NearHitDamage = 4.0,
-            FarHitDamage = 2.0,
-
-            // missile characteristics
-            MissileReloadCooldown = 5.0,
-            MissileVelocity = 50.0,
-            MissileRange = 700.0,
-            MissileDirectHitDamageBonus = 3.0,
-            MissileNearHitDamageBonus = 2.1,
-            MissileFarHitDamageBonus = 1.0
-        };
-
-        private GameLogic NewLogic(params Robot[] robots) {
-            var game = NewGame();
-            game.Robots.AddRange(robots);
-            for(var i = 0; i < game.Robots.Count; ++i) {
-                game.Robots[i].Index = i;
-            }
-            _provider = new GameDependencyProvider(
-                game,
-                new Random(100),
-                async robot => new LambdaRobotBuild {
-                    Name = robot.Id
-                },
-                async robot => {
-
-                    // destructively fetch next action from dictionary or null if none exist
-                    if(_robotActions.TryGetValue(robot.Id, out var actions) && (actions?.Any() ?? false)) {
-                        var action = actions.First();
-                        actions.RemoveAt(0);
-                        return action();
-                    }
-                    return new LambdaRobotAction();
-                }
-            );
-            return new GameLogic(_provider);
-        }
     }
 }
