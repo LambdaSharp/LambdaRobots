@@ -33,7 +33,6 @@ using Amazon.Lambda.Model;
 using Amazon.StepFunctions;
 using Amazon.StepFunctions.Model;
 using LambdaRobots.Api.Model;
-using LambdaRobots.Server;
 using LambdaRobots.Server.ServerFunction.Model;
 using LambdaSharp;
 using LambdaSharp.ApiGateway;
@@ -53,7 +52,7 @@ namespace LambdaRobots.Server.ServerFunction {
         private string _gameStateMachine;
         private IAmazonStepFunctions _stepFunctionsClient;
         private IAmazonLambda _lambdaClient;
-        private string _gameTurnAsyncFunctionArn;
+        private string _gameTurnFunctionArn;
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
@@ -64,7 +63,7 @@ namespace LambdaRobots.Server.ServerFunction {
             _gameStateMachine = config.ReadText("GameLoopStateMachine");
             _stepFunctionsClient = new AmazonStepFunctionsClient();
             _lambdaClient = new AmazonLambdaClient();
-            _gameTurnAsyncFunctionArn = config.ReadText("GameTurnAsyncFunction");
+            _gameTurnFunctionArn = config.ReadText("GameTurnFunction");
         }
 
         public async Task OpenConnectionAsync(APIGatewayProxyRequest request, string username = null) {
@@ -105,12 +104,17 @@ namespace LambdaRobots.Server.ServerFunction {
             await _table.CreateAsync(gameRecord);
 
             // dispatch game loop
+            var gameTurnRequest = new {
+                GameId = game.Id,
+                State = game.State,
+                GameLoopType = request.GameLoopType
+            };
             switch(request.GameLoopType) {
             case GameLoopType.Recursive:
-                LogInfo($"Kicking off Game Turn lambda: Name = {_gameTurnAsyncFunctionArn}");
+                LogInfo($"Kicking off Game Turn lambda: Name = {_gameTurnFunctionArn}");
                 await _lambdaClient.InvokeAsync(new InvokeRequest {
-                    Payload = SerializeJson(gameRecord),
-                    FunctionName = _gameTurnAsyncFunctionArn,
+                    Payload = SerializeJson(gameTurnRequest),
+                    FunctionName = _gameTurnFunctionArn,
                     InvocationType = InvocationType.Event
                 });
                 break;
@@ -122,10 +126,7 @@ namespace LambdaRobots.Server.ServerFunction {
                 var startGame = await _stepFunctionsClient.StartExecutionAsync(new StartExecutionRequest {
                     StateMachineArn = _gameStateMachine,
                     Name = startGameId,
-                    Input = SerializeJson(new {
-                        GameId = game.Id,
-                        State = game.State
-                    })
+                    Input = SerializeJson(gameTurnRequest)
                 });
 
                 // update execution ARN for game record
@@ -161,10 +162,14 @@ namespace LambdaRobots.Server.ServerFunction {
             // check if game state machine needs to be stopped
             if(gameRecord.GameLoopArn != null) {
                 LogInfo($"Stopping Step Function: Name = {gameRecord.GameLoopArn}");
-                await _stepFunctionsClient.StopExecutionAsync(new StopExecutionRequest {
-                    ExecutionArn = gameRecord.GameLoopArn,
-                    Cause = "user requested game to be stopped"
-                });
+                try {
+                    await _stepFunctionsClient.StopExecutionAsync(new StopExecutionRequest {
+                        ExecutionArn = gameRecord.GameLoopArn,
+                        Cause = "user requested game to be stopped"
+                    });
+                } catch(Exception e) {
+                    LogErrorAsInfo(e, "unable to stop state-machine");
+                }
             }
 
             // delete game record

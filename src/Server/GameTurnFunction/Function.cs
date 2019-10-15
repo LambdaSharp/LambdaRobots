@@ -31,6 +31,7 @@ using Amazon.Lambda;
 using Amazon.Lambda.Core;
 using LambdaSharp;
 using System.Collections.Generic;
+using Amazon.Lambda.Model;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -42,6 +43,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
         //--- Properties ---
         public string GameId { get; set; }
         public GameState State { get; set; }
+        public GameLoopType GameLoopType { get; set; } = GameLoopType.StepFunction;
     }
 
     public class FunctionResponse {
@@ -49,7 +51,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
         //--- Properties ---
         public string GameId { get; set; }
         public GameState State { get; set; }
-        public List<string> Messages { get; set; }
+        public GameLoopType GameLoopType { get; set; } = GameLoopType.StepFunction;
     }
 
     public class Function : ALambdaFunction<FunctionRequest, FunctionResponse> {
@@ -58,6 +60,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
         private static Random _random = new Random();
 
         //--- Fields ---
+        private IAmazonLambda _lambdaClient;
         private DynamoTable _table;
         private GameTurnLogic _logic;
 
@@ -65,6 +68,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
         public override async Task InitializeAsync(LambdaConfig config) {
 
             // initialize Lambda function
+            _lambdaClient = new AmazonLambdaClient();
             _table = new DynamoTable(
                 config.ReadDynamoDBTableName("GameTable"),
                 new AmazonDynamoDBClient()
@@ -86,12 +90,17 @@ namespace LambdaRobots.Server.GameTurnFunction {
             LogInfo($"Loading game state: ID = {request.GameId}");
             var gameRecord = await _table.GetAsync<GameRecord>(request.GameId);
             if(gameRecord == null) {
-                throw new ApplicationException($"game ID = {request.GameId} not found");
+
+                // game must have been stopped
+                return new FunctionResponse {
+                    GameId = request.GameId,
+                    State = GameState.Finished,
+                    GameLoopType = request.GameLoopType
+                };
             }
-            var game = gameRecord.Game;
-            var messageCount = game.Messages.Count;
 
             // compute next turn
+            var game = gameRecord.Game;
             await _logic.ComputeNextTurnAsync(gameRecord);
 
             // check if we need to update or delete the game from the game table
@@ -105,10 +114,19 @@ namespace LambdaRobots.Server.GameTurnFunction {
                 LogInfo($"Deleting game: ID = {game.Id}");
                 await _table.DeleteAsync<GameRecord>(game.Id);
             }
+
+            // check if we need to invoke the next game turn
+            if((request.GameLoopType == GameLoopType.Recursive) && (game.State == GameState.NextTurn)) {
+                await _lambdaClient.InvokeAsync(new InvokeRequest {
+                    Payload = SerializeJson(request),
+                    FunctionName = CurrentContext.FunctionName,
+                    InvocationType = InvocationType.Event
+                });
+            }
             return new FunctionResponse {
                 GameId = game.Id,
                 State = game.State,
-                Messages = game.Messages.Skip(messageCount).Select(message => message.Text).ToList()
+                GameLoopType = request.GameLoopType
             };
         }
     }

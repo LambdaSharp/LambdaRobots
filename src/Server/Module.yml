@@ -44,13 +44,8 @@ Items:
         Invoke: ScanEnemies
 
   - Function: GameTurnFunction
-    Description: Function for computing the next game turn
-    Memory: 256
-    Timeout: 30
-
-  - Function: GameTurnAsyncFunction
     Scope: ServerFunction
-    Description: Function for computing the next game turn (async version)
+    Description: Function for computing the next game turn
     Memory: 256
     Timeout: 30
 
@@ -157,7 +152,7 @@ Items:
 
   - Variable: RestApiUrl
     Description: REST API URL
-    Scope: public, GameTurnFunction, GameTurnAsyncFunction
+    Scope: public, GameTurnFunction
     Value: !Ref Module::RestApi::Url
 
   - Variable: WebsiteUrl

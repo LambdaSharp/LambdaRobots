@@ -27,11 +27,6 @@ using Newtonsoft.Json;
 
 namespace LambdaRobots.Server.ServerFunction.Model {
 
-    public enum GameLoopType {
-        StepFunction,
-        Recursive
-    }
-
     public class StartGameRequest {
 
         //--- Properties ---

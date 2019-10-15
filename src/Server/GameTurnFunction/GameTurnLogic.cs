@@ -30,14 +30,13 @@ using Amazon.Lambda.Model;
 using LambdaRobots.Protocol;
 using Newtonsoft.Json;
 using LambdaSharp.Logger;
-using System.Collections.Generic;
 using Amazon.ApiGatewayManagementApi.Model;
 using System.IO;
 using Amazon.Runtime;
 using System.Linq;
 using Amazon.ApiGatewayManagementApi;
 
-namespace LambdaRobots.Server {
+namespace LambdaRobots.Server.GameTurnFunction {
 
     public class GameTurnLogic {
 
