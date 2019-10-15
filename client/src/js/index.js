@@ -156,26 +156,24 @@ function updateRobotStats(robots) {
           </summary>
           <table>
             <tr>
-              <td>Health:${robot.Damage}</td>
-              <td>Inflicted: ${robot.TotalDamageDealt}</td>
-              <td>Reload: ${robot.ReloadCoolDown}</td>
+              <td>Health: ${Math.round(100.0 - robot.Damage)}</td>
+              <td>Collisions: ${robot.TotalCollisions}</td>
+              <td>Inflicted: ${Math.round(robot.TotalDamageDealt)}</td>
             </tr>
             <tr>
-              <td>Fired: ${robot.TotalMissileFiredCount}</td>
+              <td>Shots: ${robot.TotalMissileFiredCount}</td>
               <td>Hits: ${robot.TotalMissileHitCount}</td>
               <td>Kills: ${robot.TotalKills}</td>
             </tr>
             <tr>
-              <td>X: ${Math.round(robot.X)}</td>
-              <td>Y: ${Math.round(robot.Y)}</td>
               <td>Speed: ${Math.round(robot.Speed)}</td>
+              <td>Heading: ${Math.round(robot.Heading)}</td>
+              <td>Odometer: ${Math.round(robot.TotalTravelDistance)}</td>
             </tr>
             <tr>
-              <td>Heading: ${Math.round(robot.Heading)}</td>
-              <td>Target Heading: ${Math.round(robot.TargetHeading)}</td>
-              <td>
-                Traveled: ${Math.round(robot.TotalTravelDistance)}
-              </td>
+              <td>X: ${Math.round(robot.X)}</td>
+              <td>Y: ${Math.round(robot.Y)}</td>
+              <td>Reload: ${robot.ReloadCoolDown}</td>
             </tr>
           </table>
         </details>
