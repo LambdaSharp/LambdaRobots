@@ -144,7 +144,7 @@ function updateRobotStats(robots) {
         x => x.Id === robot.Id
       );
       let robotTemplate = html`
-        <details class="${robot.State !== "Alive" ? "robot-dead" : ""}">
+        <details ?open="${robot.State === "Alive"}" class="${robot.State !== "Alive" ? "robot-dead" : ""}">
           <summary>
             <h4>
               ${currentPosition.Medal} ${robot.Name} (R${robot.Index})
@@ -156,25 +156,25 @@ function updateRobotStats(robots) {
           </summary>
           <table>
             <tr>
-              <td>Damage:${robot.Damage}</td>
-              <td>Total Damage Dealt: ${robot.TotalDamageDealt}</td>
-              <td>Reload Cool Down: ${robot.ReloadCoolDown}</td>
+              <td>Health:${robot.Damage}</td>
+              <td>Inflicted: ${robot.TotalDamageDealt}</td>
+              <td>Reload: ${robot.ReloadCoolDown}</td>
             </tr>
             <tr>
-              <td>Missile Fire #: ${robot.TotalMissileFiredCount}</td>
-              <td>Missile Hit #: ${robot.TotalMissileHitCount}</td>
-              <td>Total Kills: ${robot.TotalKills}</td>
+              <td>Fired: ${robot.TotalMissileFiredCount}</td>
+              <td>Hits: ${robot.TotalMissileHitCount}</td>
+              <td>Kills: ${robot.TotalKills}</td>
             </tr>
             <tr>
               <td>X: ${Math.round(robot.X)}</td>
               <td>Y: ${Math.round(robot.Y)}</td>
-              <td>Speed: ${robot.Speed}</td>
+              <td>Speed: ${Math.round(robot.Speed)}</td>
             </tr>
             <tr>
               <td>Heading: ${Math.round(robot.Heading)}</td>
               <td>Target Heading: ${Math.round(robot.TargetHeading)}</td>
               <td>
-                Total Travel Distance: ${Math.round(robot.TotalTravelDistance)}
+                Traveled: ${Math.round(robot.TotalTravelDistance)}
               </td>
             </tr>
           </table>
