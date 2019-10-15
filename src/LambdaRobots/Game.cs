@@ -69,7 +69,7 @@ namespace LambdaRobots {
         public double CollisionRange;
 
         /// <summary>
-        /// Current game turn. Starts at 1.
+        /// Current game turn. Starts at `1`.
         /// </summary>
         /// <value></value>
         public int GameTurn { get; set; }
@@ -86,7 +86,7 @@ namespace LambdaRobots {
         public int MaxBuildPoints { get; set; }
 
         /// <summary>
-        /// URL for Game API.
+        /// URL for game server API.
         /// </summary>
         /// <value></value>
         public string ApiUrl { get; set; }

@@ -220,7 +220,7 @@ namespace Test.LambdaRobots.Server {
             logic.NextTurnAsync().Wait();
 
             // assert
-            robot.State.Should().Be(RobotState.Dead);
+            robot.Status.Should().Be(LambdaRobotStatus.Dead);
         }
         #endregion
     }

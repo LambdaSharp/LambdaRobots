@@ -142,20 +142,10 @@ Items:
       Bucket: !Ref WebsiteBucket
       Key: config.json
       Contents:
-        wss: !Ref WebSocketUrl
+        wss: !Ref Module::WebSocket::Url
 
   # Output Variables
-  - Variable: WebSocketUrl
-    Description: WebSocket URL
-    Scope: public
-    Value: !Ref Module::WebSocket::Url
-
-  - Variable: RestApiUrl
-    Description: REST API URL
-    Scope: public, GameTurnFunction
-    Value: !Ref Module::RestApi::Url
-
-  - Variable: WebsiteUrl
-    Description: Website URL
+  - Variable: LambdaRobotsServerUrl
+    Description: URL for the Lambda-Robots web-server
     Scope: public
     Value: !GetAtt WebsiteBucket.WebsiteURL

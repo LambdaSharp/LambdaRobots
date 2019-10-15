@@ -57,12 +57,12 @@ namespace Test.LambdaRobots.Server {
             MaxBuildPoints = 8
         };
 
-        protected Robot NewRobot(string id, double x, double y) => new Robot {
+        protected LambdaRobot NewRobot(string id, double x, double y) => new LambdaRobot {
 
             // robot state
             Id = id,
             Name = id,
-            State = RobotState.Alive,
+            Status = LambdaRobotStatus.Alive,
             X = x,
             Y = y,
             Speed = 0.0,
@@ -94,7 +94,7 @@ namespace Test.LambdaRobots.Server {
             MissileFarHitDamageBonus = 1.0
         };
 
-        protected GameLogic NewLogic(params Robot[] robots) {
+        protected GameLogic NewLogic(params LambdaRobot[] robots) {
             var game = NewGame();
             game.Robots.AddRange(robots);
             for(var i = 0; i < game.Robots.Count; ++i) {

@@ -38,7 +38,7 @@ namespace LambdaRobots.Protocol {
 
         //--- Properties ---
         public LambdaRobotCommand Command { get; set; }
-        public Robot Robot { get; set; }
+        public LambdaRobot Robot { get; set; }
         public GameInfo Game { get; set; }
     }
 }

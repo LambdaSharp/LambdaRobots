@@ -84,17 +84,17 @@ namespace LambdaRobots.Server.GameTurnFunction {
                 case GameState.Start:
 
                     // start game
-                    _logger.LogInfo($"Start game: initializing {game.Robots.Count(robot => robot.State == RobotState.Alive)} robots (total: {game.Robots.Count})");
+                    _logger.LogInfo($"Start game: initializing {game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots (total: {game.Robots.Count})");
                     await logic.StartAsync(gameRecord.LambdaRobotArns.Count);
                     game.State = GameState.NextTurn;
-                    _logger.LogInfo($"Done: {game.Robots.Count(robot => robot.State == RobotState.Alive)} robots ready");
+                    _logger.LogInfo($"Done: {game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots ready");
                     break;
                 case GameState.NextTurn:
 
                     // next turn
-                    _logger.LogInfo($"Start turn {game.TotalTurns} (max: {game.MaxTurns}): invoking {game.Robots.Count(robot => robot.State == RobotState.Alive)} robots (total: {game.Robots.Count})");
+                    _logger.LogInfo($"Start turn {game.TotalTurns} (max: {game.MaxTurns}): invoking {game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots (total: {game.Robots.Count})");
                     await logic.NextTurnAsync();
-                    _logger.LogInfo($"End turn: {game.Robots.Count(robot => robot.State == RobotState.Alive)} robots alive");
+                    _logger.LogInfo($"End turn: {game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots alive");
                     break;
                 case GameState.Finished:
 
@@ -134,7 +134,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             return gameRecord;
         }
 
-        private async Task<LambdaRobotBuild> GetRobotBuildAsync(Game game, Robot robot, string lambdaArn) {
+        private async Task<LambdaRobotBuild> GetRobotBuildAsync(Game game, LambdaRobot robot, string lambdaArn) {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
                 var getNameTask = _lambdaClient.InvokeAsync(new InvokeRequest {
@@ -174,7 +174,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             }
         }
 
-        private async Task<LambdaRobotAction> GetRobotActionAsync(Game game, Robot robot, string lambdaArn) {
+        private async Task<LambdaRobotAction> GetRobotActionAsync(Game game, LambdaRobot robot, string lambdaArn) {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
                 var getActionTask = _lambdaClient.InvokeAsync(new InvokeRequest {

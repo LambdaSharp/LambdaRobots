@@ -156,7 +156,7 @@ function updateRobotStats(robots) {
           </summary>
           <table>
             <tr>
-              <td>Health: ${Math.round(100.0 - robot.Damage)}</td>
+              <td>Health: ${Math.round(robot.MaxDamage - robot.Damage)}</td>
               <td>Collisions: ${robot.TotalCollisions}</td>
               <td>Inflicted: ${Math.round(robot.TotalDamageDealt)}</td>
             </tr>

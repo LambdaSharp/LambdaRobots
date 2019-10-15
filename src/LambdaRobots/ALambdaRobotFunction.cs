@@ -23,20 +23,18 @@
  */
 
 using System;
-using System.IO;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using LambdaRobots.Api;
 using LambdaRobots.Protocol;
 using LambdaSharp;
-using Newtonsoft.Json;
 
 namespace LambdaRobots {
 
     public abstract class ALambdaRobotFunction<TState> : ALambdaFunction<LambdaRobotRequest, LambdaRobotResponse> where TState : class, new() {
 
         //--- Types ---
-        public class RobotStateRecord : IDynamoTableSingletonRecord {
+        public class LambdaRobotStateRecord : IDynamoTableSingletonRecord {
 
             //--- Properties ---
             public string PK { get; set; }
@@ -61,7 +59,7 @@ namespace LambdaRobots {
         /// <summary>
         /// Robot data structure describing the state and characteristics of the robot.
         /// </summary>
-        public LambdaRobots.Robot Robot { get; set; }
+        public LambdaRobots.LambdaRobot Robot { get; set; }
 
         /// <summary>
         /// Game data structure describing the state and characteristics of the game;
@@ -124,9 +122,9 @@ namespace LambdaRobots {
             LogInfo($"Request:\n{SerializeJson(request)}");
 
             // check if there is a state object to load
-            var robotStateRecord = await _table.GetAsync<RobotStateRecord>(request.Robot.Id);
+            var robotStateRecord = await _table.GetAsync<LambdaRobotStateRecord>(request.Robot.Id);
             if(robotStateRecord == null) {
-                robotStateRecord = new RobotStateRecord {
+                robotStateRecord = new LambdaRobotStateRecord {
                     PK = request.Robot.Id,
                     State = new TState(),
                     Expire = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds()
@@ -186,6 +184,7 @@ namespace LambdaRobots {
 
         /// <summary>
         /// Fire a missile in a given direction with impact at a given distance.
+        /// A missile can only be fired if `Robot.ReloadCoolDown` is `0`.
         /// </summary>
         /// <param name="heading">Heading in degrees where to fire the missile to</param>
         /// <param name="distance">Distance at which the missile impacts</param>
@@ -196,7 +195,8 @@ namespace LambdaRobots {
         }
 
         /// <summary>
-        /// Fire a missile in at the given coordinates.
+        /// Fire a missile in at the given position.
+        /// A missile can only be fired if `Robot.ReloadCoolDown` is `0`.
         /// </summary>
         /// <param name="x">Target horizontal coordinate</param>
         /// <param name="y">Target vertical coordinate</param>
@@ -227,9 +227,9 @@ namespace LambdaRobots {
         }
 
         /// <summary>
-        /// Scan the game board in a given heading and resolution. The resolution
-        /// specifies in the scan arc from `heading-resolution` to `heading+resolution`.
-        /// The max resolution is limited to `Robot.ScannerResolution`.
+        /// Scan the game board in a given heading and resolution.
+        /// The resolution specifies in the scan arc centered on `heading` with +/- `resolution` tolerance.
+        /// The max resolution is limited to `Robot.RadarMaxResolution`.
         /// </summary>
         /// <param name="heading">Scan heading in degrees</param>
         /// <param name="resolution">Scan +/- arc in degrees</param>
@@ -278,10 +278,11 @@ namespace LambdaRobots {
 
         /// <summary>
         /// Adjust speed and heading to move robot to specified coordinates.
+        /// Call this method on every turn to keep adjusting the speed and heading until the destination is reached.
         /// </summary>
         /// <param name="x">Target horizontal coordinate</param>
         /// <param name="y">Target vertical coordinate</param>
-        /// <returns>Return `true` if arrived at target location</returns>
+        /// <returns>Returns `true` if arrived at target location</returns>
         public bool MoveToXY(double x, double y) {
             var heading = AngleToXY(x, y);
             var distance = DistanceToXY(x, y);
