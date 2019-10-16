@@ -435,9 +435,9 @@ namespace LambdaRobots.Server {
                 AddMessage("All robots have perished. Game Over.");
                 Game.Status = GameStatus.Finished;
                 Game.Missiles.Clear();
-            } else if(robotCount == 1) {
+            } else if((robotCount == 1) && (Game.Robots.Count > 1)) {
 
-                // last robot standing
+                // last robot standing of many
                 AddMessage($"{Game.Robots.First(robot => robot.Status == LambdaRobotStatus.Alive).Name} is victorious! Game Over.");
                 Game.Status = GameStatus.Finished;
                 Game.Missiles.Clear();
