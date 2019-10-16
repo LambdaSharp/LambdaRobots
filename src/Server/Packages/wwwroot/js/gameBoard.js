@@ -52,7 +52,7 @@ export default class GameBoard {
       const robot = robots[index];
       if(robot.Status === "Alive") {
         this.context.fillText(
-          index,
+          robot.Index,
           Math.round(robot.X),
           Math.round(this.canvas.height - robot.Y)
         );

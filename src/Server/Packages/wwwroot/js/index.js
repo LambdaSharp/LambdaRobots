@@ -218,9 +218,15 @@ function assignRobotMedals(robots) {
   robots.forEach(robot => {
     robot.Score = robot.TotalKills * 1E6 + robot.TotalDamageDealt;
   });
-  const leadingRobots = robots.slice().sort((a, b) => b.Score - a.Score);
-  for (let index = 0; index < leadingRobots.length; index++) {
-    const robot = leadingRobots[index];
+  robots.sort((a, b) => {
+    const deltaScore = b.Score - a.Score;
+    if(deltaScore !== 0) {
+      return deltaScore;
+    }
+    return a.Index - b.Index;
+  });
+  for (let index = 0; index < robots.length; index++) {
+    const robot = robots[index];
     robot.Medal = giveMedal(index, robot.Score);
   }
 }
