@@ -28,7 +28,7 @@ using Newtonsoft.Json.Converters;
 namespace LambdaRobots.Protocol {
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum LambdaRobotRadar {
+    public enum LambdaRobotRadarType {
 
         /// <summary>
         /// 200 meters range, 45 degrees resolution (0 pts)
@@ -58,7 +58,7 @@ namespace LambdaRobots.Protocol {
 
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum LambdaRobotEngine {
+    public enum LambdaRobotEngineType {
 
         /// <summary>
         /// 60 m/s max. speed, 7 m/s^2 acceleration (0 pts)
@@ -87,7 +87,7 @@ namespace LambdaRobots.Protocol {
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum LambdaRobotArmor {
+    public enum LambdaRobotArmorType {
 
         /// <summary>
         /// 50 direct hit, 25 near hit, 12 far hit, 10 collision, +35 m/s max. speed, 30 m/s^2 deceleration (0 pts)
@@ -116,7 +116,7 @@ namespace LambdaRobots.Protocol {
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum LambdaRobotMissile {
+    public enum LambdaRobotMissileType {
 
         /// <summary>
         /// 350 meters range, 250 m/s velocity, 0 direct hit bonus, 0 near hit bonus, 0 far hit bonus, 0 sec. reload (0 pts)
@@ -158,24 +158,24 @@ namespace LambdaRobots.Protocol {
         /// Type of Radar. Affects radar scan range and resolution.
         /// </summary>
         /// <value></value>
-        public LambdaRobotRadar Radar { get; set; } = LambdaRobotRadar.MidRange;
+        public LambdaRobotRadarType Radar { get; set; } = LambdaRobotRadarType.MidRange;
 
         /// <summary>
         /// Type of Engine. Affects max. speed and acceleration.
         /// </summary>
         /// <value></value>
-        public LambdaRobotEngine Engine { get; set; } = LambdaRobotEngine.Standard;
+        public LambdaRobotEngineType Engine { get; set; } = LambdaRobotEngineType.Standard;
 
         /// <summary>
         /// Type of Armor. Affects hit damage, collision damage, max. speed, and deceleration.
         /// </summary>
         /// <value></value>
-        public LambdaRobotArmor Armor { get; set; } = LambdaRobotArmor.Medium;
+        public LambdaRobotArmorType Armor { get; set; } = LambdaRobotArmorType.Medium;
 
         /// <summary>
         /// Type of Missile. Affects weapon range, velocity, hit damage, and reload speed.
         /// </summary>
         /// <value></value>
-        public LambdaRobotMissile Missile { get; set; } = LambdaRobotMissile.Javelin;
+        public LambdaRobotMissileType Missile { get; set; } = LambdaRobotMissileType.Javelin;
     }
 }

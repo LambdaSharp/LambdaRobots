@@ -44,8 +44,8 @@ namespace LambdaRobots.YosemiteSamRobot.RobotFunction {
             // TODO: this method is always invoked at the beginning of a match
             return new LambdaRobotBuild {
                 Name = "Yosemite Sam",
-                Engine = LambdaRobotEngine.ExtraLarge,
-                Missile = LambdaRobotMissile.Dart
+                Engine = LambdaRobotEngineType.ExtraLarge,
+                Missile = LambdaRobotMissileType.Dart
             };
         }
 

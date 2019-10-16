@@ -45,10 +45,10 @@ namespace LambdaRobots.BringYourOwnRobot.RobotFunction {
                 // TODO: give your robot a name!
                 Name = "BringYourOwnRobot",
 
-                Armor = LambdaRobotArmor.Medium,
-                Engine = LambdaRobotEngine.Economy,
-                Missile = LambdaRobotMissile.Dart,
-                Radar = LambdaRobotRadar.UltraShortRange
+                Armor = LambdaRobotArmorType.Medium,
+                Engine = LambdaRobotEngineType.Economy,
+                Missile = LambdaRobotMissileType.Dart,
+                Radar = LambdaRobotRadarType.UltraShortRange
             };
         }
 

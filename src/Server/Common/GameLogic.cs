@@ -175,23 +175,23 @@ namespace LambdaRobots.Server {
                 buildPoints += (int)config.Radar;
                 buildDescription.Append($"{config.Radar} Radar");
                 switch(config.Radar) {
-                case LambdaRobotRadar.UltraShortRange:
+                case LambdaRobotRadarType.UltraShortRange:
                     robot.RadarRange = 200.0;
                     robot.RadarMaxResolution = 45.0;
                     break;
-                case LambdaRobotRadar.ShortRange:
+                case LambdaRobotRadarType.ShortRange:
                     robot.RadarRange = 400.0;
                     robot.RadarMaxResolution = 20.0;
                     break;
-                case LambdaRobotRadar.MidRange:
+                case LambdaRobotRadarType.MidRange:
                     robot.RadarRange = 600.0;
                     robot.RadarMaxResolution = 10.0;
                     break;
-                case LambdaRobotRadar.LongRange:
+                case LambdaRobotRadarType.LongRange:
                     robot.RadarRange = 800.0;
                     robot.RadarMaxResolution = 8.0;
                     break;
-                case LambdaRobotRadar.UltraLongRange:
+                case LambdaRobotRadarType.UltraLongRange:
                     robot.RadarRange = 1000.0;
                     robot.RadarMaxResolution = 5.0;
                     break;
@@ -204,23 +204,23 @@ namespace LambdaRobots.Server {
                 buildPoints += (int)config.Engine;
                 buildDescription.Append($", {config.Engine} Engine");
                 switch(config.Engine) {
-                case LambdaRobotEngine.Economy:
+                case LambdaRobotEngineType.Economy:
                     robot.MaxSpeed = 60.0;
                     robot.Acceleration = 7.0;
                     break;
-                case LambdaRobotEngine.Compact:
+                case LambdaRobotEngineType.Compact:
                     robot.MaxSpeed = 80.0;
                     robot.Acceleration = 8.0;
                     break;
-                case LambdaRobotEngine.Standard:
+                case LambdaRobotEngineType.Standard:
                     robot.MaxSpeed = 100.0;
                     robot.Acceleration = 10.0;
                     break;
-                case LambdaRobotEngine.Large:
+                case LambdaRobotEngineType.Large:
                     robot.MaxSpeed = 120.0;
                     robot.Acceleration = 12.0;
                     break;
-                case LambdaRobotEngine.ExtraLarge:
+                case LambdaRobotEngineType.ExtraLarge:
                     robot.MaxSpeed = 140.0;
                     robot.Acceleration = 13.0;
                     break;
@@ -233,7 +233,7 @@ namespace LambdaRobots.Server {
                 buildPoints += (int)config.Armor;
                 buildDescription.Append($", {config.Armor} Armor");
                 switch(config.Armor) {
-                case LambdaRobotArmor.UltraLight:
+                case LambdaRobotArmorType.UltraLight:
                     robot.DirectHitDamage = 50.0;
                     robot.NearHitDamage = 25.0;
                     robot.FarHitDamage = 12.0;
@@ -241,7 +241,7 @@ namespace LambdaRobots.Server {
                     robot.MaxSpeed += 35.0;
                     robot.Deceleration = 30.0;
                     break;
-                case LambdaRobotArmor.Light:
+                case LambdaRobotArmorType.Light:
                     robot.DirectHitDamage = 16.0;
                     robot.NearHitDamage = 8.0;
                     robot.FarHitDamage = 4.0;
@@ -249,7 +249,7 @@ namespace LambdaRobots.Server {
                     robot.MaxSpeed += 25.0;
                     robot.Deceleration = 25.0;
                     break;
-                case LambdaRobotArmor.Medium:
+                case LambdaRobotArmorType.Medium:
                     robot.DirectHitDamage = 8.0;
                     robot.NearHitDamage = 4.0;
                     robot.FarHitDamage = 2.0;
@@ -257,7 +257,7 @@ namespace LambdaRobots.Server {
                     robot.MaxSpeed += 0.0;
                     robot.Deceleration = 20.0;
                     break;
-                case LambdaRobotArmor.Heavy:
+                case LambdaRobotArmorType.Heavy:
                     robot.DirectHitDamage = 4.0;
                     robot.NearHitDamage = 2.0;
                     robot.FarHitDamage = 1.0;
@@ -265,7 +265,7 @@ namespace LambdaRobots.Server {
                     robot.MaxSpeed += -25.0;
                     robot.Deceleration = 15.0;
                     break;
-                case LambdaRobotArmor.UltraHeavy:
+                case LambdaRobotArmorType.UltraHeavy:
                     robot.DirectHitDamage = 2.0;
                     robot.NearHitDamage = 1.0;
                     robot.FarHitDamage = 0.0;
@@ -282,7 +282,7 @@ namespace LambdaRobots.Server {
                 buildPoints += (int)config.Missile;
                 buildDescription.Append($", {config.Missile} Missile");
                 switch(config.Missile) {
-                case Protocol.LambdaRobotMissile.Dart:
+                case Protocol.LambdaRobotMissileType.Dart:
                     robot.MissileRange = 350.0;
                     robot.MissileVelocity = 250.0;
                     robot.MissileDirectHitDamageBonus = 0.0;
@@ -290,7 +290,7 @@ namespace LambdaRobots.Server {
                     robot.MissileFarHitDamageBonus = 0.0;
                     robot.MissileReloadCooldown = 0.0;
                     break;
-                case Protocol.LambdaRobotMissile.Arrow:
+                case Protocol.LambdaRobotMissileType.Arrow:
                     robot.MissileRange = 500.0;
                     robot.MissileVelocity = 200.0;
                     robot.MissileDirectHitDamageBonus = 1.0;
@@ -298,7 +298,7 @@ namespace LambdaRobots.Server {
                     robot.MissileFarHitDamageBonus = 0.0;
                     robot.MissileReloadCooldown = 1.0;
                     break;
-                case Protocol.LambdaRobotMissile.Javelin:
+                case Protocol.LambdaRobotMissileType.Javelin:
                     robot.MissileRange = 700.0;
                     robot.MissileVelocity = 150.0;
                     robot.MissileDirectHitDamageBonus = 3.0;
@@ -306,7 +306,7 @@ namespace LambdaRobots.Server {
                     robot.MissileFarHitDamageBonus = 1.0;
                     robot.MissileReloadCooldown = 2.0;
                     break;
-                case Protocol.LambdaRobotMissile.Cannon:
+                case Protocol.LambdaRobotMissileType.Cannon:
                     robot.MissileRange = 900.0;
                     robot.MissileVelocity = 100.0;
                     robot.MissileDirectHitDamageBonus = 6.0;
@@ -314,7 +314,7 @@ namespace LambdaRobots.Server {
                     robot.MissileFarHitDamageBonus = 2.0;
                     robot.MissileReloadCooldown = 3.0;
                     break;
-                case Protocol.LambdaRobotMissile.BFG:
+                case Protocol.LambdaRobotMissileType.BFG:
                     robot.MissileRange = 1200.0;
                     robot.MissileVelocity = 75.0;
                     robot.MissileDirectHitDamageBonus = 12.0;

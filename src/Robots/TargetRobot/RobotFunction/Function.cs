@@ -42,10 +42,10 @@ namespace LambdaRobots.TargetRobot.RobotFunction {
         public override async Task<LambdaRobotBuild> GetBuildAsync() {
             return new LambdaRobotBuild {
                 Name = "Target",
-                Armor = LambdaRobotArmor.Medium,
-                Engine = LambdaRobotEngine.Economy,
-                Missile = LambdaRobotMissile.Dart,
-                Radar = LambdaRobotRadar.UltraShortRange
+                Armor = LambdaRobotArmorType.Medium,
+                Engine = LambdaRobotEngineType.Economy,
+                Missile = LambdaRobotMissileType.Dart,
+                Radar = LambdaRobotRadarType.UltraShortRange
             };
         }
 

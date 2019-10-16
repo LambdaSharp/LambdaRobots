@@ -67,9 +67,7 @@ lash deploy src/Robots/BringYourOwnRobot
 
 ## Level 2: Create an Attack Strategy
 
-```bash
-lash deploy src/Robot
-```
+> TODO: add docs
 
 ## Level 3: Create an Evasion Strategy
 
