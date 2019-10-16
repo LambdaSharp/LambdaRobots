@@ -97,7 +97,7 @@ namespace LambdaRobots {
             });
             return (record != null)
                 ? JsonConvert.DeserializeObject<T>(record.ToJson())
-                : default;
+                : default(T);
         }
 
         public Task DeleteAsync<T>(string pk) where T : IDynamoTableSingletonRecord, new()
