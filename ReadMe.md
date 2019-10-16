@@ -69,7 +69,7 @@ Now update the behavior of `BringYourOwnRobot` to shoot down the target robots. 
 
 ## Level 3: Create an Evasion Strategy
 
-Deploy `YosemiteSamRobot` to your account and its ARN two times to the λ-Robots server to create two attackers.
+Deploy `YosemiteSamRobot` to your account and its ARN twice to the λ-Robots server to create two attackers.
 ```bash
 lash deploy LambdaRobots.YosemiteSamRobot:1.0@lambdasharp
 ```
@@ -78,14 +78,18 @@ Now update the behavior of `BringYourOwnRobot` to avoid getting shot. For exampl
 
 ## Level 4: Take on the Champ!
 
-> TODO: add docs
+Deploy `HotShotRobot` to your account and its ARN once to the λ-Robots server to create one formidable foe.
+```bash
+lash deploy LambdaRobots.HotShotRobot:1.0@lambdasharp
+```
 
 ## BOSS LEVEL: Enter the Multi-Team Deathmatch competition
 
-> TODO: add docs
+For the boss level, your opponent is every other team! Submit your Robot ARN to final showdown and see how well it fares.
 
+**May the odds be ever in your favor!**
 
-## Reference
+## Programming Reference
 
 ### Pre-Build Lambda-Robots
 
