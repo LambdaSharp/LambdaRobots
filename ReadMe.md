@@ -76,7 +76,7 @@ lash deploy LambdaRobots.YosemiteSamRobot:1.0@lambdasharp
 
 Now update the behavior of `BringYourOwnRobot` to avoid getting shot. For example, you can continuous motion, like `YosemiteSamRobot`, which zig-zags across the board, or reacting to damage like `HotShotRobot`. Beware that a robot cannot change heading without suddenly stopping if its speed exceeds `Robot.MaxSpeed`.
 
-## Level 4: Take on the Champ!
+## Level 4: Take on the Champ
 
 Deploy `HotShotRobot` to your account and its ARN once to the λ-Robots server to create one formidable foe.
 ```bash
@@ -85,7 +85,7 @@ lash deploy LambdaRobots.HotShotRobot:1.0@lambdasharp
 
 Consider modifying your robot build by tuning the engine, armor, missile, and radar to suit your attack and evasion strategies. Remember that your build cannot exceed 8 points, or your robot will be disqualified from the competition.
 
-## BOSS LEVEL: Enter the Multi-Team Deathmatch competition
+## BOSS LEVEL: Enter the Multi-Team Deathmatch Competition
 
 For the boss level, your opponent is every other team! Submit your Robot ARN to final showdown and see how well it fares.
 
