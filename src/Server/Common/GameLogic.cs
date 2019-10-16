@@ -283,7 +283,7 @@ namespace LambdaRobots.Server {
                 buildDescription.Append($", {config.Missile} Missile");
                 switch(config.Missile) {
                 case Protocol.LambdaRobotMissileType.Dart:
-                    robot.MissileRange = 350.0;
+                    robot.MissileRange = 1200.0;
                     robot.MissileVelocity = 250.0;
                     robot.MissileDirectHitDamageBonus = 0.0;
                     robot.MissileNearHitDamageBonus = 0.0;
@@ -291,7 +291,7 @@ namespace LambdaRobots.Server {
                     robot.MissileReloadCooldown = 0.0;
                     break;
                 case Protocol.LambdaRobotMissileType.Arrow:
-                    robot.MissileRange = 500.0;
+                    robot.MissileRange = 900.0;
                     robot.MissileVelocity = 200.0;
                     robot.MissileDirectHitDamageBonus = 1.0;
                     robot.MissileNearHitDamageBonus = 1.0;
@@ -307,7 +307,7 @@ namespace LambdaRobots.Server {
                     robot.MissileReloadCooldown = 2.0;
                     break;
                 case Protocol.LambdaRobotMissileType.Cannon:
-                    robot.MissileRange = 900.0;
+                    robot.MissileRange = 500.0;
                     robot.MissileVelocity = 100.0;
                     robot.MissileDirectHitDamageBonus = 6.0;
                     robot.MissileNearHitDamageBonus = 4.0;
@@ -315,7 +315,7 @@ namespace LambdaRobots.Server {
                     robot.MissileReloadCooldown = 3.0;
                     break;
                 case Protocol.LambdaRobotMissileType.BFG:
-                    robot.MissileRange = 1200.0;
+                    robot.MissileRange = 350.0;
                     robot.MissileVelocity = 75.0;
                     robot.MissileDirectHitDamageBonus = 12.0;
                     robot.MissileNearHitDamageBonus = 8.0;

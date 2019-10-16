@@ -1,5 +1,4 @@
 > TODO:
-> * bigger weapons should have a shorter range
 > * move `client` folder under `src/Server`
 > * allow game to continue when there is only 1 bot
 > * create a `BringYourOwnRobot` project
@@ -202,6 +201,8 @@ The following methods are provided to make some common operations easier, but do
 
 By default, 8 build points are available to allocate in any fashion. The robot is disqualified if its build exceeds the maximum number of build points.
 
+The default configuration for each is shown in bold font and an asterisk (*).
+
 #### Radar
 
 |Radar Type      |Radar Range |Radar Resolution|Points|
@@ -236,9 +237,9 @@ By default, 8 build points are available to allocate in any fashion. The robot i
 
 |Missile Type   |Max. Range  |Velocity|Direct Hit Bonus|Near Hit Bonus|Far Hit Bonus|Cooldown|Points|
 |---------------|------------|--------|----------------|--------------|-------------|--------|------|
-|Dart           |350 meters  |250 m/s |0               |0             |0            |0 sec   |0     |
-|Arrow          |500 meters  |200 m/s |1               |1             |0            |1 sec   |1     |
+|Dart           |1,200 meters|250 m/s |0               |0             |0            |0 sec   |0     |
+|Arrow          |900 meters  |200 m/s |1               |1             |0            |1 sec   |1     |
 |**Javelin (*)**|700 meters  |150 m/s |3               |2             |1            |2 sec   |2     |
-|Cannon         |900 meters  |100 m/s |6               |4             |2            |3 sec   |3     |
-|BFG            |1,200 meters|75 m/s  |12              |8             |4            |5 sec   |4     |
+|Cannon         |500 meters  |100 m/s |6               |4             |2            |3 sec   |3     |
+|BFG            |350 meters  |75 m/s  |12              |8             |4            |5 sec   |4     |
 
