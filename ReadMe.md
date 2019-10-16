@@ -1,7 +1,6 @@
 > TODO:
 > * move `client` folder under `src/Server`
 > * publish `LambdaRobots.Server` to `lambdasharp`
-> * move state-machine.json into `Includes` folder
 
 # λ-Robots
 

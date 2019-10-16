@@ -53,7 +53,7 @@ Items:
     Scope: ServerFunction
     Type: AWS::StepFunctions::StateMachine
     Properties:
-      DefinitionString: !Sub [ !Include GameLoopStateMachine.json, { } ]
+      DefinitionString: !Sub [ !Include "Includes/GameLoopStateMachine.json", { } ]
       RoleArn: !GetAtt GameLoopStateMachineRole.Arn
 
   - Resource: GameLoopStateMachineRole
