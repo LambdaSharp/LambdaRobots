@@ -144,6 +144,11 @@ Items:
       Contents:
         wss: !Ref Module::WebSocket::Url
 
+  - Variable: RestApiUrl
+    Description: REST API URL
+    Scope: GameTurnFunction
+    Value: !Ref Module::RestApi::Url
+
   # Output Variables
   - Variable: LambdaRobotsServerUrl
     Description: URL for the Lambda-Robots web-server
