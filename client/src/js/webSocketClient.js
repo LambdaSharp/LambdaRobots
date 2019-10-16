@@ -62,7 +62,7 @@ export default class WebSocketClient {
         this.onMessage(jsonResult);
       }
     } catch (error) {
-      console.warn("Could not run function with parsed JSON data");
+      console.warn("Could not run function with parsed JSON data", evt.data, error.stack || error);
     }
   }
 

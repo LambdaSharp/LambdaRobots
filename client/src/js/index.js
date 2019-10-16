@@ -17,6 +17,9 @@ async function init() {
     document.getElementById("output"),
     5000,
     data => {
+      if (data.Game === null) {
+        return;
+      }
       gameBoardClient.Repaint(data);
       updateRobotStats(data.Game.Robots);
       if (typeof data.Game.Messages !== "undefined") {
@@ -132,22 +135,14 @@ function updateRobotStats(robots) {
   // https://lit-html.polymer-project.org/guide/template-reference
   const robotsStats = document.getElementById("robotsStats");
   let robotTemplates = [];
-  robots = robots.map(function(robot) {
-    robot.Index = Number(robot.Id.split(":R")[1]);
-    return robot;
-  });
-  let currentRobotPositions = determineRobotLeadingPosition(robots);
+  assignRobotMedals(robots);
   robots
-    .sort((a, b) => a.Index - b.Index)
     .forEach(robot => {
-      const currentPosition = currentRobotPositions.find(
-        x => x.Id === robot.Id
-      );
       let robotTemplate = html`
         <details ?open="${robot.Status === "Alive"}" class="${robot.Status !== "Alive" ? "robot-dead" : ""}">
           <summary>
             <h4>
-              ${currentPosition.Medal} ${robot.Name} (R${robot.Index})
+              ${robot.Medal} ${robot.Name} (R${robot.Index})
               <span class="tooltip">
                 🛈
                 <pre class="tooltiptext">${JSON.stringify(robot, null, 2)}</pre>
@@ -219,34 +214,21 @@ function restoreAdvanceConfig() {
   }
 }
 
-function determineRobotLeadingPosition(robots) {
-  const leadingRobots = robots.sort((a, b) => {
-    if (a.Status !== "Alive") {
-      return 1;
-    }
-    if (a.TotalKills < b.TotalKills) {
-      return -1;
-    } else if (a.TotalKills > b.TotalKills) {
-      return 1;
-    }
-    if (a.Damage < b.Damage) {
-      return -1;
-    } else if (a.Damage > b.Damage) {
-      return 1;
-    } else {
-      // nothing to split them
-      return 0;
-    }
+function assignRobotMedals(robots) {
+  robots.forEach(robot => {
+    robot.Score = robot.TotalKills * 1E6 + robot.TotalDamageDealt;
   });
-  let botMedals = [];
+  const leadingRobots = robots.slice().sort((a, b) => b.Score - a.Score);
   for (let index = 0; index < leadingRobots.length; index++) {
     const robot = leadingRobots[index];
-    botMedals.push({ Id: robot.Id, Medal: giveMedal(index), Position: index });
+    robot.Medal = giveMedal(index, robot.Score);
   }
-  return botMedals;
 }
 
-function giveMedal(position) {
+function giveMedal(position, score) {
+  if (score === 0) {
+    return "🤖";
+  }
   switch (position) {
     case 0:
       return "🥇";
@@ -255,7 +237,7 @@ function giveMedal(position) {
     case 2:
       return "🥉";
     default:
-      return "🏅";
+      return "🤖";
   }
 }
 
