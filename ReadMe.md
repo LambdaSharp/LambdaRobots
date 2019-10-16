@@ -53,19 +53,28 @@ Stack output values:
 
 Finally, build and deploy the `BringYourOwnRobot` module, which will be the project you will be working on
 The following command builds and deploys the AWS Lambda function for your robot:
+
 ```bash
 lash deploy src/Robots/BringYourOwnRobot
 ```
+
 **NOTE:** Open `src/Robots/BringYourOwnRobot/RobotFunction/Function.cs` and customize the `Name` of your robot to distinguish it from other robots.
+
+You can add the robot lambda function ARN to the game board client in the browser.  You can add the ARN multiple times.
+
+![Game configuration](screenShotConfigure.png)
+
+Use the **Advance Configuration** to change any default settings.  Use **Clear Saved Config** to reset all settings to default.
 
 ## Level 2: Create an Attack Strategy
 
 Deploy `TargetRobot` to your account and add its ARN three times to the λ-Robots server to create three targets.
+
 ```bash
 lash deploy LambdaRobots.TargetRobot:1.0@lambdasharp
 ```
 
-Now update the behavior of `BringYourOwnRobot` to shoot down the target robots. For example, you can use luck, like `YosemiteSamRobot`, which shoots in random directions, or targeting like `HotShotRobot`. The latter uses the `ScanAsync()` method to find enemies and aim missiles at them. Remember that other robots may be out of radar range, requiring your robot to move periodically. Also, your robot can be damaged by its own missiles. Check `Game.FarHitRange` to make sure your target it beyond the damage range. If you don't mind a bit of self-inflicted pain, you can also use on `Game.NearHitRange` or even `Game.DirectHitRange` instead.
+Now update the behavior of `BringYourOwnRobot` to shoot down the target robots. For example, you can use luck, like `YosemiteSamRobot`, which shoots in random directions, or targeting like `HotShotRobot`. The latter uses the `ScanAsync()` method to find enemies and aim missiles at them. Remember that other robots may be out of radar range, requiring your robot to move periodically. Also, your robot can be damaged by its own missiles. Check `Game.FarHitRange` to make sure your target is beyond the damage range. If you don't mind a bit of self-inflicted pain, you can also use `Game.NearHitRange` or even `Game.DirectHitRange` instead.
 
 ## Level 3: Create an Evasion Strategy
 
