@@ -65,7 +65,7 @@ Deploy `TargetRobot` to your account and add its ARN three times to the λ-Robot
 lash deploy LambdaRobots.TargetRobot:1.0@lambdasharp
 ```
 
-Now update the behavior of `BringYourOwnRobot` to shoot down the target robots. For example, you can use luck, like `YosemiteSamRobot` or targeting like `HotShotRobot`. The latter uses the `ScanAsync()` method to find enemies and aim missiles at them.
+Now update the behavior of `BringYourOwnRobot` to shoot down the target robots. For example, you can use luck, like `YosemiteSamRobot`, which shoots in random directions, or targeting like `HotShotRobot`. The latter uses the `ScanAsync()` method to find enemies and aim missiles at them. Remember that other robots may be out of radar range, requiring your robot to move periodically. Also, your robot can be damaged by its own missiles. Check `Game.FarHitRange` to make sure your target it beyond the damage range. If you don't mind a bit of self-inflicted pain, you can also use on `Game.NearHitRange` or even `Game.DirectHitRange` instead.
 
 ## Level 3: Create an Evasion Strategy
 
@@ -74,7 +74,7 @@ Deploy `YosemiteSamRobot` to your account and its ARN twice to the λ-Robots ser
 lash deploy LambdaRobots.YosemiteSamRobot:1.0@lambdasharp
 ```
 
-Now update the behavior of `BringYourOwnRobot` to avoid getting shot. For example, you can continuous motion, like `YosemiteSamRobot` or reacting to damage like `HotShotRobot`. Beware that a robot cannot change heading without suddenly stopping if its speed exceeds `Robot.MaxSpeed`.
+Now update the behavior of `BringYourOwnRobot` to avoid getting shot. For example, you can continuous motion, like `YosemiteSamRobot`, which zig-zags across the board, or reacting to damage like `HotShotRobot`. Beware that a robot cannot change heading without suddenly stopping if its speed exceeds `Robot.MaxSpeed`.
 
 ## Level 4: Take on the Champ!
 
@@ -82,6 +82,8 @@ Deploy `HotShotRobot` to your account and its ARN once to the λ-Robots server t
 ```bash
 lash deploy LambdaRobots.HotShotRobot:1.0@lambdasharp
 ```
+
+Consider modifying your robot build by tuning the engine, armor, missile, and radar to suit your attack and evasion strategies. Remember that your build cannot exceed 8 points, or your robot will be disqualified from the competition.
 
 ## BOSS LEVEL: Enter the Multi-Team Deathmatch competition
 
