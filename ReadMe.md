@@ -1,7 +1,3 @@
-> TODO:
-> * move `client` folder under `src/Server`
-> * publish `LambdaRobots.Server` to `lambdasharp`
-
 # λ-Robots
 
 In λ-Robots (pronounced _Lambda Robots_), you program a battle robot that participates on a square game field. Each turn, the server invokes your robot's Lambda function to get its action for the turn until either the robot wins or is destroyed.
@@ -19,7 +15,7 @@ Make sure the following tools are installed.
 ### Setup AWS Account and CLI
 The challenge requires an AWS account. AWS provides a [*Free Tier*](https://aws.amazon.com/free/), which is sufficient for most challenges.
 * [Create an AWS Account](https://aws.amazon.com)
-* [Configure your AWS profile with the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration)
+* [Configure your AWS profile with the AWS CLI for us-west-2 (Oregon)](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration)
 
 ### Setup LambdaSharp Deployment Tier
 
@@ -39,37 +35,48 @@ lash init --quick-start
 Open a command line and navigate to your projects folder. Run the following command to clone the λ-Robots challenge directory into a `LambdaRobots` sub-folder.
 ```bash
 git clone https://github.com/LambdaSharp/LambdaRobots.git
+cd LambdaRobots
 ```
 
 ## Level 1: Run λ-Robots Server
 
-The following command deploys the `LambdaRobots.Server` module from the `lambdasharp` repository into AWS account using [CloudFormation](https://aws.amazon.com/cloudformation/).
+The following command deploys the `LambdaRobots.Server` module from the `lambdasharp` repository into the AWS account using [CloudFormation](https://aws.amazon.com/cloudformation/).
 ```bash
-lash deploy LambdaRobots.Server@lambdasharp
+lash deploy LambdaRobots.Server:1.0@lambdasharp
 ```
 
-When the command has finished running, the output will show the website URL for the λ-Robots server.
+Once the command has finished running, the output will show the website URL for the λ-Robots server.
 ```
 Stack output values:
 => LambdaRobotsServerUrl: URL for the Lambda-Robots web-server = http://lambdarobots-server-websitebucket-g54w2llfcjhq.s3-website-us-west-2.amazonaws.com
 ```
 
+Finally, build and deploy the `BringYourOwnRobot` module, which will be the project you will be working on
 The following command builds and deploys the AWS Lambda function for your robot:
 ```bash
-cd LambdaRobots
 lash deploy src/Robots/BringYourOwnRobot
 ```
 **NOTE:** Open `src/Robots/BringYourOwnRobot/RobotFunction/Function.cs` and customize the `Name` of your robot to distinguish it from other robots.
 
 ## Level 2: Create an Attack Strategy
 
-> TODO: add docs
+Deploy `TargetRobot` to your account and add its ARN three times to the λ-Robots server to create three targets.
+```bash
+lash deploy LambdaRobots.TargetRobot:1.0@lambdasharp
+```
+
+Now update the behavior of `BringYourOwnRobot` to shoot down the target robots. For example, you can use luck, like `YosemiteSamRobot` or targeting like `HotShotRobot`. The latter uses the `ScanAsync()` method to find enemies and aim missiles at them.
 
 ## Level 3: Create an Evasion Strategy
 
-> TODO: add docs
+Deploy `YosemiteSamRobot` to your account and its ARN two times to the λ-Robots server to create two attackers.
+```bash
+lash deploy LambdaRobots.YosemiteSamRobot:1.0@lambdasharp
+```
 
-## Level 4: Test Your Robot against others
+Now update the behavior of `BringYourOwnRobot` to avoid getting shot. For example, you can continuous motion, like `YosemiteSamRobot` or reacting to damage like `HotShotRobot`. Beware that a robot cannot change heading without suddenly stopping if its speed exceeds `Robot.MaxSpeed`.
+
+## Level 4: Take on the Champ!
 
 > TODO: add docs
 
