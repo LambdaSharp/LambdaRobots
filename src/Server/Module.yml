@@ -126,7 +126,7 @@ Items:
 
   - Package: WebsiteFiles
     Description: Website files to deploy
-    Files: "../../client/src"
+    Files: Packages/wwwroot
 
   - Resource: DeployWebsiteFiles
     Type: LambdaSharp::S3::Unzip
