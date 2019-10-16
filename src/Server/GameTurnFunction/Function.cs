@@ -46,7 +46,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
 
         //--- Properties ---
         public string GameId { get; set; }
-        public GameState State { get; set; }
+        public GameStatus Status { get; set; }
         public GameLoopType GameLoopType { get; set; } = GameLoopType.StepFunction;
     }
 
@@ -54,7 +54,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
 
         //--- Properties ---
         public string GameId { get; set; }
-        public GameState State { get; set; }
+        public GameStatus Status { get; set; }
         public GameLoopType GameLoopType { get; set; } = GameLoopType.StepFunction;
     }
 
@@ -94,7 +94,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                 // game must have been stopped
                 return new FunctionResponse {
                     GameId = request.GameId,
-                    State = GameState.Finished,
+                    Status = GameStatus.Finished,
                     GameLoopType = request.GameLoopType
                 };
             }
@@ -114,33 +114,33 @@ namespace LambdaRobots.Server.GameTurnFunction {
             try {
 
                 // check game state
-                switch(gameRecord.Game.State) {
-                case GameState.Start:
+                switch(gameRecord.Game.Status) {
+                case GameStatus.Start:
 
                     // start game
                     LogInfo($"Start game: initializing {game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots (total: {game.Robots.Count})");
                     await logic.StartAsync(gameRecord.LambdaRobotArns.Count);
-                    game.State = GameState.NextTurn;
+                    game.Status = GameStatus.NextTurn;
                     LogInfo($"Done: {game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots ready");
                     break;
-                case GameState.NextTurn:
+                case GameStatus.NextTurn:
 
                     // next turn
                     LogInfo($"Start turn {game.TotalTurns} (max: {game.MaxTurns}): invoking {game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots (total: {game.Robots.Count})");
                     await logic.NextTurnAsync();
                     LogInfo($"End turn: {game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots alive");
                     break;
-                case GameState.Finished:
+                case GameStatus.Finished:
 
                     // nothing further to do
                     break;
                 default:
-                    game.State = GameState.Error;
-                    throw new ApplicationException($"unexpected game state: '{gameRecord.Game.State}'");
+                    game.Status = GameStatus.Error;
+                    throw new ApplicationException($"unexpected game state: '{gameRecord.Game.Status}'");
                 }
             } catch(Exception e) {
                 LogError(e, "error during game loop");
-                game.State = GameState.Error;
+                game.Status = GameStatus.Error;
             }
 
             // log new game messages
@@ -149,7 +149,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             }
 
             // check if we need to update or delete the game from the game table
-            if(game.State == GameState.NextTurn) {
+            if(game.Status == GameStatus.NextTurn) {
                 LogInfo($"Storing game: ID = {game.Id}");
 
                 // attempt to update the game record
@@ -164,7 +164,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     // the record failed to updated, because the game was stopped
                     return new FunctionResponse {
                         GameId = game.Id,
-                        State = GameState.Finished,
+                        Status = GameStatus.Finished,
                         GameLoopType = request.GameLoopType
                     };
                 }
@@ -186,14 +186,14 @@ namespace LambdaRobots.Server.GameTurnFunction {
 
                 // connection has been closed, stop the game
                 LogInfo($"Connection is gone");
-                game.State = GameState.Finished;
+                game.Status = GameStatus.Finished;
                 await _table.DeleteAsync<GameRecord>(game.Id);
             } catch(Exception e) {
                 LogErrorAsWarning(e, "PostToConnectionAsync() failed");
             }
 
             // check if we need to invoke the next game turn
-            if((request.GameLoopType == GameLoopType.Recursive) && (game.State == GameState.NextTurn)) {
+            if((request.GameLoopType == GameLoopType.Recursive) && (game.Status == GameStatus.NextTurn)) {
                 await _lambdaClient.InvokeAsync(new InvokeRequest {
                     Payload = SerializeJson(request),
                     FunctionName = CurrentContext.FunctionName,
@@ -202,7 +202,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             }
             return new FunctionResponse {
                 GameId = game.Id,
-                State = game.State,
+                Status = game.Status,
                 GameLoopType = request.GameLoopType
             };
         }

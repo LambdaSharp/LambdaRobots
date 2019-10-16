@@ -80,7 +80,7 @@ namespace LambdaRobots.Server.ServerFunction {
             // create a new game
             var game = new Game {
                 Id = Guid.NewGuid().ToString("N"),
-                State = GameState.Start,
+                Status = GameStatus.Start,
                 BoardWidth = request.BoardWidth ?? 1000.0,
                 BoardHeight = request.BoardHeight ?? 1000.0,
                 SecondsPerTurn = request.SecondsPerTurn ?? 0.5,
@@ -106,7 +106,7 @@ namespace LambdaRobots.Server.ServerFunction {
             // dispatch game loop
             var gameTurnRequest = new {
                 GameId = game.Id,
-                State = game.State,
+                Status = game.Status,
                 GameLoopType = request.GameLoopType
             };
             switch(request.GameLoopType) {
@@ -177,7 +177,7 @@ namespace LambdaRobots.Server.ServerFunction {
             await _table.DeleteAsync<GameRecord>(request.GameId);
 
             // update game state to indicated it was stopped
-            gameRecord.Game.State = GameState.Finished;
+            gameRecord.Game.Status = GameStatus.Finished;
             ++gameRecord.Game.TotalTurns;
             gameRecord.Game.Messages.Add(new Message {
                 GameTurn = gameRecord.Game.TotalTurns,

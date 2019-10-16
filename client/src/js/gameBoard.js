@@ -22,18 +22,18 @@ export default class GameBoard {
       return;
     }
     this._clear();
-    if (gameStat.Game.State === "Start") {
+    if (gameStat.Game.Status === "Start") {
       this.canvas.width = gameStat.Game.BoardWidth;
       this.canvas.height = gameStat.Game.BoardHeight;
       return;
     }
     clearTimeout(this._spinnerInterval);
-    if (gameStat.Game.State === "NextTurn") {
+    if (gameStat.Game.Status === "NextTurn") {
       this._robots(gameStat.Game, gameStat.Game.Robots);
       this._missiles(gameStat.Game, gameStat.Game.Missiles);
       return;
     }
-    if (gameStat.Game.State === "Finished") {
+    if (gameStat.Game.Status === "Finished") {
       this._gameOver();
     }
   }
@@ -50,7 +50,7 @@ export default class GameBoard {
     this.context.textBaseline = "middle";
     for (let index = 0; index < robots.length; index++) {
       const robot = robots[index];
-      if(robot.State === "Alive") {
+      if(robot.Status === "Alive") {
         this.context.fillText(
           index,
           Math.round(robot.X),
@@ -82,7 +82,7 @@ export default class GameBoard {
       this.context.translate(0, this.canvas.height);
       this.context.scale(1, -1);
       this.context.beginPath();
-      switch (missile.State) {
+      switch (missile.Status) {
         case "Flying":
           this.context.moveTo(Math.round(missile.X), Math.round(missile.Y));
           const lineLength = 12;

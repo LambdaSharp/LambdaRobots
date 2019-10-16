@@ -35,7 +35,7 @@ namespace LambdaRobots.Server {
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum GameState {
+    public enum GameStatus {
         Undefined,
         Start,
         NextTurn,
@@ -49,7 +49,7 @@ namespace LambdaRobots.Server {
         public string Id;
 
         // current state
-        public GameState State;
+        public GameStatus Status;
         public int TotalTurns;
         public List<LambdaRobotMissile> Missiles = new List<LambdaRobotMissile>();
         public List<LambdaRobot> Robots = new List<LambdaRobot>();
@@ -77,7 +77,7 @@ namespace LambdaRobots.Server {
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
-    public enum MissileState {
+    public enum MissileStatus {
         Undefined,
         Flying,
         ExplodingDirect,
@@ -99,7 +99,7 @@ namespace LambdaRobots.Server {
         // current state
 
         [JsonRequired]
-        public MissileState State;
+        public MissileStatus Status;
 
         [JsonRequired]
         public double X;

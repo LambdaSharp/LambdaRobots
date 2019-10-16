@@ -22,11 +22,11 @@ async function init() {
       if (typeof data.Game.Messages !== "undefined") {
         messagesUi(data.Game.Messages);
       }
-      if (data.Game.State === "Start") {
+      if (data.Game.Status === "Start") {
         sessionStorage.setItem("gameId", data.Game.Id);
         startGameUi();
       }
-      if (data.Game.State === "Finished") {
+      if (data.Game.Status === "Finished") {
         stopGameUi();
       }
     }
@@ -144,7 +144,7 @@ function updateRobotStats(robots) {
         x => x.Id === robot.Id
       );
       let robotTemplate = html`
-        <details ?open="${robot.State === "Alive"}" class="${robot.State !== "Alive" ? "robot-dead" : ""}">
+        <details ?open="${robot.Status === "Alive"}" class="${robot.Status !== "Alive" ? "robot-dead" : ""}">
           <summary>
             <h4>
               ${currentPosition.Medal} ${robot.Name} (R${robot.Index})
@@ -221,7 +221,7 @@ function restoreAdvanceConfig() {
 
 function determineRobotLeadingPosition(robots) {
   const leadingRobots = robots.sort((a, b) => {
-    if (a.State !== "Alive") {
+    if (a.Status !== "Alive") {
       return 1;
     }
     if (a.TotalKills < b.TotalKills) {

@@ -8,12 +8,12 @@
         "Type": "Choice",
         "Choices": [
             {
-                "Variable": "$.State",
+                "Variable": "$.Status",
                 "StringEquals": "Start",
                 "Next": "GameStart"
             },
             {
-              "Variable": "$.State",
+              "Variable": "$.Status",
               "StringEquals": "NextTurn",
               "Next": "GameNextTurn"
             }

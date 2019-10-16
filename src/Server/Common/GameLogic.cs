@@ -394,38 +394,38 @@ namespace LambdaRobots.Server {
 
             // update missile states
             foreach(var missile in Game.Missiles) {
-                switch(missile.State) {
-                case MissileState.Flying:
+                switch(missile.Status) {
+                case MissileStatus.Flying:
 
                     // move flying missiles
                     MoveMissile(missile);
                     break;
-                case MissileState.ExplodingDirect:
+                case MissileStatus.ExplodingDirect:
 
                     // missile is exploding; assess direct damage
                     AssessMissileDamage(missile);
-                    missile.State = MissileState.ExplodingNear;
+                    missile.Status = MissileStatus.ExplodingNear;
                     break;
-                case MissileState.ExplodingNear:
+                case MissileStatus.ExplodingNear:
 
                     // missile is exploding; assess near damage
                     AssessMissileDamage(missile);
-                    missile.State = MissileState.ExplodingFar;
+                    missile.Status = MissileStatus.ExplodingFar;
                     break;
-                case MissileState.ExplodingFar:
+                case MissileStatus.ExplodingFar:
 
                     // missile is exploding; assess far damage
                     AssessMissileDamage(missile);
-                    missile.State = MissileState.Destroyed;
+                    missile.Status = MissileStatus.Destroyed;
                     break;
                 default:
-                    missile.State = MissileState.Destroyed;
+                    missile.Status = MissileStatus.Destroyed;
                     break;
                 }
             }
 
             // remove destroyed missiles
-            Game.Missiles.RemoveAll(missile => missile.State == MissileState.Destroyed);
+            Game.Missiles.RemoveAll(missile => missile.Status == MissileStatus.Destroyed);
 
             // update game state
             var robotCount = Game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive);
@@ -433,19 +433,19 @@ namespace LambdaRobots.Server {
 
                 // no robots left
                 AddMessage("All robots have perished. Game Over.");
-                Game.State = GameState.Finished;
+                Game.Status = GameStatus.Finished;
                 Game.Missiles.Clear();
             } else if(robotCount == 1) {
 
                 // last robot standing
                 AddMessage($"{Game.Robots.First(robot => robot.Status == LambdaRobotStatus.Alive).Name} is victorious! Game Over.");
-                Game.State = GameState.Finished;
+                Game.Status = GameStatus.Finished;
                 Game.Missiles.Clear();
             } else if(Game.TotalTurns >= Game.MaxTurns) {
 
                 // game has reached its turn limit
                 AddMessage($"Reached max turns. {robotCount:N0} robots are left. Game Over.");
-                Game.State = GameState.Finished;
+                Game.Status = GameStatus.Finished;
                 Game.Missiles.Clear();
             }
         }
@@ -518,7 +518,7 @@ namespace LambdaRobots.Server {
                 var missile = new LambdaRobotMissile {
                     Id = $"{robot.Id}:M{robot.TotalMissileFiredCount}",
                     RobotId = robot.Id,
-                    State = MissileState.Flying,
+                    Status = MissileStatus.Flying,
                     X = robot.X,
                     Y = robot.Y,
                     Speed = robot.MissileVelocity,
@@ -547,7 +547,7 @@ namespace LambdaRobots.Server {
                 out collision
             );
             if(collision) {
-                missile.State = MissileState.ExplodingDirect;
+                missile.Status = MissileStatus.ExplodingDirect;
                 missile.Speed = 0.0;
             }
         }
@@ -558,20 +558,20 @@ namespace LambdaRobots.Server {
                 // compute damage dealt by missile
                 double damage = 0.0;
                 string damageType = null;
-                switch(missile.State) {
-                case MissileState.ExplodingDirect:
+                switch(missile.Status) {
+                case MissileStatus.ExplodingDirect:
                     if(distance <= Game.DirectHitRange) {
                         damage = robot.DirectHitDamage + missile.DirectHitDamageBonus;
                         damageType = "direct";
                     }
                     break;
-                case MissileState.ExplodingNear:
+                case MissileStatus.ExplodingNear:
                     if(distance <= Game.NearHitRange) {
                         damage = robot.NearHitDamage + missile.NearHitDamageBonus;
                         damageType = "near";
                     }
                     break;
-                case MissileState.ExplodingFar:
+                case MissileStatus.ExplodingFar:
                     if(distance <= Game.FarHitRange) {
                         damage = robot.FarHitDamage + missile.FarHitDamageBonus;
                         damageType = "far";

@@ -1,9 +1,8 @@
 > TODO:
 > * move `client` folder under `src/Server`
 > * allow game to continue when there is only 1 bot
-> * create a `BringYourOwnRobot` project
 > * publish `LambdaRobots.Server` to `lambdasharp`
-
+> * move state-machine.json into `Includes` folder
 
 # λ-Robots
 
