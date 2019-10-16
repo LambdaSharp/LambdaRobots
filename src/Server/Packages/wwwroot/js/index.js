@@ -219,10 +219,22 @@ function assignRobotMedals(robots) {
     robot.Score = robot.TotalKills * 1E6 + robot.TotalDamageDealt;
   });
   robots.sort((a, b) => {
+
+    // the higher the score, the closer to the top of the leaderboard
     const deltaScore = b.Score - a.Score;
     if(deltaScore !== 0) {
       return deltaScore;
     }
+
+    // the longer alive the robot has been, the closer to the top of the leaderboard
+    const timeOfDeathA = (a.TimeOfDeathGameTurn === -1) ? 1E9 : a.TimeOfDeathGameTurn;
+    const timeOfDeathB = (b.TimeOfDeathGameTurn === -1) ? 1E9 : b.TimeOfDeathGameTurn;
+    const deltaTimeOfDeath = timeOfDeathB - timeOfDeathA;
+    if(deltaTimeOfDeath !== 0) {
+      return deltaTimeOfDeath;
+    }
+
+    // if all fails, just sort by increasing index
     return a.Index - b.Index;
   });
   for (let index = 0; index < robots.length; index++) {
