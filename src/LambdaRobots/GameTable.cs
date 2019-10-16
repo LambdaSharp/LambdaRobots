@@ -106,7 +106,7 @@ namespace LambdaRobots {
         public Task DeleteAsync(string pk, string sk)
             => _table.DeleteItemAsync(pk, sk);
 
-        public async Task<IEnumerable<T>> GetAllAsync<T>(string pk) where T : IGameTableMultiRecord, new() {
+        public async Task<IEnumerable<T>> GetAllRecordsAsync<T>(string pk) where T : IGameTableMultiRecord, new() {
             var records = await _table.Query(pk, new Expression {
                 ExpressionStatement = "begins_with(SK, :sortkeyprefix)",
                 ExpressionAttributeValues = {
