@@ -30,8 +30,6 @@ using Amazon.Lambda;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Amazon.Lambda.Model;
-using Amazon.StepFunctions;
-using Amazon.StepFunctions.Model;
 using LambdaRobots.Api.Model;
 using LambdaRobots.Server.ServerFunction.Model;
 using LambdaSharp;
@@ -49,8 +47,6 @@ namespace LambdaRobots.Server.ServerFunction {
 
         //--- Fields ---
         private DynamoTable _table;
-        private string _gameStateMachine;
-        private IAmazonStepFunctions _stepFunctionsClient;
         private IAmazonLambda _lambdaClient;
         private string _gameTurnFunctionArn;
 
@@ -60,8 +56,6 @@ namespace LambdaRobots.Server.ServerFunction {
                 config.ReadDynamoDBTableName("GameTable"),
                 new AmazonDynamoDBClient()
             );
-            _gameStateMachine = config.ReadText("GameLoopStateMachine");
-            _stepFunctionsClient = new AmazonStepFunctionsClient();
             _lambdaClient = new AmazonLambdaClient();
             _gameTurnFunctionArn = config.ReadText("GameTurnFunction");
         }
@@ -104,42 +98,15 @@ namespace LambdaRobots.Server.ServerFunction {
             await _table.CreateAsync(gameRecord);
 
             // dispatch game loop
-            var gameTurnRequest = new {
-                GameId = game.Id,
-                Status = game.Status,
-                GameLoopType = request.GameLoopType
-            };
-            switch(request.GameLoopType) {
-            case GameLoopType.Recursive:
-                LogInfo($"Kicking off Game Turn lambda: Name = {_gameTurnFunctionArn}");
-                await _lambdaClient.InvokeAsync(new InvokeRequest {
-                    Payload = SerializeJson(gameTurnRequest),
-                    FunctionName = _gameTurnFunctionArn,
-                    InvocationType = InvocationType.Event
-                });
-                break;
-            case GameLoopType.StepFunction:
-
-                // kick off game step function
-                var startGameId = $"LambdaRobotsGame-{game.Id}";
-                LogInfo($"Kicking off Step Function: Name = {startGameId}");
-                var startGame = await _stepFunctionsClient.StartExecutionAsync(new StartExecutionRequest {
-                    StateMachineArn = _gameStateMachine,
-                    Name = startGameId,
-                    Input = SerializeJson(gameTurnRequest)
-                });
-
-                // update execution ARN for game record
-                await _table.UpdateAsync(new GameRecord {
-                    PK = game.Id,
-                    GameLoopArn = startGame.ExecutionArn
-                }, new[] {
-                    nameof(GameRecord.GameLoopArn)
-                });
-                break;
-            default:
-                throw new ApplicationException($"unsupported: GameLoopType = {request.GameLoopType}");
-            }
+            LogInfo($"Kicking off Game Turn lambda: Name = {_gameTurnFunctionArn}");
+            await _lambdaClient.InvokeAsync(new InvokeRequest {
+                Payload = SerializeJson(new {
+                    GameId = game.Id,
+                    Status = game.Status
+                }),
+                FunctionName = _gameTurnFunctionArn,
+                InvocationType = InvocationType.Event
+            });
 
             // return with kicked off game
             return new StartGameResponse {
@@ -157,19 +124,6 @@ namespace LambdaRobots.Server.ServerFunction {
 
                 // game is already stopped, nothing further to do
                 return new StopGameResponse();
-            }
-
-            // check if game state machine needs to be stopped
-            if(gameRecord.GameLoopArn != null) {
-                LogInfo($"Stopping Step Function: Name = {gameRecord.GameLoopArn}");
-                try {
-                    await _stepFunctionsClient.StopExecutionAsync(new StopExecutionRequest {
-                        ExecutionArn = gameRecord.GameLoopArn,
-                        Cause = "user requested game to be stopped"
-                    });
-                } catch(Exception e) {
-                    LogErrorAsInfo(e, "unable to stop state-machine");
-                }
             }
 
             // delete game record

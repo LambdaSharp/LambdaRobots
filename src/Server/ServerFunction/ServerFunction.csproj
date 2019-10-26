@@ -14,7 +14,6 @@
     <PackageReference Include="AWSSDK.ApiGatewayManagementApi" Version="3.3.101.12"/>
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.101.71"/>
     <PackageReference Include="AWSSDK.Lambda" Version="3.3.103.12"/>
-    <PackageReference Include="AWSSDK.StepFunctions" Version="3.3.102.8"/>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../LambdaRobots/LambdaRobots.csproj" />

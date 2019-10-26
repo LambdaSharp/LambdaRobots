@@ -28,11 +28,6 @@ using Newtonsoft.Json.Converters;
 
 namespace LambdaRobots.Server {
 
-    public enum GameLoopType {
-        StepFunction,
-        Recursive
-    }
-
     [JsonConverter(typeof(StringEnumConverter))]
     public enum GameStatus {
         Undefined,
