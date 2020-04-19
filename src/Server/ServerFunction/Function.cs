@@ -101,7 +101,7 @@ namespace LambdaRobots.Server.ServerFunction {
             // dispatch game loop
             LogInfo($"Kicking off Game Turn lambda: Name = {_gameTurnFunctionArn}");
             await _lambdaClient.InvokeAsync(new InvokeRequest {
-                Payload = SerializeJson(new {
+                Payload = LambdaSerializer.Serialize(new {
                     GameId = game.Id,
                     Status = game.Status
                 }),
