@@ -25,10 +25,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
-using Newtonsoft.Json;
+using Amazon.Lambda.Core;
+using LambdaSharp;
 
 namespace LambdaRobots {
 
@@ -51,16 +53,18 @@ namespace LambdaRobots {
         //--- Fields ---
         private readonly IAmazonDynamoDB _dynamoDbClient;
         private readonly Table _table;
+        private readonly ILambdaSerializer _serializer;
 
         //--- Constructors ---
-        public DynamoTable(string tableName, IAmazonDynamoDB dynamoDbClient) {
+        public DynamoTable(string tableName, IAmazonDynamoDB dynamoDbClient, ILambdaSerializer serializer) {
             _dynamoDbClient = dynamoDbClient ?? throw new ArgumentNullException(nameof(dynamoDbClient));
             _table = Table.LoadTable(_dynamoDbClient, tableName ?? throw new ArgumentNullException(nameof(tableName)));
+            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         }
 
         //--- Methods ---
         public async Task CreateAsync<T>(T record) where T : IDynamoTableRecord {
-            await _table.PutItemAsync(Document.FromJson(JsonConvert.SerializeObject(record)), new PutItemOperationConfig {
+            await _table.PutItemAsync(Document.FromJson(_serializer.Serialize(record)), new PutItemOperationConfig {
                 ConditionalExpression = new Expression {
                     ExpressionStatement = "attribute_not_exists(PK)"
                 }
@@ -68,7 +72,7 @@ namespace LambdaRobots {
         }
 
         public async Task UpdateAsync<T>(T record) where T : IDynamoTableRecord {
-            await _table.PutItemAsync(Document.FromJson(JsonConvert.SerializeObject(record)), new PutItemOperationConfig {
+            await _table.PutItemAsync(Document.FromJson(JsonSerializer.Serialize(record)), new PutItemOperationConfig {
                 ConditionalExpression = new Expression {
                     ExpressionStatement = "attribute_exists(PK)"
                 }
@@ -76,7 +80,7 @@ namespace LambdaRobots {
         }
 
         public async Task UpdateAsync<T>(T record, IEnumerable<string> columnsToUpdate) where T : IDynamoTableRecord {
-            var document = Document.FromJson(JsonConvert.SerializeObject(record));
+            var document = Document.FromJson(_serializer.Serialize(record));
             if(columnsToUpdate.Any()) {
                 foreach(var key in document.Keys.Where(key => (key != "PK") && (key != "SK") && !columnsToUpdate.Contains(key)).ToList()) {
                     document.Remove(key);
@@ -85,7 +89,7 @@ namespace LambdaRobots {
             await _table.UpdateItemAsync(document, new UpdateItemOperationConfig());
         }
 
-        public Task CreateOrUpdateAsync<T>(T record) => _table.PutItemAsync(Document.FromJson(JsonConvert.SerializeObject(record)));
+        public Task CreateOrUpdateAsync<T>(T record) => _table.PutItemAsync(Document.FromJson(_serializer.Serialize(record)));
 
         public Task<T> GetAsync<T>(string pk) where T : IDynamoTableSingletonRecord, new()
             => GetAsync<T>(pk, new T().SK);
@@ -96,7 +100,7 @@ namespace LambdaRobots {
                 ["SK"] = sk
             });
             return (record != null)
-                ? JsonConvert.DeserializeObject<T>(record.ToJson())
+                ? _serializer.Deserialize<T>(record.ToJson())
                 : default(T);
         }
 
@@ -113,7 +117,7 @@ namespace LambdaRobots {
                     [":sortkeyprefix"] = new T().SKPrefix
                 }
             }).GetRemainingAsync();
-            return records.Select(record => JsonConvert.DeserializeObject<T>(record.ToJson())).ToList();
+            return records.Select(record => _serializer.Deserialize<T>(record.ToJson())).ToList();
         }
     }
 }

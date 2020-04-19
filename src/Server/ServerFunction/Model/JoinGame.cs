@@ -22,8 +22,7 @@
  * SOFTWARE.
  */
 
-using LambdaRobots.Server;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace LambdaRobots.Server.ServerFunction.Model {
 
@@ -31,7 +30,7 @@ namespace LambdaRobots.Server.ServerFunction.Model {
 
         //--- Properties ---
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public string GameId { get; set; }
     }
 
@@ -39,7 +38,7 @@ namespace LambdaRobots.Server.ServerFunction.Model {
 
         //--- Properties ---
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public Game Game { get; set; }
     }
 }

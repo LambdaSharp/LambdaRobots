@@ -38,7 +38,7 @@ using LambdaRobots.Protocol;
 using LambdaSharp;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
+[assembly: LambdaSerializer(typeof(LambdaSharp.Serialization.LambdaJsonSerializer))]
 
 namespace LambdaRobots.Server.GameTurnFunction {
 
@@ -79,7 +79,8 @@ namespace LambdaRobots.Server.GameTurnFunction {
             });
             _table = new DynamoTable(
                 config.ReadDynamoDBTableName("GameTable"),
-                new AmazonDynamoDBClient()
+                new AmazonDynamoDBClient(),
+                LambdaSerializer
             );
             _gameApiUrl = config.ReadText("RestApiUrl");
         }
@@ -178,7 +179,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             try {
                 await _amaClient.PostToConnectionAsync(new PostToConnectionRequest {
                     ConnectionId = gameRecord.ConnectionId,
-                    Data = new MemoryStream(Encoding.UTF8.GetBytes(SerializeJson(new GameTurnNotification {
+                    Data = new MemoryStream(Encoding.UTF8.GetBytes(LambdaSerializer.Serialize(new GameTurnNotification {
                         Game = game
                     })))
                 });
@@ -195,7 +196,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             // check if we need to invoke the next game turn
             if((request.GameLoopType == GameLoopType.Recursive) && (game.Status == GameStatus.NextTurn)) {
                 await _lambdaClient.InvokeAsync(new InvokeRequest {
-                    Payload = SerializeJson(request),
+                    Payload = LambdaSerializer.Serialize(request),
                     FunctionName = CurrentContext.FunctionName,
                     InvocationType = InvocationType.Event
                 });
@@ -211,7 +212,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
                 var getNameTask = _lambdaClient.InvokeAsync(new InvokeRequest {
-                    Payload = SerializeJson(new LambdaRobotRequest {
+                    Payload = LambdaSerializer.Serialize(new LambdaRobotRequest {
                         Command = LambdaRobotCommand.GetBuild,
                         Game = new GameInfo {
                             Id = game.Id,
@@ -238,7 +239,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     return null;
                 }
                 var response = Encoding.UTF8.GetString(getNameTask.Result.Payload.ToArray());
-                var result = DeserializeJson<LambdaRobotResponse>(response);
+                var result = LambdaSerializer.Deserialize<LambdaRobotResponse>(response);
                 LogInfo($"Robot {robot.Id} GetName responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
                 return result.RobotBuild;
             } catch(Exception e) {
@@ -251,7 +252,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
                 var getActionTask = _lambdaClient.InvokeAsync(new InvokeRequest {
-                    Payload = SerializeJson(new LambdaRobotRequest {
+                    Payload = LambdaSerializer.Serialize(new LambdaRobotRequest {
                         Command = LambdaRobotCommand.GetAction,
                         Game = new GameInfo {
                             Id = game.Id,
@@ -279,7 +280,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     return null;
                 }
                 var response = Encoding.UTF8.GetString(getActionTask.Result.Payload.ToArray());
-                var result = DeserializeJson<LambdaRobotResponse>(response);
+                var result = LambdaSerializer.Deserialize<LambdaRobotResponse>(response);
                 LogInfo($"Robot {robot.Id} GetAction responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
                 return result.RobotAction;
             } catch(Exception e) {

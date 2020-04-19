@@ -23,8 +23,8 @@
  */
 
 using System.Collections.Generic;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace LambdaRobots.Server {
 
@@ -33,7 +33,7 @@ namespace LambdaRobots.Server {
         Recursive
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum GameStatus {
         Undefined,
         Start,
@@ -75,7 +75,7 @@ namespace LambdaRobots.Server {
         public string Text;
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum MissileStatus {
         Undefined,
         Flying,
@@ -89,44 +89,44 @@ namespace LambdaRobots.Server {
 
         //--- Fields ---
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public string Id;
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public string RobotId;
 
         // current state
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public MissileStatus Status;
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public double X;
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public double Y;
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public double Distance;
 
         // missile characteristics
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public double Speed;
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public double Heading;
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public double Range;
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public double DirectHitDamageBonus;
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public double NearHitDamageBonus;
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public double FarHitDamageBonus;
     }
 }

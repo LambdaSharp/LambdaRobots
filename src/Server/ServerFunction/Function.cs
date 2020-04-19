@@ -38,7 +38,7 @@ using LambdaSharp;
 using LambdaSharp.ApiGateway;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
+[assembly: LambdaSerializer(typeof(LambdaSharp.Serialization.LambdaJsonSerializer))]
 
 namespace LambdaRobots.Server.ServerFunction {
 
@@ -58,7 +58,8 @@ namespace LambdaRobots.Server.ServerFunction {
         public override async Task InitializeAsync(LambdaConfig config) {
             _table = new DynamoTable(
                 config.ReadDynamoDBTableName("GameTable"),
-                new AmazonDynamoDBClient()
+                new AmazonDynamoDBClient(),
+                LambdaSerializer
             );
             _gameStateMachine = config.ReadText("GameLoopStateMachine");
             _stepFunctionsClient = new AmazonStepFunctionsClient();
@@ -113,7 +114,7 @@ namespace LambdaRobots.Server.ServerFunction {
             case GameLoopType.Recursive:
                 LogInfo($"Kicking off Game Turn lambda: Name = {_gameTurnFunctionArn}");
                 await _lambdaClient.InvokeAsync(new InvokeRequest {
-                    Payload = SerializeJson(gameTurnRequest),
+                    Payload = LambdaSerializer.Serialize(gameTurnRequest),
                     FunctionName = _gameTurnFunctionArn,
                     InvocationType = InvocationType.Event
                 });
@@ -126,7 +127,7 @@ namespace LambdaRobots.Server.ServerFunction {
                 var startGame = await _stepFunctionsClient.StartExecutionAsync(new StartExecutionRequest {
                     StateMachineArn = _gameStateMachine,
                     Name = startGameId,
-                    Input = SerializeJson(gameTurnRequest)
+                    Input = LambdaSerializer.Serialize(gameTurnRequest)
                 });
 
                 // update execution ARN for game record

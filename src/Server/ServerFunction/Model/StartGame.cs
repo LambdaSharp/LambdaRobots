@@ -23,17 +23,17 @@
  */
 
 using System.Collections.Generic;
-using Newtonsoft.Json;
+using System.Runtime.Serialization;
 
 namespace LambdaRobots.Server.ServerFunction.Model {
 
     public class StartGameRequest {
 
         //--- Properties ---
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public string Action { get; set; }
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public List<string> RobotArns { get; set; } = new List<string>();
 
         // optional board initialization settings
@@ -54,7 +54,7 @@ namespace LambdaRobots.Server.ServerFunction.Model {
     public class StartGameResponse {
 
         //--- Properties ---
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public Game Game { get; set; }
     }
 }
