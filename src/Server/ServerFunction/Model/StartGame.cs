@@ -37,7 +37,6 @@ namespace LambdaRobots.Server.ServerFunction.Model {
         public List<string> RobotArns { get; set; } = new List<string>();
 
         // optional board initialization settings
-        public GameLoopType GameLoopType { get; set; } = GameLoopType.StepFunction;
         public double? BoardWidth { get; set; }
         public double? BoardHeight { get; set; }
         public double? SecondsPerTurn { get; set; }

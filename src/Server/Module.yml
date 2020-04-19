@@ -1,6 +1,6 @@
 Module: LambdaRobots.Server
 Description: Lambda-Robots is based on the 90s game P-Robots by David Malmberg
-Version: 1.0-DEV
+Version: 1.1-DEV
 Pragmas:
   - Overrides:
       Module::WebSocket.RouteSelectionExpression: $request.body.Action
@@ -48,54 +48,6 @@ Items:
     Description: Function for computing the next game turn
     Memory: 256
     Timeout: 30
-
-  - Resource: GameLoopStateMachine
-    Scope: ServerFunction
-    Type: AWS::StepFunctions::StateMachine
-    Properties:
-      DefinitionString: !Sub [ !Include "Includes/GameLoopStateMachine.json", { } ]
-      RoleArn: !GetAtt GameLoopStateMachineRole.Arn
-
-  - Resource: GameLoopStateMachineRole
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-          - Effect: "Allow"
-            Principal:
-              Service:
-                - !Sub states.${AWS::Region}.amazonaws.com
-            Action: sts:AssumeRole
-      Path: "/"
-      Policies:
-        - PolicyName: StatesExecutionPolicy
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: Allow
-                Action:
-                  - lambda:InvokeFunction
-                Resource: !GetAtt GameTurnFunction.Arn
-
-  - Resource: GameLoopStateMachineStartStopPolicy
-    Type: AWS::IAM::Policy
-    Properties:
-      PolicyName: !Sub "${AWS::StackName}GameLoopStateMachineStartStopPolicy"
-      PolicyDocument:
-        Id: GameLoopStateMachineStateStartStopPolicy
-        Version: "2012-10-17"
-        Statement:
-          - Sid: StateMachineStartStopPermission
-            Effect: Allow
-            Action:
-              - states:StartExecution
-              - states:StopExecution
-            Resource:
-              - !Ref GameLoopStateMachine
-              - !Sub "arn:aws:states:${AWS::Region}:${AWS::AccountId}:execution:${GameLoopStateMachine.Name}:*"
-      Roles:
-        - !Ref Module::Role
 
   - Resource: InvokeLambdasPermission
     Allow: lambda:InvokeFunction

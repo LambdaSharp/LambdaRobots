@@ -28,11 +28,6 @@ using System.Text.Json.Serialization;
 
 namespace LambdaRobots.Server {
 
-    public enum GameLoopType {
-        StepFunction,
-        Recursive
-    }
-
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum GameStatus {
         Undefined,

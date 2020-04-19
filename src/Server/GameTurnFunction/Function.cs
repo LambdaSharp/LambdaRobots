@@ -47,7 +47,6 @@ namespace LambdaRobots.Server.GameTurnFunction {
         //--- Properties ---
         public string GameId { get; set; }
         public GameStatus Status { get; set; }
-        public GameLoopType GameLoopType { get; set; } = GameLoopType.StepFunction;
     }
 
     public class FunctionResponse {
@@ -55,7 +54,6 @@ namespace LambdaRobots.Server.GameTurnFunction {
         //--- Properties ---
         public string GameId { get; set; }
         public GameStatus Status { get; set; }
-        public GameLoopType GameLoopType { get; set; } = GameLoopType.StepFunction;
     }
 
     public class Function : ALambdaFunction<FunctionRequest, FunctionResponse> {
@@ -95,8 +93,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                 // game must have been stopped
                 return new FunctionResponse {
                     GameId = request.GameId,
-                    Status = GameStatus.Finished,
-                    GameLoopType = request.GameLoopType
+                    Status = GameStatus.Finished
                 };
             }
 
@@ -165,8 +162,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     // the record failed to updated, because the game was stopped
                     return new FunctionResponse {
                         GameId = game.Id,
-                        Status = GameStatus.Finished,
-                        GameLoopType = request.GameLoopType
+                        Status = GameStatus.Finished
                     };
                 }
             } else {
@@ -194,7 +190,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             }
 
             // check if we need to invoke the next game turn
-            if((request.GameLoopType == GameLoopType.Recursive) && (game.Status == GameStatus.NextTurn)) {
+            if(game.Status == GameStatus.NextTurn) {
                 await _lambdaClient.InvokeAsync(new InvokeRequest {
                     Payload = LambdaSerializer.Serialize(request),
                     FunctionName = CurrentContext.FunctionName,
@@ -203,8 +199,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             }
             return new FunctionResponse {
                 GameId = game.Id,
-                Status = game.Status,
-                GameLoopType = request.GameLoopType
+                Status = game.Status
             };
         }
 
