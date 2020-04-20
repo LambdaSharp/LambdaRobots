@@ -133,8 +133,9 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     // nothing further to do
                     break;
                 default:
+                    var status = game.Status;
                     game.Status = GameStatus.Error;
-                    throw new ApplicationException($"unexpected game state: '{gameRecord.Game.Status}'");
+                    throw new ApplicationException($"unexpected game state: '{status}'");
                 }
             } catch(Exception e) {
                 LogError(e, "error during game loop");
