@@ -195,8 +195,7 @@ function getAdvanceConfig() {
     CollisionRange: Number(document.getElementById("CollisionRange").value),
     RobotTimeoutSeconds: Number(
       document.getElementById("RobotTimeoutSeconds").value
-    ),
-    GameLoopType: document.getElementById("GameLoopType").value
+    )
   };
 
   // remove properties with zero value
@@ -209,7 +208,10 @@ function restoreAdvanceConfig() {
   const config = JSON.parse(localStorage.getItem("advanceConfig"));
   if (config) {
     Object.keys(config).forEach(key => {
-      document.getElementById(key).value = config[key];
+      const elem = document.getElementById(key);
+      if(elem != null) {
+        elem.value = config[key];
+      }
     });
   }
 }
