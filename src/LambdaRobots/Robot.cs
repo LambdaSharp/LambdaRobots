@@ -22,11 +22,12 @@
  * SOFTWARE.
  */
 
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 namespace LambdaRobots {
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
+    [JsonConverter(typeof(StringEnumConverter))]
     public enum LambdaRobotStatus {
 
         /// <summary>
