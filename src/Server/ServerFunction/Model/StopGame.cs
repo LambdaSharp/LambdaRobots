@@ -22,18 +22,18 @@
  * SOFTWARE.
  */
 
+using System.Runtime.Serialization;
 using LambdaRobots.Server;
-using Newtonsoft.Json;
 
 namespace LambdaRobots.Server.ServerFunction.Model {
 
     public class StopGameRequest {
 
         //--- Properties ---
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public string Action { get; set; }
 
-        [JsonRequired]
+        [DataMember(IsRequired = true)]
         public string GameId { get; set; }
     }
 

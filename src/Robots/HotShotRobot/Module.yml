@@ -1,6 +1,5 @@
 Module: LambdaRobots.HotShotRobot
 Description: Robot focused on taking its targets down as quickly as possible
-Version: 1.0-DEV
 Items:
 
   - Function: RobotFunction
