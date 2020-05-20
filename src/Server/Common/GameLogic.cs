@@ -541,11 +541,14 @@ namespace LambdaRobots.Server {
                 missile.Speed,
                 missile.Heading,
                 missile.Range,
-                out missile.X,
-                out missile.Y,
-                out missile.Distance,
+                out var missileX,
+                out var missileY,
+                out var missileDistance,
                 out collision
             );
+            missile.X = missileX;
+            missile.Y = missileY;
+            missile.Distance = missileDistance;
             if(collision) {
                 missile.Status = MissileStatus.ExplodingDirect;
                 missile.Speed = 0.0;
@@ -647,11 +650,14 @@ namespace LambdaRobots.Server {
                 effectiveSpeed,
                 robot.Heading,
                 double.MaxValue,
-                out robot.X,
-                out robot.Y,
-                out robot.TotalTravelDistance,
+                out var robotX,
+                out var robotY,
+                out var robotTotalTravelDistance,
                 out collision
             );
+            robot.X = robotX;
+            robot.Y = robotY;
+            robot.TotalTravelDistance = robotTotalTravelDistance;
 
             // check for collision with wall
             if(collision) {

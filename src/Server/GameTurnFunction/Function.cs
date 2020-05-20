@@ -37,9 +37,6 @@ using Amazon.Runtime;
 using LambdaRobots.Protocol;
 using LambdaSharp;
 
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
-
 namespace LambdaRobots.Server.GameTurnFunction {
 
     public class FunctionRequest {
@@ -47,7 +44,6 @@ namespace LambdaRobots.Server.GameTurnFunction {
         //--- Properties ---
         public string GameId { get; set; }
         public GameStatus Status { get; set; }
-        public GameLoopType GameLoopType { get; set; } = GameLoopType.StepFunction;
     }
 
     public class FunctionResponse {
@@ -55,7 +51,6 @@ namespace LambdaRobots.Server.GameTurnFunction {
         //--- Properties ---
         public string GameId { get; set; }
         public GameStatus Status { get; set; }
-        public GameLoopType GameLoopType { get; set; } = GameLoopType.StepFunction;
     }
 
     public class Function : ALambdaFunction<FunctionRequest, FunctionResponse> {
@@ -79,7 +74,8 @@ namespace LambdaRobots.Server.GameTurnFunction {
             });
             _table = new DynamoTable(
                 config.ReadDynamoDBTableName("GameTable"),
-                new AmazonDynamoDBClient()
+                new AmazonDynamoDBClient(),
+                LambdaSerializer
             );
             _gameApiUrl = config.ReadText("RestApiUrl");
         }
@@ -94,8 +90,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                 // game must have been stopped
                 return new FunctionResponse {
                     GameId = request.GameId,
-                    Status = GameStatus.Finished,
-                    GameLoopType = request.GameLoopType
+                    Status = GameStatus.Finished
                 };
             }
 
@@ -135,8 +130,9 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     // nothing further to do
                     break;
                 default:
+                    var status = game.Status;
                     game.Status = GameStatus.Error;
-                    throw new ApplicationException($"unexpected game state: '{gameRecord.Game.Status}'");
+                    throw new ApplicationException($"unexpected game state: '{status}'");
                 }
             } catch(Exception e) {
                 LogError(e, "error during game loop");
@@ -164,8 +160,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     // the record failed to updated, because the game was stopped
                     return new FunctionResponse {
                         GameId = game.Id,
-                        Status = GameStatus.Finished,
-                        GameLoopType = request.GameLoopType
+                        Status = GameStatus.Finished
                     };
                 }
             } else {
@@ -178,7 +173,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             try {
                 await _amaClient.PostToConnectionAsync(new PostToConnectionRequest {
                     ConnectionId = gameRecord.ConnectionId,
-                    Data = new MemoryStream(Encoding.UTF8.GetBytes(SerializeJson(new GameTurnNotification {
+                    Data = new MemoryStream(Encoding.UTF8.GetBytes(LambdaSerializer.Serialize(new GameTurnNotification {
                         Game = game
                     })))
                 });
@@ -193,17 +188,16 @@ namespace LambdaRobots.Server.GameTurnFunction {
             }
 
             // check if we need to invoke the next game turn
-            if((request.GameLoopType == GameLoopType.Recursive) && (game.Status == GameStatus.NextTurn)) {
+            if(game.Status == GameStatus.NextTurn) {
                 await _lambdaClient.InvokeAsync(new InvokeRequest {
-                    Payload = SerializeJson(request),
+                    Payload = LambdaSerializer.Serialize(request),
                     FunctionName = CurrentContext.FunctionName,
                     InvocationType = InvocationType.Event
                 });
             }
             return new FunctionResponse {
                 GameId = game.Id,
-                Status = game.Status,
-                GameLoopType = request.GameLoopType
+                Status = game.Status
             };
         }
 
@@ -211,7 +205,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
                 var getNameTask = _lambdaClient.InvokeAsync(new InvokeRequest {
-                    Payload = SerializeJson(new LambdaRobotRequest {
+                    Payload = LambdaSerializer.Serialize(new LambdaRobotRequest {
                         Command = LambdaRobotCommand.GetBuild,
                         Game = new GameInfo {
                             Id = game.Id,
@@ -238,7 +232,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     return null;
                 }
                 var response = Encoding.UTF8.GetString(getNameTask.Result.Payload.ToArray());
-                var result = DeserializeJson<LambdaRobotResponse>(response);
+                var result = LambdaSerializer.Deserialize<LambdaRobotResponse>(response);
                 LogInfo($"Robot {robot.Id} GetName responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
                 return result.RobotBuild;
             } catch(Exception e) {
@@ -251,7 +245,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
                 var getActionTask = _lambdaClient.InvokeAsync(new InvokeRequest {
-                    Payload = SerializeJson(new LambdaRobotRequest {
+                    Payload = LambdaSerializer.Serialize(new LambdaRobotRequest {
                         Command = LambdaRobotCommand.GetAction,
                         Game = new GameInfo {
                             Id = game.Id,
@@ -279,7 +273,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     return null;
                 }
                 var response = Encoding.UTF8.GetString(getActionTask.Result.Payload.ToArray());
-                var result = DeserializeJson<LambdaRobotResponse>(response);
+                var result = LambdaSerializer.Deserialize<LambdaRobotResponse>(response);
                 LogInfo($"Robot {robot.Id} GetAction responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
                 return result.RobotAction;
             } catch(Exception e) {

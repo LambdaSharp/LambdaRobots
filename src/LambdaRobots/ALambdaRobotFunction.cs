@@ -111,7 +111,8 @@ namespace LambdaRobots {
         public override async Task InitializeAsync(LambdaConfig config) {
             _table = new DynamoTable(
                 config.ReadDynamoDBTableName("RobotStateTable"),
-                new AmazonDynamoDBClient()
+                new AmazonDynamoDBClient(),
+                LambdaSerializer
             );
         }
 
@@ -119,7 +120,7 @@ namespace LambdaRobots {
 
             // NOTE (2019-10-03, bjorg): this method dispatches to other methods based on the incoming
             //  request; most likely, there is nothing to change here.
-            LogInfo($"Request:\n{SerializeJson(request)}");
+            LogInfo($"Request:\n{LambdaSerializer.Serialize(request)}");
 
             // check if there is a state object to load
             var robotStateRecord = await _table.GetAsync<LambdaRobotStateRecord>(request.Robot.Id);
@@ -131,7 +132,7 @@ namespace LambdaRobots {
                 };
             }
             State = robotStateRecord.State;
-            LogInfo($"Starting State:\n{SerializeJson(State)}");
+            LogInfo($"Starting State:\n{LambdaSerializer.Serialize(State)}");
 
             // dispatch to specific method based on request command
             LambdaRobotResponse response;
@@ -177,8 +178,8 @@ namespace LambdaRobots {
             await _table.CreateOrUpdateAsync(robotStateRecord);
 
             // log response and return
-            LogInfo($"Final State:\n{SerializeJson(State)}");
-            LogInfo($"Response:\n{SerializeJson(response)}");
+            LogInfo($"Final State:\n{LambdaSerializer.Serialize(State)}");
+            LogInfo($"Response:\n{LambdaSerializer.Serialize(response)}");
             return response;
         }
 
@@ -235,7 +236,7 @@ namespace LambdaRobots {
         /// <param name="resolution">Scan +/- arc in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
         public async Task<double?> ScanAsync(double heading, double resolution) {
-            var response = await new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Game.Id, Robot.Id).ScanAsync(heading, resolution);
+            var response = await new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Game.Id, Robot.Id, LambdaSerializer).ScanAsync(heading, resolution);
             var result = (response.Success && response.Found)
                 ? (double?)response.Distance
                 : null;

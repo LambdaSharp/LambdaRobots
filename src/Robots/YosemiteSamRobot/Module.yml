@@ -1,6 +1,5 @@
 Module: LambdaRobots.YosemiteSamRobot
 Description: Robot that runs around randomly firing missiles in all directions
-Version: 1.0-DEV
 Items:
 
   - Function: RobotFunction

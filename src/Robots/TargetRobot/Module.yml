@@ -1,6 +1,5 @@
 Module: LambdaRobots.TargetRobot
 Description: Stationary target robot
-Version: 1.0-DEV
 Items:
 
   - Function: RobotFunction
@@ -21,10 +20,9 @@ Items:
 
   - Resource: RobotStateTable
     Description: Table for holding the state of the robot
-    Scope: all
+    Scope: RobotFunction
     Type: AWS::DynamoDB::Table
     Allow: ReadWrite
-    Scope: all
     Properties:
       BillingMode: PAY_PER_REQUEST
       AttributeDefinitions:

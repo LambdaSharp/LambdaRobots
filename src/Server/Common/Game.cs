@@ -23,15 +23,11 @@
  */
 
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
 namespace LambdaRobots.Server {
-
-    public enum GameLoopType {
-        StepFunction,
-        Recursive
-    }
 
     [JsonConverter(typeof(StringEnumConverter))]
     public enum GameStatus {
@@ -44,35 +40,35 @@ namespace LambdaRobots.Server {
 
     public class Game {
 
-        //--- Fields ---
-        public string Id;
+        //--- Properties ---
+        public string Id { get; set; }
 
         // current state
-        public GameStatus Status;
-        public int TotalTurns;
-        public List<LambdaRobotMissile> Missiles = new List<LambdaRobotMissile>();
-        public List<LambdaRobot> Robots = new List<LambdaRobot>();
-        public List<Message> Messages = new List<Message>();
+        public GameStatus Status { get; set; }
+        public int TotalTurns { get; set; }
+        public List<LambdaRobotMissile> Missiles { get; set; } = new List<LambdaRobotMissile>();
+        public List<LambdaRobot> Robots { get; set; } = new List<LambdaRobot>();
+        public List<Message> Messages { get; set; } = new List<Message>();
 
         // game characteristics
-        public double BoardWidth;
-        public double BoardHeight;
-        public double SecondsPerTurn;
-        public double DirectHitRange;
-        public double NearHitRange;
-        public double FarHitRange;
-        public double CollisionRange;
-        public double MinRobotStartDistance;
-        public double RobotTimeoutSeconds;
-        public int MaxTurns;
-        public int MaxBuildPoints;
+        public double BoardWidth { get; set; }
+        public double BoardHeight { get; set; }
+        public double SecondsPerTurn { get; set; }
+        public double DirectHitRange { get; set; }
+        public double NearHitRange { get; set; }
+        public double FarHitRange { get; set; }
+        public double CollisionRange { get; set; }
+        public double MinRobotStartDistance { get; set; }
+        public double RobotTimeoutSeconds { get; set; }
+        public int MaxTurns { get; set; }
+        public int MaxBuildPoints { get; set; }
     }
 
     public class Message {
 
-        //--- Fields ---
-        public int GameTurn;
-        public string Text;
+        //--- Properties ---
+        public int GameTurn { get; set; }
+        public string Text { get; set; }
     }
 
     [JsonConverter(typeof(StringEnumConverter))]
@@ -89,44 +85,44 @@ namespace LambdaRobots.Server {
 
         //--- Fields ---
 
-        [JsonRequired]
-        public string Id;
+        [DataMember(IsRequired = true)]
+        public string Id { get; set; }
 
-        [JsonRequired]
-        public string RobotId;
+        [DataMember(IsRequired = true)]
+        public string RobotId { get; set; }
 
         // current state
 
-        [JsonRequired]
-        public MissileStatus Status;
+        [DataMember(IsRequired = true)]
+        public MissileStatus Status { get; set; }
 
-        [JsonRequired]
-        public double X;
+        [DataMember(IsRequired = true)]
+        public double X { get; set; }
 
-        [JsonRequired]
-        public double Y;
+        [DataMember(IsRequired = true)]
+        public double Y { get; set; }
 
-        [JsonRequired]
-        public double Distance;
+        [DataMember(IsRequired = true)]
+        public double Distance { get; set; }
 
         // missile characteristics
 
-        [JsonRequired]
-        public double Speed;
+        [DataMember(IsRequired = true)]
+        public double Speed { get; set; }
 
-        [JsonRequired]
-        public double Heading;
+        [DataMember(IsRequired = true)]
+        public double Heading { get; set; }
 
-        [JsonRequired]
-        public double Range;
+        [DataMember(IsRequired = true)]
+        public double Range { get; set; }
 
-        [JsonRequired]
-        public double DirectHitDamageBonus;
+        [DataMember(IsRequired = true)]
+        public double DirectHitDamageBonus { get; set; }
 
-        [JsonRequired]
-        public double NearHitDamageBonus;
+        [DataMember(IsRequired = true)]
+        public double NearHitDamageBonus { get; set; }
 
-        [JsonRequired]
-        public double FarHitDamageBonus;
+        [DataMember(IsRequired = true)]
+        public double FarHitDamageBonus { get; set; }
     }
 }
