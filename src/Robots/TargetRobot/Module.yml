@@ -1,6 +1,5 @@
 Module: LambdaRobots.TargetRobot
 Description: Stationary target robot
-Version: 1.0-DEV
 Items:
 
   - Function: RobotFunction

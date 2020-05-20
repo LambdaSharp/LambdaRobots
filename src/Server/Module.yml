@@ -1,6 +1,5 @@
 Module: LambdaRobots.Server
 Description: Lambda-Robots is based on the 90s game P-Robots by David Malmberg
-Version: 1.1-DEV
 Pragmas:
   - Overrides:
       Module::WebSocket.RouteSelectionExpression: $request.body.Action
