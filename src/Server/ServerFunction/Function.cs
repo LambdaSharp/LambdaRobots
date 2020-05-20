@@ -28,15 +28,11 @@ using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.Lambda;
 using Amazon.Lambda.APIGatewayEvents;
-using Amazon.Lambda.Core;
 using Amazon.Lambda.Model;
 using LambdaRobots.Api.Model;
 using LambdaRobots.Server.ServerFunction.Model;
 using LambdaSharp;
 using LambdaSharp.ApiGateway;
-
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(LambdaSharp.Serialization.LambdaJsonSerializer))]
 
 namespace LambdaRobots.Server.ServerFunction {
 

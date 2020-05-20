@@ -37,9 +37,6 @@ using Amazon.Runtime;
 using LambdaRobots.Protocol;
 using LambdaSharp;
 
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(LambdaSharp.Serialization.LambdaJsonSerializer))]
-
 namespace LambdaRobots.Server.GameTurnFunction {
 
     public class FunctionRequest {

@@ -24,11 +24,7 @@
 
 using System;
 using System.Threading.Tasks;
-using Amazon.Lambda.Core;
 using LambdaRobots.Protocol;
-
-// Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
-[assembly: LambdaSerializer(typeof(LambdaSharp.Serialization.LambdaJsonSerializer))]
 
 namespace LambdaRobots.HotShotRobot.RobotFunction {
 
