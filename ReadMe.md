@@ -1,3 +1,5 @@
+> TODO: have the game server store the robot state and send it back each turn
+
 # λ-Robots
 
 In λ-Robots (pronounced _Lambda Robots_), you program a battle robot that participates on a square game field. Each turn, the server invokes your robot's Lambda function to get its action for the turn until either the robot wins or is destroyed.
