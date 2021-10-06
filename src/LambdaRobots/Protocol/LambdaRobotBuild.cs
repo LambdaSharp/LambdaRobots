@@ -22,12 +22,11 @@
  * SOFTWARE.
  */
 
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json.Serialization;
 
 namespace LambdaRobots.Protocol {
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum LambdaRobotRadarType {
 
         /// <summary>
@@ -57,7 +56,7 @@ namespace LambdaRobots.Protocol {
     }
 
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum LambdaRobotEngineType {
 
         /// <summary>
@@ -86,7 +85,7 @@ namespace LambdaRobots.Protocol {
         ExtraLarge
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum LambdaRobotArmorType {
 
         /// <summary>
@@ -115,7 +114,7 @@ namespace LambdaRobots.Protocol {
         UltraHeavy
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum LambdaRobotMissileType {
 
         /// <summary>

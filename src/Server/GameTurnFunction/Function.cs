@@ -58,6 +58,9 @@ namespace LambdaRobots.Server.GameTurnFunction {
         //--- Class Fields ---
         private static Random _random = new Random();
 
+        //--- Constructors ---
+        public Function() : base(new LambdaSharp.Serialization.LambdaSystemTextJsonSerializer()) { }
+
         //--- Fields ---
         private IAmazonLambda _lambdaClient;
         private IAmazonApiGatewayManagementApi _amaClient;

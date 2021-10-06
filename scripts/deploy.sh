@@ -1,6 +1,6 @@
 #!/bin/bash
 
-LAMBDAROBOTS_VERSION=1.2
+LAMBDAROBOTS_VERSION=2.0
 
 lash deploy \
     LambdaRobots.Server:$LAMBDAROBOTS_VERSION@lambdasharp \

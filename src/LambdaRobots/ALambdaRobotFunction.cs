@@ -54,6 +54,9 @@ namespace LambdaRobots {
         private LambdaRobotAction _action;
         private DynamoTable _table;
 
+        //--- Constructors ---
+        protected ALambdaRobotFunction() : base(new LambdaSharp.Serialization.LambdaSystemTextJsonSerializer()) { }
+
         //--- Properties ---
 
         /// <summary>

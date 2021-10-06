@@ -29,8 +29,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DocumentModel;
-using Amazon.Lambda.Core;
-using LambdaSharp;
+using LambdaSharp.Serialization;
 
 namespace LambdaRobots {
 
@@ -53,10 +52,10 @@ namespace LambdaRobots {
         //--- Fields ---
         private readonly IAmazonDynamoDB _dynamoDbClient;
         private readonly Table _table;
-        private readonly ILambdaSerializer _serializer;
+        private readonly ILambdaJsonSerializer _serializer;
 
         //--- Constructors ---
-        public DynamoTable(string tableName, IAmazonDynamoDB dynamoDbClient, ILambdaSerializer serializer) {
+        public DynamoTable(string tableName, IAmazonDynamoDB dynamoDbClient, ILambdaJsonSerializer serializer) {
             _dynamoDbClient = dynamoDbClient ?? throw new ArgumentNullException(nameof(dynamoDbClient));
             _table = Table.LoadTable(_dynamoDbClient, tableName ?? throw new ArgumentNullException(nameof(tableName)));
             _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));

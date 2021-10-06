@@ -46,6 +46,9 @@ namespace LambdaRobots.Server.ServerFunction {
         private IAmazonLambda _lambdaClient;
         private string _gameTurnFunctionArn;
 
+        //--- Constructors ---
+        public Function() : base(new LambdaSharp.Serialization.LambdaSystemTextJsonSerializer()) { }
+
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
             _table = new DynamoTable(

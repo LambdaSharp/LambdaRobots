@@ -42,7 +42,7 @@ cd LambdaRobots
 
 The following command deploys the `LambdaRobots.Server` module from the `lambdasharp` repository into the AWS account using [CloudFormation](https://aws.amazon.com/cloudformation/).
 ```bash
-lash deploy LambdaRobots.Server:1.2@lambdasharp
+lash deploy LambdaRobots.Server:2.0@lambdasharp
 ```
 
 Once the command has finished running, the output will show the website URL for the λ-Robots server.
@@ -71,7 +71,7 @@ Use the **Advance Configuration** to change any default settings.  Use **Clear S
 Deploy `TargetRobot` to your account and add its ARN three times to the λ-Robots server to create three targets.
 
 ```bash
-lash deploy LambdaRobots.TargetRobot:1.2@lambdasharp
+lash deploy LambdaRobots.TargetRobot:2.0@lambdasharp
 ```
 
 Now update the behavior of `BringYourOwnRobot` to shoot down the target robots. For example, you can use luck, like `YosemiteSamRobot`, which shoots in random directions, or targeting like `HotShotRobot`. The latter uses the `ScanAsync()` method to find enemies and aim missiles at them. Remember that other robots may be out of radar range, requiring your robot to move periodically. Also, your robot can be damaged by its own missiles. Check `Game.FarHitRange` to make sure your target is beyond the damage range. If you don't mind a bit of self-inflicted pain, you can also use `Game.NearHitRange` or even `Game.DirectHitRange` instead.
@@ -80,7 +80,7 @@ Now update the behavior of `BringYourOwnRobot` to shoot down the target robots. 
 
 Deploy `YosemiteSamRobot` to your account and its ARN twice to the λ-Robots server to create two attackers.
 ```bash
-lash deploy LambdaRobots.YosemiteSamRobot:1.2@lambdasharp
+lash deploy LambdaRobots.YosemiteSamRobot:2.0@lambdasharp
 ```
 
 Now update the behavior of `BringYourOwnRobot` to avoid getting shot. For example, you can continuous motion, like `YosemiteSamRobot`, which zig-zags across the board, or reacting to damage like `HotShotRobot`. Beware that a robot cannot change heading without suddenly stopping if its speed exceeds `Robot.MaxSpeed`.
@@ -89,7 +89,7 @@ Now update the behavior of `BringYourOwnRobot` to avoid getting shot. For exampl
 
 Deploy `HotShotRobot` to your account and its ARN once to the λ-Robots server to create one formidable foe.
 ```bash
-lash deploy LambdaRobots.HotShotRobot:1.2@lambdasharp
+lash deploy LambdaRobots.HotShotRobot:2.0@lambdasharp
 ```
 
 Consider modifying your robot build by tuning the engine, armor, missile, and radar to suit your attack and evasion strategies. Remember that your build cannot exceed 8 points, or your robot will be disqualified from the competition.

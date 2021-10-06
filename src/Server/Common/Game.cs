@@ -24,12 +24,11 @@
 
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
+using System.Text.Json.Serialization;
 
 namespace LambdaRobots.Server {
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum GameStatus {
         Undefined,
         Start,
@@ -71,7 +70,7 @@ namespace LambdaRobots.Server {
         public string Text { get; set; }
     }
 
-    [JsonConverter(typeof(StringEnumConverter))]
+    [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum MissileStatus {
         Undefined,
         Flying,

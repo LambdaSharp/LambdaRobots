@@ -26,9 +26,8 @@ using System;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Amazon.Lambda.Core;
-using LambdaSharp;
 using LambdaRobots.Api.Model;
+using LambdaSharp.Serialization;
 
 namespace LambdaRobots.Api {
 
@@ -39,10 +38,10 @@ namespace LambdaRobots.Api {
         private readonly string _gameApi;
         private readonly string _gameId;
         private readonly string _robotId;
-        private readonly ILambdaSerializer _serializer;
+        private readonly ILambdaJsonSerializer _serializer;
 
         //--- Constructors ---
-        public LambdaRobotsApiClient(HttpClient httpClient, string gameApi, string gameId, string robotId, ILambdaSerializer serializer) {
+        public LambdaRobotsApiClient(HttpClient httpClient, string gameApi, string gameId, string robotId, ILambdaJsonSerializer serializer) {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _gameApi = gameApi ?? throw new ArgumentNullException(nameof(gameApi));
             _gameId = gameId ?? throw new ArgumentNullException(nameof(gameId));

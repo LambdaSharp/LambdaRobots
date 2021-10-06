@@ -1,11 +1,11 @@
 #!/bin/bash
 
-LAMBDAROBOTS_VERSION=1.2
+LAMBDAROBOTS_VERSION=2.0
 FOLDER=`pwd`
 
 lash publish \
     --aws-profile lambdasharp \
-    --tier Public \
+    --tier Release \
     --force-build \
     --module-version $LAMBDAROBOTS_VERSION \
     $FOLDER/src/Server \
