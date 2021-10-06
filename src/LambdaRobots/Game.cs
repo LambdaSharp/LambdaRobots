@@ -71,7 +71,6 @@ namespace LambdaRobots {
         /// <summary>
         /// Current game turn. Starts at `1`.
         /// </summary>
-        /// <value></value>
         public int GameTurn { get; set; }
 
         /// <summary>
@@ -82,13 +81,11 @@ namespace LambdaRobots {
         /// <summary>
         /// Maximum number of build points a robot can use.
         /// </summary>
-        /// <value></value>
         public int MaxBuildPoints { get; set; }
 
         /// <summary>
         /// URL for game server API.
         /// </summary>
-        /// <value></value>
         public string ApiUrl { get; set; }
     }
 }

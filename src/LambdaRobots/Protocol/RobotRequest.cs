@@ -36,8 +36,20 @@ namespace LambdaRobots.Protocol {
     public class LambdaRobotRequest {
 
         //--- Properties ---
+
+        /// <summary>
+        /// Command for the request.
+        /// </summary>
         public LambdaRobotCommand Command { get; set; }
+
+        /// <summary>
+        /// Current robot state. Used only by `GetAction` command
+        /// </summary>
         public LambdaRobot Robot { get; set; }
+
+        /// <summary>
+        /// Current game state. Used only by `GetAction` command
+        /// </summary>
         public GameInfo Game { get; set; }
     }
 }

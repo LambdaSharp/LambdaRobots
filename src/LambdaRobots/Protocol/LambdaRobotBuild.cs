@@ -150,35 +150,30 @@ namespace LambdaRobots.Protocol {
         /// <summary>
         /// Name of Lambda-Robot.
         /// </summary>
-        /// <value></value>
         public string Name { get; set; }
 
         /// <summary>
         /// Type of Radar. Affects radar scan range and resolution.
         /// </summary>
-        /// <value></value>
         public LambdaRobotRadarType Radar { get; set; } = LambdaRobotRadarType.MidRange;
 
         /// <summary>
         /// Type of Engine. Affects max. speed and acceleration.
         /// </summary>
-        /// <value></value>
         public LambdaRobotEngineType Engine { get; set; } = LambdaRobotEngineType.Standard;
 
         /// <summary>
         /// Type of Armor. Affects hit damage, collision damage, max. speed, and deceleration.
         /// </summary>
-        /// <value></value>
         public LambdaRobotArmorType Armor { get; set; } = LambdaRobotArmorType.Medium;
 
         /// <summary>
         /// Type of Missile. Affects weapon range, velocity, hit damage, and reload speed.
         /// </summary>
-        /// <value></value>
         public LambdaRobotMissileType Missile { get; set; } = LambdaRobotMissileType.Javelin;
 
         /// <summary>
-        /// Starting internal state for the robot.
+        /// Internal starting state for the robot.
         /// </summary>
         public string StartState { get; set; }
     }
