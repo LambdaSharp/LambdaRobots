@@ -31,7 +31,6 @@ using Amazon.ApiGatewayManagementApi;
 using Amazon.ApiGatewayManagementApi.Model;
 using Amazon.DynamoDBv2;
 using Amazon.Lambda;
-using Amazon.Lambda.Core;
 using Amazon.Lambda.Model;
 using Amazon.Runtime;
 using LambdaRobots.Protocol;
@@ -88,8 +87,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             // run game
             try {
                 await GameLoopAsync(request.GameId);
-            } catch(Exception e) {
-                LogError(e, "error during game loop");
+            } catch(Exception) {
                 return new FunctionResponse {
                     GameId = request.GameId,
                     Status = GameStatus.Error
@@ -169,6 +167,16 @@ namespace LambdaRobots.Server.GameTurnFunction {
                         LogErrorAsWarning(e, "PostToConnectionAsync() failed");
                     }
                 }
+            } catch(Exception e) {
+                LogError(e, "error during game loop");
+                game.Status = GameStatus.Error;
+                await _amaClient.PostToConnectionAsync(new PostToConnectionRequest {
+                    ConnectionId = gameRecord.ConnectionId,
+                    Data = new MemoryStream(Encoding.UTF8.GetBytes(LambdaSerializer.Serialize(new GameTurnNotification {
+                        Game = game
+                    })))
+                });
+                throw;
             } finally {
 
                 // delete game from table

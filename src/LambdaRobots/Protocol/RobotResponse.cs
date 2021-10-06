@@ -38,5 +38,6 @@ namespace LambdaRobots.Protocol {
         public double? Heading { get; set; }
         public double? FireMissileHeading { get; set; }
         public double? FireMissileDistance { get; set; }
+        public string State { get; set; }
     }
 }

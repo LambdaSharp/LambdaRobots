@@ -5,6 +5,7 @@ FOLDER=`pwd`
 
 lash deploy \
     --module-version $LAMBDAROBOTS_VERSION \
+    --allow-data-loss \
     $FOLDER/src/Server \
     $FOLDER/src/Robots/HotShotRobot/ \
     $FOLDER/src/Robots/TargetRobot/ \

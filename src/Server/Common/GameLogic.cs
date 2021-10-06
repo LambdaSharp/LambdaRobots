@@ -338,6 +338,7 @@ namespace LambdaRobots.Server {
                     robot.TimeOfDeathGameTurn = Game.TotalTurns;
                     return $"{robot.Name} (R{robot.Index}) was disqualified due to bad configuration ({buildDescription}: {buildPoints} points)";
                 }
+                robot.State = config.StartState;
                 return $"{robot.Name} (R{robot.Index}) has joined the battle ({buildDescription}: {buildPoints} points)";
             }))).ToList();
             foreach(var message in messages) {
@@ -487,6 +488,9 @@ namespace LambdaRobots.Server {
         }
 
         private void ApplyRobotAction(LambdaRobot robot, LambdaRobotAction action) {
+
+            // update robot state
+            robot.State = action.State;
 
             // reduce reload time if any is active
             if(robot.ReloadCoolDown > 0) {

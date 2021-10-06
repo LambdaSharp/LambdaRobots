@@ -24,7 +24,6 @@
 
 using System;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2;
 using LambdaRobots.Api;
 using LambdaRobots.Protocol;
 using LambdaSharp;
@@ -32,16 +31,6 @@ using LambdaSharp;
 namespace LambdaRobots {
 
     public abstract class ALambdaRobotFunction<TState> : ALambdaFunction<LambdaRobotRequest, LambdaRobotResponse> where TState : class, new() {
-
-        //--- Types ---
-        public class LambdaRobotStateRecord : IDynamoTableSingletonRecord {
-
-            //--- Properties ---
-            public string PK { get; set; }
-            public string SK => "ROBOT-STATE";
-            public TState State { get; set; }
-            public long Expire { get; set; }
-        }
 
         //--- Class Fields ---
 
@@ -52,7 +41,6 @@ namespace LambdaRobots {
 
         //--- Fields ---
         private LambdaRobotAction _action;
-        private DynamoTable _table;
 
         //--- Constructors ---
         protected ALambdaRobotFunction() : base(new LambdaSharp.Serialization.LambdaSystemTextJsonSerializer()) { }
@@ -116,26 +104,14 @@ namespace LambdaRobots {
         public abstract Task GetActionAsync();
 
         //--- Methods ---
-        public override async Task InitializeAsync(LambdaConfig config) {
-            _table = new DynamoTable(
-                config.ReadDynamoDBTableName("RobotStateTable"),
-                new AmazonDynamoDBClient(),
-                LambdaSerializer
-            );
-        }
+        public override async Task InitializeAsync(LambdaConfig config) { }
 
         public override sealed async Task<LambdaRobotResponse> ProcessMessageAsync(LambdaRobotRequest request) {
 
             // check if there is a state object to load
-            var robotStateRecord = await _table.GetAsync<LambdaRobotStateRecord>(request.Robot.Id);
-            if(robotStateRecord == null) {
-                robotStateRecord = new LambdaRobotStateRecord {
-                    PK = request.Robot.Id,
-                    State = new TState(),
-                    Expire = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds()
-                };
-            }
-            State = robotStateRecord.State;
+            State = !string.IsNullOrEmpty(request.Robot.State)
+                ? LambdaSerializer.Deserialize<TState>(request.Robot.State)
+                : new TState();
             LogInfo($"Starting State:\n{LambdaSerializer.Serialize(State)}");
 
             // dispatch to specific method based on request command
@@ -165,8 +141,9 @@ namespace LambdaRobots {
                     await GetActionAsync();
 
                     // generate response
+                    _action.State = LambdaSerializer.Serialize(State);
                     response = new LambdaRobotResponse {
-                        RobotAction = _action
+                        RobotAction = _action,
                     };
                 } finally {
                     Robot = null;
@@ -178,10 +155,6 @@ namespace LambdaRobots {
                 // unrecognized request
                 throw new ApplicationException($"unexpected request: '{request.Command}'");
             }
-
-            // check if there is a state object to save
-            robotStateRecord.Expire = DateTimeOffset.UtcNow.AddHours(1).ToUnixTimeSeconds();
-            await _table.CreateOrUpdateAsync(robotStateRecord);
 
             // log response and return
             LogInfo($"Final State:\n{LambdaSerializer.Serialize(State)}");

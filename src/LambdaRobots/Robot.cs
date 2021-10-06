@@ -238,5 +238,10 @@ namespace LambdaRobots {
         /// Bonus damage on target for a far hit.
         /// </summary>
         public double MissileFarHitDamageBonus { get; set; }
+
+        /// <summary>
+        /// Internal robot state.
+        /// </summary>
+        public string State { get; set; }
     }
 }

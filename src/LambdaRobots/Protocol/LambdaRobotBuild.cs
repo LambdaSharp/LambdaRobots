@@ -176,5 +176,10 @@ namespace LambdaRobots.Protocol {
         /// </summary>
         /// <value></value>
         public LambdaRobotMissileType Missile { get; set; } = LambdaRobotMissileType.Javelin;
+
+        /// <summary>
+        /// Starting internal state for the robot.
+        /// </summary>
+        public string StartState { get; set; }
     }
 }
