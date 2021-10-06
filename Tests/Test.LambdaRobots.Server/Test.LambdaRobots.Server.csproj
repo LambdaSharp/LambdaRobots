@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <IsPackable>false</IsPackable>
     <NoWarn>CS1998</NoWarn>
   </PropertyGroup>
@@ -19,7 +19,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\..\src\Server\Common\Game.cs"/>
+    <Compile Include="..\..\src\Server\Common\GameDependencyProvider.cs"/>
     <Compile Include="..\..\src\Server\Common\GameLogic.cs"/>
+    <Compile Include="..\..\src\Server\Common\GameMath.cs"/>
+    <Compile Include="..\..\src\Server\Common\RobotBuild.cs"/>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp" Version="0.8.3.*"/>

@@ -114,8 +114,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             try {
 
                 // initialize game logic
-                var logic = new GameLogic(new GameDependencyProvider(
-                    gameRecord.Game,
+                var logic = new GameLogic(gameRecord.Game, new GameDependencyProvider(
                     _random,
                     robot => GetRobotBuildAsync(gameRecord.Game, robot, gameRecord.LambdaRobotArns[gameRecord.Game.Robots.IndexOf(robot)]),
                     robot => GetRobotActionAsync(gameRecord.Game, robot, gameRecord.LambdaRobotArns[gameRecord.Game.Robots.IndexOf(robot)])
