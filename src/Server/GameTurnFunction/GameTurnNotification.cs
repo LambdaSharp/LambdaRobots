@@ -22,8 +22,6 @@
  * SOFTWARE.
  */
 
-using Amazon.Lambda.Core;
-
 namespace LambdaRobots.Server.GameTurnFunction {
 
     public class GameTurnNotification {
