@@ -46,7 +46,7 @@ Items:
     Scope: ServerFunction
     Description: Function for computing the next game turn
     Memory: 256
-    Timeout: 30
+    Timeout: 900
 
   - Resource: InvokeLambdasPermission
     Allow: lambda:InvokeFunction
