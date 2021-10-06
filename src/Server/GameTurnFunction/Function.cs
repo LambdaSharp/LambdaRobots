@@ -243,7 +243,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                             MaxGameTurns = game.MaxTurns,
                             MaxBuildPoints = game.MaxBuildPoints,
                             SecondsPerTurn = game.SecondsPerTurn,
-                            ApiUrl = _gameApiUrl
+                            ApiUrl = _gameApiUrl + $"/{game.Id}"
                         },
                         Robot = robot
                     }),

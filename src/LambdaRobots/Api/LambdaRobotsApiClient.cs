@@ -31,21 +31,7 @@ using LambdaRobots.Api.Model;
 
 namespace LambdaRobots.Api {
 
-    public class LambdaRobotsApiClient {
-
-        //--- Fields ---
-        private readonly HttpClient _httpClient;
-        private readonly string _gameApi;
-        private readonly string _gameId;
-        private readonly string _robotId;
-
-        //--- Constructors ---
-        public LambdaRobotsApiClient(HttpClient httpClient, string gameApi, string gameId, string robotId) {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
-            _gameApi = gameApi ?? throw new ArgumentNullException(nameof(gameApi));
-            _gameId = gameId ?? throw new ArgumentNullException(nameof(gameId));
-            _robotId = robotId ?? throw new ArgumentNullException(nameof(robotId));
-        }
+    public interface ILambdaRobotsApi {
 
         //--- Methods ---
 
@@ -57,11 +43,28 @@ namespace LambdaRobots.Api {
         /// <param name="heading">Scan heading in degrees</param>
         /// <param name="resolution">Scan resolution in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
+        Task<(bool Success, bool Found, double Distance)> ScanAsync(double heading, double resolution);
+    }
+
+    public class LambdaRobotsApiClient : ILambdaRobotsApi {
+
+        //--- Fields ---
+        private readonly HttpClient _httpClient;
+        private readonly string _gameApi;
+        private readonly string _robotId;
+
+        //--- Constructors ---
+        public LambdaRobotsApiClient(HttpClient httpClient, string gameApi, string robotId) {
+            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _gameApi = gameApi ?? throw new ArgumentNullException(nameof(gameApi));
+            _robotId = robotId ?? throw new ArgumentNullException(nameof(robotId));
+        }
+
+        //--- Methods ---
         public async Task<(bool Success, bool Found, double Distance)> ScanAsync(double heading, double resolution) {
 
             // issue scan request to game API
             var postTask = _httpClient.PostAsync($"{_gameApi}/scan", new StringContent(JsonSerializer.Serialize(new ScanEnemiesRequest {
-                GameId = _gameId,
                 RobotId = _robotId,
                 Heading = heading,
                 Resolution = resolution

@@ -144,12 +144,12 @@ namespace LambdaRobots.Server.ServerFunction {
             };
         }
 
-        public async Task<ScanEnemiesResponse> ScanEnemiesAsync(ScanEnemiesRequest request) {
+        public async Task<ScanEnemiesResponse> ScanEnemiesAsync(string gameId, ScanEnemiesRequest request) {
 
             // fetch game record from table
-            var gameRecord = await _table.GetAsync<GameRecord>(request.GameId);
+            var gameRecord = await _table.GetAsync<GameRecord>(gameId);
             if(gameRecord == null) {
-                throw AbortNotFound($"could not find a game session: ID = {request.GameId ?? "<NULL>"}");
+                throw AbortNotFound($"could not find a game session: ID = {gameId ?? "<NULL>"}");
             }
             var gameLogic = new GameLogic(new GameDependencyProvider(
                 gameRecord.Game,

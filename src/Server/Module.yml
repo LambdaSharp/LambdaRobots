@@ -39,7 +39,7 @@ Items:
         Invoke: StartGame
       - WebSocket: stop
         Invoke: StopGame
-      - Api: POST:/scan
+      - Api: POST:/{gameId}/scan
         Invoke: ScanEnemies
 
   - Function: GameTurnFunction

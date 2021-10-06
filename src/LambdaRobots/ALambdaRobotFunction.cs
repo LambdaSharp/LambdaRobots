@@ -97,7 +97,7 @@ namespace LambdaRobots {
         /// </summary>
         public TState State { get; set; }
 
-        public LambdaRobotsApiClient LambdaRobotsApi { get; set; }
+        public ILambdaRobotsApi LambdaRobotsApi { get; set; }
 
         //--- Abstract Methods ---
         public abstract Task<LambdaRobotBuild> GetBuildAsync();
@@ -132,7 +132,7 @@ namespace LambdaRobots {
                     // capture request fields for easy access
                     Game = request.Game;
                     Robot = request.Robot;
-                    LambdaRobotsApi = new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Game.Id, Robot.Id);
+                    LambdaRobotsApi = new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Robot.Id);
 
                     // initialize a default empty action
                     _action = new LambdaRobotAction();
