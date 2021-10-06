@@ -239,7 +239,7 @@ namespace LambdaRobots {
         /// <param name="resolution">Scan +/- arc in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
         public async Task<double?> ScanAsync(double heading, double resolution) {
-            var response = await new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Game.Id, Robot.Id, LambdaSerializer).ScanAsync(heading, resolution);
+            var response = await new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Game.Id, Robot.Id).ScanAsync(heading, resolution);
             var result = (response.Success && response.Found)
                 ? (double?)response.Distance
                 : null;

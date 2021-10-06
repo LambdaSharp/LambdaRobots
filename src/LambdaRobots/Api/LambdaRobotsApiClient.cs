@@ -25,9 +25,9 @@
 using System;
 using System.Net.Http;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using LambdaRobots.Api.Model;
-using LambdaSharp.Serialization;
 
 namespace LambdaRobots.Api {
 
@@ -38,15 +38,13 @@ namespace LambdaRobots.Api {
         private readonly string _gameApi;
         private readonly string _gameId;
         private readonly string _robotId;
-        private readonly ILambdaJsonSerializer _serializer;
 
         //--- Constructors ---
-        public LambdaRobotsApiClient(HttpClient httpClient, string gameApi, string gameId, string robotId, ILambdaJsonSerializer serializer) {
+        public LambdaRobotsApiClient(HttpClient httpClient, string gameApi, string gameId, string robotId) {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _gameApi = gameApi ?? throw new ArgumentNullException(nameof(gameApi));
             _gameId = gameId ?? throw new ArgumentNullException(nameof(gameId));
             _robotId = robotId ?? throw new ArgumentNullException(nameof(robotId));
-            _serializer = serializer ?? throw new ArgumentNullException(nameof(serializer));
         }
 
         //--- Methods ---
@@ -62,7 +60,7 @@ namespace LambdaRobots.Api {
         public async Task<(bool Success, bool Found, double Distance)> ScanAsync(double heading, double resolution) {
 
             // issue scan request to game API
-            var postTask = _httpClient.PostAsync($"{_gameApi}/scan", new StringContent(_serializer.Serialize(new ScanEnemiesRequest {
+            var postTask = _httpClient.PostAsync($"{_gameApi}/scan", new StringContent(JsonSerializer.Serialize(new ScanEnemiesRequest {
                 GameId = _gameId,
                 RobotId = _robotId,
                 Heading = heading,
@@ -76,7 +74,7 @@ namespace LambdaRobots.Api {
 
             // deserialize scan response
             var httpResponseText = await postTask.Result.Content.ReadAsStringAsync();
-            var response = _serializer.Deserialize<ScanEnemiesResponse>(httpResponseText);
+            var response = JsonSerializer.Deserialize<ScanEnemiesResponse>(httpResponseText);
             return (Success: true, Found: response.Found, Distance: response.Distance);
         }
     }
