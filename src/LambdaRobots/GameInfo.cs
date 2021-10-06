@@ -46,6 +46,8 @@ namespace LambdaRobots {
         /// <summary>
         /// Number of seconds elapsed per game turn.
         /// </summary>
+        ///
+        // TODO: is still useful when using real-time?
         public double SecondsPerTurn { get; set; }
 
         /// <summary>
