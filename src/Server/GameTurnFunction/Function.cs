@@ -188,7 +188,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
         private async Task<LambdaRobotBuild> GetRobotBuildAsync(Game game, LambdaRobot robot, string lambdaArn) {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
-                var getNameTask = _lambdaClient.InvokeAsync(new InvokeRequest {
+                var getBuildTask = _lambdaClient.InvokeAsync(new InvokeRequest {
                     Payload = LambdaSerializer.Serialize(new LambdaRobotRequest {
                         Command = LambdaRobotCommand.GetBuild,
                         Game = new GameInfo {
@@ -211,16 +211,16 @@ namespace LambdaRobots.Server.GameTurnFunction {
                 });
 
                 // check if lambda responds within time limit
-                if(await Task.WhenAny(getNameTask, Task.Delay(TimeSpan.FromSeconds(game.RobotTimeoutSeconds))) != getNameTask) {
-                    LogInfo($"Robot {robot.Id} GetName timed out after {stopwatch.Elapsed.TotalSeconds:N2}s");
+                if(await Task.WhenAny(getBuildTask, Task.Delay(TimeSpan.FromSeconds(game.RobotTimeoutSeconds))) != getBuildTask) {
+                    LogInfo($"Robot {robot.Id} GetBuild timed out after {stopwatch.Elapsed.TotalSeconds:N2}s");
                     return null;
                 }
-                var response = Encoding.UTF8.GetString(getNameTask.Result.Payload.ToArray());
+                var response = Encoding.UTF8.GetString(getBuildTask.Result.Payload.ToArray());
                 var result = LambdaSerializer.Deserialize<LambdaRobotResponse>(response);
-                LogInfo($"Robot {robot.Id} GetName responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
+                LogInfo($"Robot {robot.Id} GetBuild responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
                 return result.RobotBuild;
             } catch(Exception e) {
-                LogErrorAsWarning(e, $"Robot {robot.Id} GetName failed (arn: {lambdaArn})");
+                LogErrorAsWarning(e, $"Robot {robot.Id} GetBuild failed (arn: {lambdaArn})");
                 return null;
             }
         }
