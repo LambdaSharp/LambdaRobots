@@ -99,12 +99,17 @@ namespace LambdaRobots {
         /// </summary>
         public double ReloadCoolDown => Robot.ReloadCoolDown;
 
+        /// <summary>
+        /// How long it will take for the robot to stop.
+        /// </summary>
         public double BreakingDistance => (Speed * Speed) / (2.0 * Robot.Deceleration);
 
         /// <summary>
         /// Robot state is automatically saved and loaded for each invocation when available.
         /// </summary>
         public TState State { get; set; }
+
+        public LambdaRobotsApiClient LambdaRobotsApi { get; set; }
 
         //--- Abstract Methods ---
         public abstract Task<LambdaRobotBuild> GetBuildAsync();
@@ -120,10 +125,6 @@ namespace LambdaRobots {
         }
 
         public override sealed async Task<LambdaRobotResponse> ProcessMessageAsync(LambdaRobotRequest request) {
-
-            // NOTE (2019-10-03, bjorg): this method dispatches to other methods based on the incoming
-            //  request; most likely, there is nothing to change here.
-            LogInfo($"Request:\n{LambdaSerializer.Serialize(request)}");
 
             // check if there is a state object to load
             var robotStateRecord = await _table.GetAsync<LambdaRobotStateRecord>(request.Robot.Id);
@@ -155,6 +156,7 @@ namespace LambdaRobots {
                     // capture request fields for easy access
                     Game = request.Game;
                     Robot = request.Robot;
+                    LambdaRobotsApi = new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Game.Id, Robot.Id);
 
                     // initialize a default empty action
                     _action = new LambdaRobotAction();
@@ -168,6 +170,7 @@ namespace LambdaRobots {
                     };
                 } finally {
                     Robot = null;
+                    LambdaRobotsApi = null;
                 }
                 break;
             default:
@@ -182,7 +185,6 @@ namespace LambdaRobots {
 
             // log response and return
             LogInfo($"Final State:\n{LambdaSerializer.Serialize(State)}");
-            LogInfo($"Response:\n{LambdaSerializer.Serialize(response)}");
             return response;
         }
 
@@ -239,7 +241,7 @@ namespace LambdaRobots {
         /// <param name="resolution">Scan +/- arc in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
         public async Task<double?> ScanAsync(double heading, double resolution) {
-            var response = await new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Game.Id, Robot.Id).ScanAsync(heading, resolution);
+            var response = await LambdaRobotsApi.ScanAsync(heading, resolution);
             var result = (response.Success && response.Found)
                 ? (double?)response.Distance
                 : null;
