@@ -25,17 +25,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using LambdaRobots;
 using LambdaRobots.Protocol;
 using LambdaRobots.Server;
 
 namespace Test.LambdaRobots.Server {
 
-    public abstract class _Init {
+    public abstract class _Init : IGameDependencyProvider {
 
         //--- Fields ---
         protected IGameDependencyProvider _provider;
         protected Dictionary<string, List<Func<LambdaRobotAction>>> _robotActions = new Dictionary<string, List<Func<LambdaRobotAction>>>();
+        protected readonly Random _random = new Random();
 
         //--- Methods ---
         protected Game NewGame() => new Game {
@@ -97,23 +99,26 @@ namespace Test.LambdaRobots.Server {
             for(var i = 0; i < game.Robots.Count; ++i) {
                 game.Robots[i].Index = i;
             }
-            _provider = new GameDependencyProvider(
-                new Random(100),
-                async robot => new LambdaRobotBuild {
-                    Name = robot.Id
-                },
-                async robot => {
-
-                    // destructively fetch next action from dictionary or null if none exist
-                    if(_robotActions.TryGetValue(robot.Id, out var actions) && (actions?.Any() ?? false)) {
-                        var action = actions.First();
-                        actions.RemoveAt(0);
-                        return action();
-                    }
-                    return new LambdaRobotAction();
-                }
-            );
+            _provider = this;
             return new GameLogic(game, _provider);
+        }
+
+        //--- IGameDependencyProvider Members ---
+        double IGameDependencyProvider.NextRandomDouble() => _random.NextDouble();
+
+        async Task<LambdaRobotBuild> IGameDependencyProvider.GetRobotBuild(LambdaRobot robot) => new LambdaRobotBuild {
+            Name = robot.Id
+        };
+
+        async Task<LambdaRobotAction> IGameDependencyProvider.GetRobotAction(LambdaRobot robot) {
+
+            // destructively fetch next action from dictionary or null if none exist
+            if(_robotActions.TryGetValue(robot.Id, out var actions) && (actions?.Any() ?? false)) {
+                var action = actions.First();
+                actions.RemoveAt(0);
+                return action();
+            }
+            return new LambdaRobotAction();
         }
     }
 }

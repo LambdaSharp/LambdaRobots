@@ -161,7 +161,7 @@ namespace LambdaRobots.Server {
                 AddMessage("All robots have perished. Game Over.");
                 Game.Status = GameStatus.Finished;
                 Game.Missiles.Clear();
-            } else if((robotCount == 1) && (Game.Robots.Count > 1)) {
+            } else if(robotCount == 1) {
 
                 // last robot standing
                 AddMessage($"{Game.Robots.First(robot => robot.Status == LambdaRobotStatus.Alive).Name} is victorious! Game Over.");
@@ -265,9 +265,6 @@ namespace LambdaRobots.Server {
 
         private void ApplyRobotAction(LambdaRobot robot, LambdaRobotAction action) {
 
-            // update robot state
-            robot.State = action.RobotState;
-
             // reduce reload time if any is active
             if(robot.ReloadCoolDown > 0) {
                 robot.ReloadCoolDown = Math.Max(0.0, robot.ReloadCoolDown - Game.SecondsPerTurn);
@@ -282,6 +279,9 @@ namespace LambdaRobots.Server {
                 AddMessage($"{robot.Name} (R{robot.Index}) was disqualified by lack of action");
                 return;
             }
+
+            // update robot state
+            robot.State = action.RobotState;
 
             // update speed and heading
             robot.TargetSpeed = GameMath.MinMax(0.0, action.Speed ?? robot.TargetSpeed, robot.MaxSpeed);

@@ -30,16 +30,17 @@ using Amazon.Lambda;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Model;
 using LambdaRobots.Api.Model;
+using LambdaRobots.Protocol;
 using LambdaRobots.Server.ServerFunction.Model;
 using LambdaSharp;
 using LambdaSharp.ApiGateway;
 
 namespace LambdaRobots.Server.ServerFunction {
 
-    public class Function : ALambdaApiGatewayFunction {
+    public class Function : ALambdaApiGatewayFunction, IGameDependencyProvider {
 
         //--- Class Fields ---
-        private static Random _random = new Random();
+        private readonly static Random _random = new Random();
 
         //--- Fields ---
         private DynamoTable _table;
@@ -151,11 +152,7 @@ namespace LambdaRobots.Server.ServerFunction {
             if(gameRecord == null) {
                 throw AbortNotFound($"could not find a game session: ID = {gameId ?? "<NULL>"}");
             }
-            var gameLogic = new GameLogic(gameRecord.Game, new GameDependencyProvider(
-                _random,
-                r => throw new NotImplementedException("not implementation for GetBuild"),
-                r => throw new NotImplementedException("not implementation for GetAction")
-            ));
+            var gameLogic = new GameLogic(gameRecord.Game, this);
 
             // identify scanning robot
             var robot = gameRecord.Game.Robots.FirstOrDefault(r => r.Id == request.RobotId);
@@ -181,5 +178,10 @@ namespace LambdaRobots.Server.ServerFunction {
                 };
             }
         }
+
+        //--- IGameDependencyProvider Members ---
+        double IGameDependencyProvider.NextRandomDouble() => _random.NextDouble();
+        Task<LambdaRobotBuild> IGameDependencyProvider.GetRobotBuild(LambdaRobot robot) => throw new NotImplementedException();
+        Task<LambdaRobotAction> IGameDependencyProvider.GetRobotAction(LambdaRobot robot) => throw new NotImplementedException();
     }
 }
