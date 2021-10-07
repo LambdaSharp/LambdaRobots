@@ -26,7 +26,6 @@ using System;
 using System.Collections.Generic;
 using LambdaRobots;
 using LambdaRobots.Protocol;
-using LambdaRobots.Server;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
@@ -132,9 +131,9 @@ namespace Test.LambdaRobots.Server {
             robot.Y.Should().Be(1000.0);
             robot.Speed.Should().Be(0.0);
             robot.Damage.Should().Be(robot.CollisionDamage);
-            Game.Messages.Count.Should().Be(2);
-            Game.Messages[0].Text.Should().Be("Bob (R0) received 2 damage by wall collision");
-            Game.Messages[1].Text.Should().Be("Bob is victorious! Game Over.");
+            logic.Game.Messages.Count.Should().Be(2);
+            logic.Game.Messages[0].Text.Should().Be("Bob (R0) received 2 damage by wall collision");
+            logic.Game.Messages[1].Text.Should().Be("Bob is victorious! Game Over.");
         }
 
         [Fact]
@@ -151,9 +150,9 @@ namespace Test.LambdaRobots.Server {
             // assert
             bob.Damage.Should().Be(bob.CollisionDamage);
             dave.Damage.Should().Be(dave.CollisionDamage);
-            Game.Messages.Count.Should().Be(2);
-            Game.Messages[0].Text.Should().Be("Bob (R0) was damaged 2 by collision with Dave (R1)");
-            Game.Messages[1].Text.Should().Be("Dave (R1) was damaged 2 by collision with Bob (R0)");
+            logic.Game.Messages.Count.Should().Be(2);
+            logic.Game.Messages[0].Text.Should().Be("Bob (R0) was damaged 2 by collision with Dave (R1)");
+            logic.Game.Messages[1].Text.Should().Be("Dave (R1) was damaged 2 by collision with Bob (R0)");
         }
         #endregion
 

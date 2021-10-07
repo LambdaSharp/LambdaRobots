@@ -37,9 +37,6 @@ namespace Test.LambdaRobots.Server {
         protected IGameDependencyProvider _provider;
         protected Dictionary<string, List<Func<LambdaRobotAction>>> _robotActions = new Dictionary<string, List<Func<LambdaRobotAction>>>();
 
-        //--- Properties ---
-        protected Game Game => _provider.Game;
-
         //--- Methods ---
         protected Game NewGame() => new Game {
             Id = "Test",
@@ -52,7 +49,7 @@ namespace Test.LambdaRobots.Server {
             CollisionRange = 5.0,
             MinRobotStartDistance = 100.0,
             RobotTimeoutSeconds = 10.0,
-            TotalTurns = 0,
+            CurrentGameTurn = 0,
             MaxTurns = 300,
             MaxBuildPoints = 8
         };
@@ -101,7 +98,6 @@ namespace Test.LambdaRobots.Server {
                 game.Robots[i].Index = i;
             }
             _provider = new GameDependencyProvider(
-                game,
                 new Random(100),
                 async robot => new LambdaRobotBuild {
                     Name = robot.Id
@@ -117,7 +113,7 @@ namespace Test.LambdaRobots.Server {
                     return new LambdaRobotAction();
                 }
             );
-            return new GameLogic(_provider);
+            return new GameLogic(game, _provider);
         }
     }
 }
