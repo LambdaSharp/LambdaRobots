@@ -133,12 +133,10 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     // next turn
                     LogInfo($"Start turn {game.CurrentGameTurn} (max: {game.MaxTurns}): invoking {game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots (total: {game.Robots.Count})");
                     await logic.NextTurnAsync();
-                    LogInfo($"End turn: {game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots alive");
-
-                    // log new game messages
                     for(var i = messageCount; i < game.Messages.Count; ++i) {
                         LogInfo($"Game message {i + 1}: {game.Messages[i].Text}");
                     }
+                    LogInfo($"End turn: {game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots alive");
 
                     // attempt to update the game record
                     LogInfo($"Storing game: ID = {gameId}");
@@ -148,33 +146,16 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     }, new[] { nameof(GameRecord.Game) });
 
                     // notify WebSocket of new game state
-                    LogInfo($"Posting game update to connection: {gameId}");
-                    try {
-                        await _amaClient.PostToConnectionAsync(new PostToConnectionRequest {
-                            ConnectionId = gameRecord.ConnectionId,
-                            Data = new MemoryStream(Encoding.UTF8.GetBytes(LambdaSerializer.Serialize(new GameTurnNotification {
-                                Game = game
-                            })))
-                        });
-                    } catch(AmazonServiceException e) when(e.StatusCode == System.Net.HttpStatusCode.Gone) {
-
-                        // connection has been closed, stop the game
-                        LogInfo($"Connection is gone");
-                        game.Status = GameStatus.Finished;
+                    if(!await TryPostGameUpdateAsync(gameRecord.ConnectionId, game)) {
                         return;
-                    } catch(Exception e) {
-                        LogErrorAsWarning(e, "PostToConnectionAsync() failed");
                     }
                 }
             } catch(Exception e) {
-                LogError(e, "error during game loop");
+                LogError(e, "Error during game loop");
+
+                // notify frontend that the game is over
                 game.Status = GameStatus.Error;
-                await _amaClient.PostToConnectionAsync(new PostToConnectionRequest {
-                    ConnectionId = gameRecord.ConnectionId,
-                    Data = new MemoryStream(Encoding.UTF8.GetBytes(LambdaSerializer.Serialize(new GameTurnNotification {
-                        Game = game
-                    })))
-                });
+                await TryPostGameUpdateAsync(gameRecord.ConnectionId, game);
                 throw;
             } finally {
 
@@ -263,6 +244,28 @@ namespace LambdaRobots.Server.GameTurnFunction {
                 LogErrorAsWarning(e, $"Robot {robot.Id} GetAction failed (arn: {lambdaArn})");
                 return null;
             }
+        }
+
+        private async Task<bool> TryPostGameUpdateAsync(string connectionId, Game game) {
+            LogInfo($"Posting game update to connection: {game.Id}");
+            try {
+                var json = LambdaSerializer.Serialize(new GameTurnNotification {
+                    Game = game
+                });
+                await _amaClient.PostToConnectionAsync(new PostToConnectionRequest {
+                    ConnectionId = connectionId,
+                    Data = new MemoryStream(Encoding.UTF8.GetBytes(json))
+                });
+            } catch(AmazonServiceException e) when(e.StatusCode == System.Net.HttpStatusCode.Gone) {
+
+                // connection has been closed, stop the game
+                LogInfo($"Connection is gone");
+                game.Status = GameStatus.Finished;
+                return false;
+            } catch(Exception e) {
+                LogErrorAsWarning(e, "Failed posting game update");
+            }
+            return true;
         }
     }
 }
