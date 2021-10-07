@@ -131,7 +131,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                 while(game.Status == GameStatus.NextTurn) {
 
                     // next turn
-                    LogInfo($"Start turn {game.TotalTurns} (max: {game.MaxTurns}): invoking {game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots (total: {game.Robots.Count})");
+                    LogInfo($"Start turn {game.CurrentGameTurn} (max: {game.MaxTurns}): invoking {game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots (total: {game.Robots.Count})");
                     await logic.NextTurnAsync();
                     LogInfo($"End turn: {game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots alive");
 
@@ -198,7 +198,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                             NearHitRange = game.NearHitRange,
                             FarHitRange = game.FarHitRange,
                             CollisionRange = game.CollisionRange,
-                            GameTurn = game.TotalTurns,
+                            GameTurn = game.CurrentGameTurn,
                             MaxGameTurns = game.MaxTurns,
                             MaxBuildPoints = game.MaxBuildPoints,
                             SecondsPerTurn = game.SecondsPerTurn
@@ -238,7 +238,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                             NearHitRange = game.NearHitRange,
                             FarHitRange = game.FarHitRange,
                             CollisionRange = game.CollisionRange,
-                            GameTurn = game.TotalTurns,
+                            GameTurn = game.CurrentGameTurn,
                             MaxGameTurns = game.MaxTurns,
                             MaxBuildPoints = game.MaxBuildPoints,
                             SecondsPerTurn = game.SecondsPerTurn,

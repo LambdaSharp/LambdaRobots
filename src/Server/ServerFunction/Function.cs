@@ -132,9 +132,9 @@ namespace LambdaRobots.Server.ServerFunction {
 
             // update game state to indicated it was stopped
             gameRecord.Game.Status = GameStatus.Finished;
-            ++gameRecord.Game.TotalTurns;
+            ++gameRecord.Game.CurrentGameTurn;
             gameRecord.Game.Messages.Add(new Message {
-                GameTurn = gameRecord.Game.TotalTurns,
+                GameTurn = gameRecord.Game.CurrentGameTurn,
                 Text = "Game stopped."
             });
 

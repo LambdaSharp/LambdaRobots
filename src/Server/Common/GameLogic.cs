@@ -56,7 +56,7 @@ namespace LambdaRobots.Server {
         public async Task StartAsync(int robotCount) {
 
             // reset game state
-            Game.TotalTurns = 0;
+            Game.CurrentGameTurn = 0;
             Game.Missiles.Clear();
             Game.Messages.Clear();
             Game.Robots.Clear();
@@ -102,7 +102,7 @@ namespace LambdaRobots.Server {
         public async Task NextTurnAsync() {
 
             // increment turn counter
-            ++Game.TotalTurns;
+            ++Game.CurrentGameTurn;
 
             // invoke all robots to get their actions
             await Task.WhenAll(Game.Robots
@@ -163,11 +163,11 @@ namespace LambdaRobots.Server {
                 Game.Missiles.Clear();
             } else if((robotCount == 1) && (Game.Robots.Count > 1)) {
 
-                // last robot standing of many
+                // last robot standing
                 AddMessage($"{Game.Robots.First(robot => robot.Status == LambdaRobotStatus.Alive).Name} is victorious! Game Over.");
                 Game.Status = GameStatus.Finished;
                 Game.Missiles.Clear();
-            } else if(Game.TotalTurns >= Game.MaxTurns) {
+            } else if(Game.CurrentGameTurn >= Game.MaxTurns) {
 
                 // game has reached its turn limit
                 AddMessage($"Reached max turns. {robotCount:N0} robots are left. Game Over.");
@@ -256,7 +256,7 @@ namespace LambdaRobots.Server {
             // check if robot is disqualified due to a bad build
             if(!success) {
                 robot.Status = LambdaRobotStatus.Dead;
-                robot.TimeOfDeathGameTurn = Game.TotalTurns;
+                robot.TimeOfDeathGameTurn = Game.CurrentGameTurn;
                 return $"{robot.Name} (R{robot.Index}) was disqualified due to bad configuration ({buildDescription}: {buildPoints} points)";
             }
             robot.State = config.StartState;
@@ -278,7 +278,7 @@ namespace LambdaRobots.Server {
 
                 // robot didn't respond with an action; consider it dead
                 robot.Status = LambdaRobotStatus.Dead;
-                robot.TimeOfDeathGameTurn = Game.TotalTurns;
+                robot.TimeOfDeathGameTurn = Game.CurrentGameTurn;
                 AddMessage($"{robot.Name} (R{robot.Index}) was disqualified by lack of action");
                 return;
             }
@@ -472,7 +472,7 @@ namespace LambdaRobots.Server {
 
         private void AddMessage(string text) {
             Game.Messages.Add(new Message {
-                GameTurn = Game.TotalTurns,
+                GameTurn = Game.CurrentGameTurn,
                 Text = text
             });
         }
@@ -555,7 +555,7 @@ namespace LambdaRobots.Server {
             if(robot.Damage >= robot.MaxDamage) {
                 robot.Damage = robot.MaxDamage;
                 robot.Status = LambdaRobotStatus.Dead;
-                robot.TimeOfDeathGameTurn = Game.TotalTurns;
+                robot.TimeOfDeathGameTurn = Game.CurrentGameTurn;
                 return true;
             }
             return false;

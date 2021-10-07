@@ -44,7 +44,7 @@ namespace LambdaRobots.Server {
 
         // current state
         public GameStatus Status { get; set; }
-        public int TotalTurns { get; set; }
+        public int CurrentGameTurn { get; set; }
         public List<LambdaRobotMissile> Missiles { get; set; } = new List<LambdaRobotMissile>();
         public List<LambdaRobot> Robots { get; set; } = new List<LambdaRobot>();
         public List<Message> Messages { get; set; } = new List<Message>();
