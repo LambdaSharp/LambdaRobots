@@ -266,7 +266,7 @@ namespace LambdaRobots.Server {
         private void ApplyRobotAction(LambdaRobot robot, LambdaRobotAction action) {
 
             // update robot state
-            robot.State = action.State;
+            robot.State = action.RobotState;
 
             // reduce reload time if any is active
             if(robot.ReloadCoolDown > 0) {

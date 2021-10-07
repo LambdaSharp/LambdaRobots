@@ -141,7 +141,7 @@ namespace LambdaRobots {
                     await GetActionAsync();
 
                     // generate response
-                    _action.State = LambdaSerializer.Serialize(State);
+                    _action.RobotState = LambdaSerializer.Serialize(State);
                     response = new LambdaRobotResponse {
                         RobotAction = _action,
                     };
