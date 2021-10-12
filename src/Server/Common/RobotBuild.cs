@@ -22,8 +22,6 @@
  * SOFTWARE.
  */
 
-using LambdaRobots.Protocol;
-
 namespace LambdaRobots.Server {
 
     public static class RobotBuild {
@@ -182,7 +180,7 @@ namespace LambdaRobots.Server {
 
         public static bool TrySetMissile(LambdaRobotMissileType missile, LambdaRobot robot) {
             switch(missile) {
-            case Protocol.LambdaRobotMissileType.Dart:
+            case LambdaRobotMissileType.Dart:
                 robot.MissileRange = 1200.0;
                 robot.MissileVelocity = 250.0;
                 robot.MissileDirectHitDamageBonus = 0.0;
@@ -190,7 +188,7 @@ namespace LambdaRobots.Server {
                 robot.MissileFarHitDamageBonus = 0.0;
                 robot.MissileReloadCooldown = 0.0;
                 break;
-            case Protocol.LambdaRobotMissileType.Arrow:
+            case LambdaRobotMissileType.Arrow:
                 robot.MissileRange = 900.0;
                 robot.MissileVelocity = 200.0;
                 robot.MissileDirectHitDamageBonus = 1.0;
@@ -198,7 +196,7 @@ namespace LambdaRobots.Server {
                 robot.MissileFarHitDamageBonus = 0.0;
                 robot.MissileReloadCooldown = 1.0;
                 break;
-            case Protocol.LambdaRobotMissileType.Javelin:
+            case LambdaRobotMissileType.Javelin:
                 robot.MissileRange = 700.0;
                 robot.MissileVelocity = 150.0;
                 robot.MissileDirectHitDamageBonus = 3.0;
@@ -206,7 +204,7 @@ namespace LambdaRobots.Server {
                 robot.MissileFarHitDamageBonus = 1.0;
                 robot.MissileReloadCooldown = 2.0;
                 break;
-            case Protocol.LambdaRobotMissileType.Cannon:
+            case LambdaRobotMissileType.Cannon:
                 robot.MissileRange = 500.0;
                 robot.MissileVelocity = 100.0;
                 robot.MissileDirectHitDamageBonus = 6.0;
@@ -214,7 +212,7 @@ namespace LambdaRobots.Server {
                 robot.MissileFarHitDamageBonus = 2.0;
                 robot.MissileReloadCooldown = 3.0;
                 break;
-            case Protocol.LambdaRobotMissileType.BFG:
+            case LambdaRobotMissileType.BFG:
                 robot.MissileRange = 350.0;
                 robot.MissileVelocity = 75.0;
                 robot.MissileDirectHitDamageBonus = 12.0;

@@ -24,7 +24,7 @@
 
 using System.Text.Json.Serialization;
 
-namespace LambdaRobots.Protocol {
+namespace LambdaRobots {
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
     public enum LambdaRobotRadarType {
