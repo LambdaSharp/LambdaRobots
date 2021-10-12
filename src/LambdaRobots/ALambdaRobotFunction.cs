@@ -132,7 +132,7 @@ namespace LambdaRobots {
                     // capture request fields for easy access
                     Game = request.Game;
                     Robot = request.Robot;
-                    LambdaRobotsApi = new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Robot.Id);
+                    LambdaRobotsApi = new LambdaRobotsApiClient(Game.ApiUrl, Robot.Id, HttpClient);
 
                     // initialize a default empty action
                     _action = new LambdaRobotAction();

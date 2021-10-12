@@ -54,10 +54,10 @@ namespace LambdaRobots.Api {
         private readonly string _robotId;
 
         //--- Constructors ---
-        public LambdaRobotsApiClient(HttpClient httpClient, string gameApi, string robotId) {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+        public LambdaRobotsApiClient(string gameApi, string robotId, HttpClient httpClient = null) {
             _gameApi = gameApi ?? throw new ArgumentNullException(nameof(gameApi));
             _robotId = robotId ?? throw new ArgumentNullException(nameof(robotId));
+            _httpClient = httpClient ?? new HttpClient();
         }
 
         //--- Methods ---

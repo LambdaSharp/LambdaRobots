@@ -89,8 +89,6 @@ namespace LambdaRobots.Server.GameTurnFunction {
         }
 
         public override async Task<FunctionResponse> ProcessMessageAsync(FunctionRequest request) {
-
-            // run game
             try {
                 await GameLoopAsync(request.GameId);
             } catch(Exception) {
@@ -114,7 +112,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                 if(GameRecord?.Game?.Status != GameStatus.Start) {
 
                     // TODO: better log diagnostics
-                    LogWarn($"Game state is not valid");
+                    LogWarn($"Game state is invalid");
                     return;
                 }
                 try {
@@ -145,7 +143,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                         if(!await _dataClient.UpdateGameRecordAsync(gameId, Game)) {
 
                             // TODO: better exception
-                            throw new Exception("unable to update recor");
+                            throw new Exception("unable to update record");
                         }
 
                         // notify WebSocket of new game state
@@ -201,24 +199,25 @@ namespace LambdaRobots.Server.GameTurnFunction {
             try {
                 var lambdaArn = GameRecord.LambdaRobotArns[robot.Index];
                 try {
+                    var request = new LambdaRobotRequest {
+                        Command = LambdaRobotCommand.GetBuild,
+                        Game = new GameInfo {
+                            Id = Game.Id,
+                            BoardWidth = Game.BoardWidth,
+                            BoardHeight = Game.BoardHeight,
+                            DirectHitRange = Game.DirectHitRange,
+                            NearHitRange = Game.NearHitRange,
+                            FarHitRange = Game.FarHitRange,
+                            CollisionRange = Game.CollisionRange,
+                            GameTurn = Game.CurrentGameTurn,
+                            MaxGameTurns = Game.MaxTurns,
+                            MaxBuildPoints = Game.MaxBuildPoints,
+                            SecondsPerTurn = Game.SecondsPerTurn
+                        },
+                        Robot = robot
+                    };
                     var getBuildTask = _lambdaClient.InvokeAsync(new InvokeRequest {
-                        Payload = LambdaSerializer.Serialize(new LambdaRobotRequest {
-                            Command = LambdaRobotCommand.GetBuild,
-                            Game = new GameInfo {
-                                Id = Game.Id,
-                                BoardWidth = Game.BoardWidth,
-                                BoardHeight = Game.BoardHeight,
-                                DirectHitRange = Game.DirectHitRange,
-                                NearHitRange = Game.NearHitRange,
-                                FarHitRange = Game.FarHitRange,
-                                CollisionRange = Game.CollisionRange,
-                                GameTurn = Game.CurrentGameTurn,
-                                MaxGameTurns = Game.MaxTurns,
-                                MaxBuildPoints = Game.MaxBuildPoints,
-                                SecondsPerTurn = Game.SecondsPerTurn
-                            },
-                            Robot = robot
-                        }),
+                        Payload = LambdaSerializer.Serialize(request),
                         FunctionName = lambdaArn,
                         InvocationType = InvocationType.RequestResponse
                     });
@@ -247,25 +246,26 @@ namespace LambdaRobots.Server.GameTurnFunction {
             try {
                 var lambdaArn = GameRecord.LambdaRobotArns[robot.Index];
                 try {
+                    var request = new LambdaRobotRequest {
+                        Command = LambdaRobotCommand.GetAction,
+                        Game = new GameInfo {
+                            Id = Game.Id,
+                            BoardWidth = Game.BoardWidth,
+                            BoardHeight = Game.BoardHeight,
+                            DirectHitRange = Game.DirectHitRange,
+                            NearHitRange = Game.NearHitRange,
+                            FarHitRange = Game.FarHitRange,
+                            CollisionRange = Game.CollisionRange,
+                            GameTurn = Game.CurrentGameTurn,
+                            MaxGameTurns = Game.MaxTurns,
+                            MaxBuildPoints = Game.MaxBuildPoints,
+                            SecondsPerTurn = Game.SecondsPerTurn,
+                            ApiUrl = _gameApiUrl + $"/{Game.Id}"
+                        },
+                        Robot = robot
+                    };
                     var getActionTask = _lambdaClient.InvokeAsync(new InvokeRequest {
-                        Payload = LambdaSerializer.Serialize(new LambdaRobotRequest {
-                            Command = LambdaRobotCommand.GetAction,
-                            Game = new GameInfo {
-                                Id = Game.Id,
-                                BoardWidth = Game.BoardWidth,
-                                BoardHeight = Game.BoardHeight,
-                                DirectHitRange = Game.DirectHitRange,
-                                NearHitRange = Game.NearHitRange,
-                                FarHitRange = Game.FarHitRange,
-                                CollisionRange = Game.CollisionRange,
-                                GameTurn = Game.CurrentGameTurn,
-                                MaxGameTurns = Game.MaxTurns,
-                                MaxBuildPoints = Game.MaxBuildPoints,
-                                SecondsPerTurn = Game.SecondsPerTurn,
-                                ApiUrl = _gameApiUrl + $"/{Game.Id}"
-                            },
-                            Robot = robot
-                        }),
+                        Payload = LambdaSerializer.Serialize(request),
                         FunctionName = lambdaArn,
                         InvocationType = InvocationType.RequestResponse
                     });
