@@ -1,4 +1,4 @@
-﻿/*
+/*
  * MIT License
  *
  * Copyright (c) 2019-2021 LambdaSharp
@@ -24,11 +24,33 @@
 
 namespace LambdaRobots.Api.Model {
 
-    public sealed class ScanEnemiesRequest {
+    public sealed class GetBuildRequest {
 
         //--- Properties ---
-        public string RobotId { get; set; }
-        public double Heading { get; set; }
-        public double Resolution { get; set; }
+
+        /// <summary>
+        /// Current game state. Used only by `GetAction` command
+        /// </summary>
+        public GameInfo GameInfo { get; set; }
+
+        /// <summary>
+        /// Current robot state. Used only by `GetAction` command
+        /// </summary>
+        public LambdaRobot Robot { get; set; }
+    }
+
+    public sealed class GetActionRequest {
+
+        //--- Properties ---
+
+        /// <summary>
+        /// Current game state. Used only by `GetAction` command
+        /// </summary>
+        public GameInfo GameInfo { get; set; }
+
+        /// <summary>
+        /// Current robot state. Used only by `GetAction` command
+        /// </summary>
+        public LambdaRobot Robot { get; set; }
     }
 }

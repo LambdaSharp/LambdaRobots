@@ -109,7 +109,7 @@ namespace LambdaRobots {
         public override sealed async Task<LambdaRobotResponse> ProcessMessageAsync(LambdaRobotRequest request) {
 
             // check if there is a state object to load
-            State = !string.IsNullOrEmpty(request.Robot.State)
+            State = !string.IsNullOrEmpty(request.Robot?.State)
                 ? LambdaSerializer.Deserialize<TState>(request.Robot.State)
                 : new TState();
             LogInfo($"Starting State:\n{LambdaSerializer.Serialize(State)}");
