@@ -25,6 +25,9 @@ Items:
           KeyType: HASH
         - AttributeName: SK
           KeyType: RANGE
+      TimeToLiveSpecification:
+        AttributeName: Expire
+        Enabled: true
 
   - Function: ServerFunction
     Description: Function for handling REST API and WebSocket interactions

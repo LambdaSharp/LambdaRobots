@@ -33,5 +33,6 @@ namespace LambdaRobots.Server.DataAccess.Records {
         public Game Game { get; set; }
         public List<string> LambdaRobotArns { get; set; }
         public string ConnectionId { get; set; }
+        public long Expire { get; set; }
     }
 }

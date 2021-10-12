@@ -89,7 +89,8 @@ namespace LambdaRobots.Server.ServerFunction {
                 GameId = game.Id,
                 Game = game,
                 LambdaRobotArns = request.RobotArns,
-                ConnectionId = CurrentRequest.RequestContext.ConnectionId
+                ConnectionId = CurrentRequest.RequestContext.ConnectionId,
+                Expire = DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeSeconds()
             };
 
             // store game record
