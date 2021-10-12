@@ -18,13 +18,12 @@
     <ProjectReference Include="../../src/LambdaRobots/LambdaRobots.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\..\src\Server\Common\Game.cs"/>
-    <Compile Include="..\..\src\Server\Common\GameLogic.cs"/>
-    <Compile Include="..\..\src\Server\Common\GameMath.cs"/>
-    <Compile Include="..\..\src\Server\Common\RobotBuild.cs"/>
+    <Compile Include="..\..\src\Server\Common\**"/>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp" Version="0.8.3.*"/>
     <ProjectReference Condition="'$(LAMBDASHARP)'!=''" Include="$(LAMBDASHARP)/src/LambdaSharp/LambdaSharp.csproj" />
+    <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp.DynamoDB.Native" Version="0.8.3.*"/>
+    <ProjectReference Condition="'$(LAMBDASHARP)'!=''" Include="$(LAMBDASHARP)/src/LambdaSharp.DynamoDB.Native/LambdaSharp.DynamoDB.Native.csproj"/>
   </ItemGroup>
 </Project>

@@ -24,13 +24,12 @@
 
 using System.Collections.Generic;
 
-namespace LambdaRobots.Server {
+namespace LambdaRobots.Server.DataAccess.Records {
 
-    public class GameRecord : IDynamoTableSingletonRecord {
+    public class GameRecord {
 
         //--- Properties ---
-        public string PK { get; set; }
-        public string SK => "GAME";
+        public string GameId { get; set; }
         public Game Game { get; set; }
         public List<string> LambdaRobotArns { get; set; }
         public string ConnectionId { get; set; }

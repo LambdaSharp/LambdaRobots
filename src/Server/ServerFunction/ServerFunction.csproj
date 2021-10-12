@@ -10,7 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="AWSSDK.ApiGatewayManagementApi" Version="3.7.0.75"/>
-    <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.7.0.76"/>
     <PackageReference Include="AWSSDK.Lambda" Version="3.7.4.2"/>
   </ItemGroup>
   <ItemGroup>
@@ -24,5 +23,7 @@
     <ProjectReference Condition="'$(LAMBDASHARP)'!=''" Include="$(LAMBDASHARP)/src/LambdaSharp/LambdaSharp.csproj"/>
     <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp.ApiGateway" Version="0.8.3.*"/>
     <ProjectReference Condition="'$(LAMBDASHARP)'!=''" Include="$(LAMBDASHARP)/src/LambdaSharp.ApiGateway/LambdaSharp.ApiGateway.csproj"/>
+    <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp.DynamoDB.Native" Version="0.8.3.*"/>
+    <ProjectReference Condition="'$(LAMBDASHARP)'!=''" Include="$(LAMBDASHARP)/src/LambdaSharp.DynamoDB.Native/LambdaSharp.DynamoDB.Native.csproj"/>
   </ItemGroup>
 </Project>

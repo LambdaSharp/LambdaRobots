@@ -25,12 +25,13 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2;
 using Amazon.Lambda;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Model;
 using LambdaRobots.Api.Model;
 using LambdaRobots.Protocol;
+using LambdaRobots.Server.DataAccess;
+using LambdaRobots.Server.DataAccess.Records;
 using LambdaRobots.Server.ServerFunction.Model;
 using LambdaSharp;
 using LambdaSharp.ApiGateway;
@@ -43,7 +44,7 @@ namespace LambdaRobots.Server.ServerFunction {
         private readonly static Random _random = new Random();
 
         //--- Fields ---
-        private DynamoTable _table;
+        private DataAccessClient _dataClient;
         private IAmazonLambda _lambdaClient;
         private string _gameTurnFunctionArn;
 
@@ -52,11 +53,7 @@ namespace LambdaRobots.Server.ServerFunction {
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
-            _table = new DynamoTable(
-                config.ReadDynamoDBTableName("GameTable"),
-                new AmazonDynamoDBClient(),
-                LambdaSerializer
-            );
+            _dataClient = new DataAccessClient(config.ReadDynamoDBTableName("GameTable"));
             _lambdaClient = new AmazonLambdaClient();
             _gameTurnFunctionArn = config.ReadText("GameTurnFunction");
         }
@@ -89,14 +86,13 @@ namespace LambdaRobots.Server.ServerFunction {
                 RobotTimeoutSeconds = request.RobotTimeoutSeconds ?? 15.0
             };
             var gameRecord = new GameRecord {
-                PK = game.Id,
                 Game = game,
                 LambdaRobotArns = request.RobotArns,
                 ConnectionId = CurrentRequest.RequestContext.ConnectionId
             };
 
             // store game record
-            await _table.CreateAsync(gameRecord);
+            await _dataClient.CreateGameRecordAsync(gameRecord);
 
             // dispatch game loop
             LogInfo($"Kicking off Game Turn lambda: Name = {_gameTurnFunctionArn}");
@@ -119,7 +115,7 @@ namespace LambdaRobots.Server.ServerFunction {
             LogInfo($"Stop game: ConnectionId = {CurrentRequest.RequestContext.ConnectionId}");
 
             // fetch game record from table
-            var gameRecord = await _table.GetAsync<GameRecord>(request.GameId);
+            var gameRecord = await _dataClient.GetGameRecordAsync(request.GameId);
             if(gameRecord == null) {
                 LogInfo("No game found to stop");
 
@@ -129,7 +125,7 @@ namespace LambdaRobots.Server.ServerFunction {
 
             // delete game record
             LogInfo($"Deleting game record: ID = {request.GameId}");
-            await _table.DeleteAsync<GameRecord>(request.GameId);
+            await _dataClient.DeleteGameRecordAsync(request.GameId);
 
             // update game state to indicated it was stopped
             gameRecord.Game.Status = GameStatus.Finished;
@@ -148,7 +144,7 @@ namespace LambdaRobots.Server.ServerFunction {
         public async Task<ScanEnemiesResponse> ScanEnemiesAsync(string gameId, ScanEnemiesRequest request) {
 
             // fetch game record from table
-            var gameRecord = await _table.GetAsync<GameRecord>(gameId);
+            var gameRecord = await _dataClient.GetGameRecordAsync(gameId);
             if(gameRecord == null) {
                 throw AbortNotFound($"could not find a game session: ID = {gameId ?? "<NULL>"}");
             }

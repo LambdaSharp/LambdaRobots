@@ -29,11 +29,12 @@ using System.Text;
 using System.Threading.Tasks;
 using Amazon.ApiGatewayManagementApi;
 using Amazon.ApiGatewayManagementApi.Model;
-using Amazon.DynamoDBv2;
 using Amazon.Lambda;
 using Amazon.Lambda.Model;
 using Amazon.Runtime;
 using LambdaRobots.Protocol;
+using LambdaRobots.Server.DataAccess;
+using LambdaRobots.Server.DataAccess.Records;
 using LambdaSharp;
 
 namespace LambdaRobots.Server.GameTurnFunction {
@@ -63,7 +64,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
         //--- Fields ---
         private IAmazonLambda _lambdaClient;
         private IAmazonApiGatewayManagementApi _amaClient;
-        private DynamoTable _table;
+        private DataAccessClient _dataClient;
         private string _gameApiUrl;
         private GameRecord _gameRecord;
 
@@ -83,11 +84,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             _amaClient = new AmazonApiGatewayManagementApiClient(new AmazonApiGatewayManagementApiConfig {
                 ServiceURL = config.ReadText("Module::WebSocket::Url")
             });
-            _table = new DynamoTable(
-                config.ReadDynamoDBTableName("GameTable"),
-                new AmazonDynamoDBClient(),
-                LambdaSerializer
-            );
+            _dataClient = new DataAccessClient(config.ReadDynamoDBTableName("GameTable"));
             _gameApiUrl = config.ReadText("RestApiUrl");
         }
 
@@ -112,7 +109,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
 
             // get game state from DynamoDB table
             LogInfo($"Loading game state: ID = {gameId}");
-            GameRecord = await _table.GetAsync<GameRecord>(gameId);
+            GameRecord = await _dataClient.GetGameRecordAsync(gameId);
             try {
                 if(GameRecord?.Game?.Status != GameStatus.Start) {
 
@@ -145,10 +142,11 @@ namespace LambdaRobots.Server.GameTurnFunction {
 
                         // attempt to update the game record
                         LogInfo($"Storing game: ID = {gameId}");
-                        await _table.UpdateAsync(new GameRecord {
-                            PK = gameId,
-                            Game = Game
-                        }, new[] { nameof(Function.Game) });
+                        if(!await _dataClient.UpdateGameRecordAsync(gameId, Game)) {
+
+                            // TODO: better exception
+                            throw new Exception("unable to update recor");
+                        }
 
                         // notify WebSocket of new game state
                         if(!await TryPostGameUpdateAsync(GameRecord.ConnectionId, Game)) {
@@ -166,7 +164,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
 
                     // delete game from table
                     LogInfo($"Deleting game: ID = {gameId}");
-                    await _table.DeleteAsync<GameRecord>(gameId);
+                    await _dataClient.DeleteGameRecordAsync(gameId);
                 }
             } finally {
                 GameRecord = null;
