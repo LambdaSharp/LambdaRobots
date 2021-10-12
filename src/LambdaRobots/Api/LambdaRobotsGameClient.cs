@@ -31,7 +31,7 @@ using LambdaRobots.Api.Model;
 
 namespace LambdaRobots.Api {
 
-    public interface ILambdaRobotsApi {
+    public interface ILambdaRobotsGame {
 
         //--- Methods ---
 
@@ -46,7 +46,7 @@ namespace LambdaRobots.Api {
         Task<(bool Success, bool Found, double Distance)> ScanAsync(double heading, double resolution);
     }
 
-    public class LambdaRobotsApiClient : ILambdaRobotsApi {
+    public class LambdaRobotsGameClient : ILambdaRobotsGame {
 
         //--- Fields ---
         private readonly HttpClient _httpClient;
@@ -54,7 +54,7 @@ namespace LambdaRobots.Api {
         private readonly string _robotId;
 
         //--- Constructors ---
-        public LambdaRobotsApiClient(string gameApi, string robotId, HttpClient httpClient = null) {
+        public LambdaRobotsGameClient(string gameApi, string robotId, HttpClient httpClient = null) {
             _gameApi = gameApi ?? throw new ArgumentNullException(nameof(gameApi));
             _robotId = robotId ?? throw new ArgumentNullException(nameof(robotId));
             _httpClient = httpClient ?? new HttpClient();
