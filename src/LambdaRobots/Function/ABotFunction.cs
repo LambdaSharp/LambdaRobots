@@ -97,7 +97,7 @@ namespace LambdaRobots.Function {
         /// </summary>
         public TState State { get; set; }
 
-        public ILambdaRobotsGame LambdaRobotsApi { get; set; }
+        public ILambdaRobotsGame GameClient { get; set; }
 
         //--- Abstract Methods ---
         public abstract Task<GetBuildResponse> GetBuildAsync();
@@ -132,7 +132,7 @@ namespace LambdaRobots.Function {
                     // capture request fields for easy access
                     Game = request.Game;
                     Robot = request.Robot;
-                    LambdaRobotsApi = new LambdaRobotsGameClient(Game.ApiUrl, Robot.Id, HttpClient);
+                    GameClient = new LambdaRobotsGameClient(Game.ApiUrl, Robot.Id, HttpClient);
 
                     // initialize a default empty action
                     _action = new GetActionResponse();
@@ -147,7 +147,7 @@ namespace LambdaRobots.Function {
                     };
                 } finally {
                     Robot = null;
-                    LambdaRobotsApi = null;
+                    GameClient = null;
                 }
                 break;
             default:
@@ -214,8 +214,10 @@ namespace LambdaRobots.Function {
         /// <param name="resolution">Scan +/- arc in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
         public async Task<double?> ScanAsync(double heading, double resolution) {
-            var response = await LambdaRobotsApi.ScanAsync(heading, resolution);
-            var result = (double?)response?.Distance;
+            var response = await GameClient.ScanAsync(heading, resolution);
+            var result = (response?.Found ?? false)
+                ? (double?)response.Distance
+                : null;
             LogInfo($"Scan: Heading = {heading:N2}, Resolution = {resolution:N2}, Found = {result?.ToString("N2") ?? "(null)"} [Success = {response != null}]");
             return result;
         }
