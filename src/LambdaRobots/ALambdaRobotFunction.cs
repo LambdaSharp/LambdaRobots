@@ -24,7 +24,7 @@
 
 using System;
 using System.Threading.Tasks;
-using LambdaRobots.Api;
+using LambdaRobots.Game;
 using LambdaRobots.Protocol;
 using LambdaSharp;
 
@@ -215,10 +215,8 @@ namespace LambdaRobots {
         /// <returns>Distance to nearest target or `null` if no target found</returns>
         public async Task<double?> ScanAsync(double heading, double resolution) {
             var response = await LambdaRobotsApi.ScanAsync(heading, resolution);
-            var result = (response.Success && response.Found)
-                ? (double?)response.Distance
-                : null;
-            LogInfo($"Scan: Heading = {heading:N2}, Resolution = {resolution:N2}, Found = {result?.ToString("N2") ?? "(null)"} [Success = {response.Success}]");
+            var result = (double?)response?.Distance;
+            LogInfo($"Scan: Heading = {heading:N2}, Resolution = {resolution:N2}, Found = {result?.ToString("N2") ?? "(null)"} [Success = {response != null}]");
             return result;
         }
 

@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Api.Model {
+namespace LambdaRobots.Game.Model {
 
     public sealed class ScanEnemiesRequest {
 

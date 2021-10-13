@@ -22,35 +22,12 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Api.Model {
+namespace LambdaRobots.Game.Model {
 
-    public sealed class GetBuildRequest {
-
-        //--- Properties ---
-
-        /// <summary>
-        /// Current game state. Used only by `GetAction` command
-        /// </summary>
-        public GameInfo GameInfo { get; set; }
-
-        /// <summary>
-        /// Current robot state. Used only by `GetAction` command
-        /// </summary>
-        public LambdaRobot Robot { get; set; }
-    }
-
-    public sealed class GetActionRequest {
+    public sealed class ScanResponse {
 
         //--- Properties ---
-
-        /// <summary>
-        /// Current game state. Used only by `GetAction` command
-        /// </summary>
-        public GameInfo GameInfo { get; set; }
-
-        /// <summary>
-        /// Current robot state. Used only by `GetAction` command
-        /// </summary>
-        public LambdaRobot Robot { get; set; }
+        public bool Found { get; set; }
+        public double Distance { get; set; }
     }
 }

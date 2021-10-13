@@ -31,8 +31,8 @@ using Amazon.ApiGatewayManagementApi;
 using Amazon.ApiGatewayManagementApi.Model;
 using Amazon.Lambda;
 using Amazon.Runtime;
-using LambdaRobots.Api;
-using LambdaRobots.Api.Model;
+using LambdaRobots.Bot;
+using LambdaRobots.Bot.Model;
 using LambdaRobots.Protocol;
 using LambdaRobots.Server.DataAccess;
 using LambdaRobots.Server.DataAccess.Records;
@@ -197,7 +197,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
 
         Task<LambdaRobotBuild> IGameDependencyProvider.GetRobotBuild(LambdaRobot robot) {
             try {
-                var client = new LambdaRobotClient(robot.Id, GameRecord.LambdaRobotArns[robot.Index], TimeSpan.FromSeconds(Game.RobotTimeoutSeconds), _lambdaClient, this);
+                var client = new LambdaRobotBotClient(robot.Id, GameRecord.LambdaRobotArns[robot.Index], TimeSpan.FromSeconds(Game.RobotTimeoutSeconds), _lambdaClient, this);
                 return client.GetBuild(new GetBuildRequest {
                     GameInfo = new GameInfo {
                         Id = Game.Id,
@@ -223,7 +223,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
         Task<LambdaRobotAction> IGameDependencyProvider.GetRobotAction(LambdaRobot robot) {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
-                var client = new LambdaRobotClient(robot.Id, GameRecord.LambdaRobotArns[robot.Index], TimeSpan.FromSeconds(Game.RobotTimeoutSeconds), _lambdaClient, this);
+                var client = new LambdaRobotBotClient(robot.Id, GameRecord.LambdaRobotArns[robot.Index], TimeSpan.FromSeconds(Game.RobotTimeoutSeconds), _lambdaClient, this);
                 return client.GetAction(new GetActionRequest {
                     GameInfo = new GameInfo {
                         Id = Game.Id,

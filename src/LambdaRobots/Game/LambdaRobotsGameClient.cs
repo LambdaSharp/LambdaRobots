@@ -27,9 +27,9 @@ using System.Net.Http;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
-using LambdaRobots.Api.Model;
+using LambdaRobots.Game.Model;
 
-namespace LambdaRobots.Api {
+namespace LambdaRobots.Game {
 
     public interface ILambdaRobotsGame {
 
@@ -43,7 +43,7 @@ namespace LambdaRobots.Api {
         /// <param name="heading">Scan heading in degrees</param>
         /// <param name="resolution">Scan resolution in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
-        Task<(bool Success, bool Found, double Distance)> ScanAsync(double heading, double resolution);
+        Task<ScanResponse> ScanAsync(double heading, double resolution);
     }
 
     public class LambdaRobotsGameClient : ILambdaRobotsGame {
@@ -61,7 +61,7 @@ namespace LambdaRobots.Api {
         }
 
         //--- Methods ---
-        public async Task<(bool Success, bool Found, double Distance)> ScanAsync(double heading, double resolution) {
+        public async Task<ScanResponse> ScanAsync(double heading, double resolution) {
 
             // issue scan request to game API
             var postTask = _httpClient.PostAsync($"{_gameApi}/scan", new StringContent(JsonSerializer.Serialize(new ScanEnemiesRequest {
@@ -72,13 +72,12 @@ namespace LambdaRobots.Api {
 
             // wait for response or timeout
             if(await Task.WhenAny(postTask, Task.Delay(TimeSpan.FromSeconds(1.0))) != postTask) {
-                return (Success: false, Found: false, Distance: 0.0);
+                return null;
             }
 
             // deserialize scan response
             var httpResponseText = await postTask.Result.Content.ReadAsStringAsync();
-            var response = JsonSerializer.Deserialize<ScanEnemiesResponse>(httpResponseText);
-            return (Success: true, Found: response.Found, Distance: response.Distance);
+            return JsonSerializer.Deserialize<ScanResponse>(httpResponseText);
         }
     }
 }

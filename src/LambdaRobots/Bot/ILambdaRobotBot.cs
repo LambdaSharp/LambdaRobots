@@ -28,20 +28,20 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Amazon.Lambda;
 using Amazon.Lambda.Model;
-using LambdaRobots.Api.Model;
+using LambdaRobots.Bot.Model;
 using LambdaRobots.Protocol;
 using LambdaSharp.Logging;
 
-namespace LambdaRobots.Api {
+namespace LambdaRobots.Bot {
 
-    public interface ILambdaRobot {
+    public interface ILambdaRobotBot {
 
         //--- Methods ---
         Task<LambdaRobotBuild> GetBuild(GetBuildRequest request);
         Task<LambdaRobotAction> GetAction(GetActionRequest request);
     }
 
-    public sealed class LambdaRobotClient : ILambdaRobot {
+    public sealed class LambdaRobotBotClient : ILambdaRobotBot {
 
         //--- Fields ---
         private readonly string _robotId;
@@ -51,7 +51,7 @@ namespace LambdaRobots.Api {
         private IAmazonLambda _lambdaClient;
 
         //--- Constructors ---
-        public LambdaRobotClient(string robotId, string lambdaArn, TimeSpan requestTimeout, IAmazonLambda lambdaClient = null, ILambdaSharpLogger logger = null) {
+        public LambdaRobotBotClient(string robotId, string lambdaArn, TimeSpan requestTimeout, IAmazonLambda lambdaClient = null, ILambdaSharpLogger logger = null) {
             _robotId = robotId ?? throw new ArgumentNullException(nameof(robotId));
             _lambdaArn = lambdaArn ?? throw new ArgumentNullException(nameof(lambdaArn));
             _requestTimeout = requestTimeout;

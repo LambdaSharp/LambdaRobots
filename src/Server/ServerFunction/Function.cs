@@ -28,7 +28,7 @@ using System.Threading.Tasks;
 using Amazon.Lambda;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Model;
-using LambdaRobots.Api.Model;
+using LambdaRobots.Game.Model;
 using LambdaRobots.Protocol;
 using LambdaRobots.Server.DataAccess;
 using LambdaRobots.Server.DataAccess.Records;
@@ -143,7 +143,7 @@ namespace LambdaRobots.Server.ServerFunction {
             };
         }
 
-        public async Task<ScanEnemiesResponse> ScanEnemiesAsync(string gameId, ScanEnemiesRequest request) {
+        public async Task<ScanResponse> ScanEnemiesAsync(string gameId, ScanEnemiesRequest request) {
 
             // fetch game record from table
             var gameRecord = await _dataClient.GetGameRecordAsync(gameId);
@@ -164,13 +164,13 @@ namespace LambdaRobots.Server.ServerFunction {
                 var distance = GameMath.Distance(robot.X, robot.Y, found.X, found.Y);
                 var angle = GameMath.NormalizeAngle(Math.Atan2(found.X - robot.X, found.Y - robot.Y) * 180.0 / Math.PI);
                 LogInfo($"Scanning: Heading = {GameMath.NormalizeAngle(request.Heading):N2}, Resolution = {request.Resolution:N2}, Found = R{found.Index}, Distance = {distance:N2}, Angle = {angle:N2}");
-                return new ScanEnemiesResponse {
+                return new ScanResponse {
                     Found = true,
                     Distance = distance
                 };
             } else {
                LogInfo($"Scanning: Heading = {GameMath.NormalizeAngle(request.Heading):N2}, Resolution = {request.Resolution:N2}, Found = nothing");
-                return new ScanEnemiesResponse {
+                return new ScanResponse {
                     Found = false,
                     Distance = 0.0
                 };
