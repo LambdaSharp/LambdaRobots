@@ -25,10 +25,10 @@
 using System;
 using System.Collections.Generic;
 using LambdaRobots;
-using LambdaRobots.Protocol;
 using FluentAssertions;
 using Xunit;
 using Xunit.Abstractions;
+using LambdaRobots.Bot.Model;
 
 namespace Test.LambdaRobots.Server {
 
@@ -49,8 +49,8 @@ namespace Test.LambdaRobots.Server {
             // arrange
             var robot = NewRobot("Bob", 500, 500);
             var logic = NewLogic(robot);
-            _robotActions["Bob"] = new List<Func<LambdaRobotAction>> {
-                () => new LambdaRobotAction {
+            _robotActions["Bob"] = new List<Func<GetActionResponse>> {
+                () => new GetActionResponse {
                     Heading = 0.0,
                     Speed = 100.0
                 }
@@ -71,8 +71,8 @@ namespace Test.LambdaRobots.Server {
             // arrange
             var robot = NewRobot("Bob", 500, 500);
             var logic = NewLogic(robot);
-            _robotActions["Bob"] = new List<Func<LambdaRobotAction>> {
-                () => new LambdaRobotAction {
+            _robotActions["Bob"] = new List<Func<GetActionResponse>> {
+                () => new GetActionResponse {
                     Heading = 0.0,
                     Speed = 100.0
                 }
@@ -94,8 +94,8 @@ namespace Test.LambdaRobots.Server {
             // arrange
             var robot = NewRobot("Bob", 500, 500);
             var logic = NewLogic(robot);
-            _robotActions["Bob"] = new List<Func<LambdaRobotAction>> {
-                () => new LambdaRobotAction {
+            _robotActions["Bob"] = new List<Func<GetActionResponse>> {
+                () => new GetActionResponse {
                     Heading = 90.0,
                     Speed = 100.0
                 }
@@ -211,7 +211,7 @@ namespace Test.LambdaRobots.Server {
             // arrange
             var robot = NewRobot("Bob", 500, 500);
             var logic = NewLogic(robot);
-            _robotActions["Bob"] = new List<Func<LambdaRobotAction>> {
+            _robotActions["Bob"] = new List<Func<GetActionResponse>> {
                 () => null
             };
 
@@ -219,7 +219,7 @@ namespace Test.LambdaRobots.Server {
             logic.NextTurnAsync().Wait();
 
             // assert
-            robot.Status.Should().Be(LambdaRobotStatus.Dead);
+            robot.Status.Should().Be(BotStatus.Dead);
         }
         #endregion
     }

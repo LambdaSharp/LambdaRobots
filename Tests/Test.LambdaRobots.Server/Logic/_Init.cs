@@ -27,7 +27,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LambdaRobots;
-using LambdaRobots.Protocol;
+using LambdaRobots.Bot.Model;
 using LambdaRobots.Server;
 
 namespace Test.LambdaRobots.Server {
@@ -36,7 +36,7 @@ namespace Test.LambdaRobots.Server {
 
         //--- Fields ---
         protected IGameDependencyProvider _provider;
-        protected Dictionary<string, List<Func<LambdaRobotAction>>> _robotActions = new Dictionary<string, List<Func<LambdaRobotAction>>>();
+        protected Dictionary<string, List<Func<GetActionResponse>>> _robotActions = new Dictionary<string, List<Func<GetActionResponse>>>();
         protected readonly Random _random = new Random();
 
         //--- Methods ---
@@ -56,12 +56,12 @@ namespace Test.LambdaRobots.Server {
             MaxBuildPoints = 8
         };
 
-        protected LambdaRobot NewRobot(string id, double x, double y) => new LambdaRobot {
+        protected BotInfo NewRobot(string id, double x, double y) => new BotInfo {
 
             // robot state
             Id = id,
             Name = id,
-            Status = LambdaRobotStatus.Alive,
+            Status = BotStatus.Alive,
             X = x,
             Y = y,
             Speed = 0.0,
@@ -93,7 +93,7 @@ namespace Test.LambdaRobots.Server {
             MissileFarHitDamageBonus = 1.0
         };
 
-        protected GameLogic NewLogic(params LambdaRobot[] robots) {
+        protected GameLogic NewLogic(params BotInfo[] robots) {
             var game = NewGame();
             game.Robots.AddRange(robots);
             for(var i = 0; i < game.Robots.Count; ++i) {
@@ -106,11 +106,11 @@ namespace Test.LambdaRobots.Server {
         //--- IGameDependencyProvider Members ---
         double IGameDependencyProvider.NextRandomDouble() => _random.NextDouble();
 
-        async Task<LambdaRobotBuild> IGameDependencyProvider.GetRobotBuild(LambdaRobot robot) => new LambdaRobotBuild {
+        async Task<GetBuildResponse> IGameDependencyProvider.GetRobotBuild(BotInfo robot) => new GetBuildResponse {
             Name = robot.Id
         };
 
-        async Task<LambdaRobotAction> IGameDependencyProvider.GetRobotAction(LambdaRobot robot) {
+        async Task<GetActionResponse> IGameDependencyProvider.GetRobotAction(BotInfo robot) {
 
             // destructively fetch next action from dictionary or null if none exist
             if(_robotActions.TryGetValue(robot.Id, out var actions) && (actions?.Any() ?? false)) {
@@ -118,7 +118,7 @@ namespace Test.LambdaRobots.Server {
                 actions.RemoveAt(0);
                 return action();
             }
-            return new LambdaRobotAction();
+            return new GetActionResponse();
         }
     }
 }

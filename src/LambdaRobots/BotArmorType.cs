@@ -22,39 +22,36 @@
  * SOFTWARE.
  */
 
-using System.Threading.Tasks;
-using LambdaRobots.Bot.Model;
-using LambdaRobots.Function;
+using System.Text.Json.Serialization;
 
-namespace LambdaRobots.BringYourOwnRobot.RobotFunction {
+namespace LambdaRobots {
 
-    public sealed class BotState {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum BotArmorType {
 
-        // TODO: use this to define the internal state of the bot
-    }
+        /// <summary>
+        /// 50 direct hit, 25 near hit, 12 far hit, 10 collision, +35 m/s max. speed, 30 m/s^2 deceleration (0 pts)
+        /// </summary>
+        UltraLight,
 
-    public sealed class Function : ABotFunction<BotState> {
+        /// <summary>
+        /// 16 direct hit, 8 near hit, 4 far hit, 3 collision, +25 m/s max. speed, 25 m/s^2 deceleration (1 pt)
+        /// </summary>
+        Light,
 
-        //--- Methods ---
-        public override async Task<GetBuildResponse> GetBuildAsync() {
-            return new GetBuildResponse {
+        /// <summary>
+        /// 8 direct hit, 4 near hit, 2 far hit, 2 collision, +0 m/s max. speed, 20 m/s^2 deceleration (2 pts)
+        /// </summary>
+        Medium,
 
-                // TODO: give your robot a name!
-                Name = "BringYourOwnRobot",
+        /// <summary>
+        /// 4 direct hit, 2 near hit, 1 far hit, 1 collision, -25 m/s max. speed, 15 m/s^2 deceleration (3 pts)
+        /// </summary>
+        Heavy,
 
-                Armor = BotArmorType.Medium,
-                Engine = BotEngineType.Economy,
-                Missile = BotMissileType.Dart,
-                Radar = BotRadarType.UltraShortRange
-            };
-        }
-
-        public override async Task GetActionAsync() {
-
-            // TODO: breath life into your robots behavior
-
-            // NOTE: you can use the `State` property to fetch and store state across invocation.
-            //  The `State` property is of type `BotState`.
-        }
+        /// <summary>
+        /// 2 direct hit, 1 near hit, 0 far hit, 1 collision, -45 m/s max. speed, 10 m/s^2 deceleration (4 pts)
+        /// </summary>
+        UltraHeavy
     }
 }

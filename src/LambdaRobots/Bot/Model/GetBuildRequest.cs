@@ -29,28 +29,13 @@ namespace LambdaRobots.Bot.Model {
         //--- Properties ---
 
         /// <summary>
-        /// Current game state. Used only by `GetAction` command
+        /// Current game state.
         /// </summary>
         public GameInfo GameInfo { get; set; }
 
         /// <summary>
-        /// Current robot state. Used only by `GetAction` command
+        /// Current robot state.
         /// </summary>
-        public LambdaRobot Robot { get; set; }
-    }
-
-    public sealed class GetActionRequest {
-
-        //--- Properties ---
-
-        /// <summary>
-        /// Current game state. Used only by `GetAction` command
-        /// </summary>
-        public GameInfo GameInfo { get; set; }
-
-        /// <summary>
-        /// Current robot state. Used only by `GetAction` command
-        /// </summary>
-        public LambdaRobot Robot { get; set; }
+        public BotInfo Robot { get; set; }
     }
 }

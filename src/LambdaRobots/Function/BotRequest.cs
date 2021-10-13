@@ -22,39 +22,34 @@
  * SOFTWARE.
  */
 
-using System.Threading.Tasks;
-using LambdaRobots.Bot.Model;
-using LambdaRobots.Function;
+using System.Text.Json.Serialization;
 
-namespace LambdaRobots.BringYourOwnRobot.RobotFunction {
+namespace LambdaRobots.Function {
 
-    public sealed class BotState {
-
-        // TODO: use this to define the internal state of the bot
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum BotCommand {
+        Undefined,
+        GetBuild,
+        GetAction
     }
 
-    public sealed class Function : ABotFunction<BotState> {
+    public class BotRequest {
 
-        //--- Methods ---
-        public override async Task<GetBuildResponse> GetBuildAsync() {
-            return new GetBuildResponse {
+        //--- Properties ---
 
-                // TODO: give your robot a name!
-                Name = "BringYourOwnRobot",
+        /// <summary>
+        /// Command for the request.
+        /// </summary>
+        public BotCommand Command { get; set; }
 
-                Armor = BotArmorType.Medium,
-                Engine = BotEngineType.Economy,
-                Missile = BotMissileType.Dart,
-                Radar = BotRadarType.UltraShortRange
-            };
-        }
+        /// <summary>
+        /// Current robot state. Used only by `GetAction` command
+        /// </summary>
+        public BotInfo Robot { get; set; }
 
-        public override async Task GetActionAsync() {
-
-            // TODO: breath life into your robots behavior
-
-            // NOTE: you can use the `State` property to fetch and store state across invocation.
-            //  The `State` property is of type `BotState`.
-        }
+        /// <summary>
+        /// Current game state. Used only by `GetAction` command
+        /// </summary>
+        public GameInfo Game { get; set; }
     }
 }

@@ -22,22 +22,40 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Protocol {
+namespace LambdaRobots.Bot.Model {
 
-    public class LambdaRobotResponse {
-
-        //--- Properties ---
-        public LambdaRobotBuild RobotBuild { get; set; }
-        public LambdaRobotAction RobotAction { get; set; }
-    }
-
-    public class LambdaRobotAction {
+    public class GetBuildResponse  {
 
         //--- Properties ---
-        public double? Speed { get; set; }
-        public double? Heading { get; set; }
-        public double? FireMissileHeading { get; set; }
-        public double? FireMissileDistance { get; set; }
-        public string RobotState { get; set; }
+
+        /// <summary>
+        /// Name of Lambda-Robot.
+        /// </summary>
+        public string Name { get; set; }
+
+        /// <summary>
+        /// Type of Radar. Affects radar scan range and resolution.
+        /// </summary>
+        public BotRadarType Radar { get; set; } = BotRadarType.MidRange;
+
+        /// <summary>
+        /// Type of Engine. Affects max. speed and acceleration.
+        /// </summary>
+        public BotEngineType Engine { get; set; } = BotEngineType.Standard;
+
+        /// <summary>
+        /// Type of Armor. Affects hit damage, collision damage, max. speed, and deceleration.
+        /// </summary>
+        public BotArmorType Armor { get; set; } = BotArmorType.Medium;
+
+        /// <summary>
+        /// Type of Missile. Affects weapon range, velocity, hit damage, and reload speed.
+        /// </summary>
+        public BotMissileType Missile { get; set; } = BotMissileType.Javelin;
+
+        /// <summary>
+        /// Internal starting state for the robot.
+        /// </summary>
+        public string InternalStartState { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * MIT License
  *
  * Copyright (c) 2019-2021 LambdaSharp
@@ -22,39 +22,36 @@
  * SOFTWARE.
  */
 
-using System.Threading.Tasks;
-using LambdaRobots.Bot.Model;
-using LambdaRobots.Function;
+using System.Text.Json.Serialization;
 
-namespace LambdaRobots.BringYourOwnRobot.RobotFunction {
+namespace LambdaRobots {
 
-    public sealed class BotState {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum BotMissileType {
 
-        // TODO: use this to define the internal state of the bot
-    }
+        /// <summary>
+        /// 1,200 meters range, 250 m/s velocity, 0 direct hit bonus, 0 near hit bonus, 0 far hit bonus, 0 sec. reload (0 pts)
+        /// </summary>
+        Dart,
 
-    public sealed class Function : ABotFunction<BotState> {
+        /// <summary>
+        /// 900 meters range, 200 m/s velocity, 1 direct hit bonus, 1 near hit bonus, 0 far hit bonus, 1 sec. reload (1 pt)
+        /// </summary>
+        Arrow,
 
-        //--- Methods ---
-        public override async Task<GetBuildResponse> GetBuildAsync() {
-            return new GetBuildResponse {
+        /// <summary>
+        /// 700 meters range, 150 m/s velocity, 3 direct hit bonus, 2 near hit bonus, 1 far hit bonus, 2 sec. reload (2 pts)
+        /// </summary>
+        Javelin,
 
-                // TODO: give your robot a name!
-                Name = "BringYourOwnRobot",
+        /// <summary>
+        /// 500 meters range, 100 m/s velocity, 6 direct hit bonus, 4 near hit bonus, 2 far hit bonus, 3 sec. reload (3 pts)
+        /// </summary>
+        Cannon,
 
-                Armor = BotArmorType.Medium,
-                Engine = BotEngineType.Economy,
-                Missile = BotMissileType.Dart,
-                Radar = BotRadarType.UltraShortRange
-            };
-        }
-
-        public override async Task GetActionAsync() {
-
-            // TODO: breath life into your robots behavior
-
-            // NOTE: you can use the `State` property to fetch and store state across invocation.
-            //  The `State` property is of type `BotState`.
-        }
+        /// <summary>
+        /// 350 meters range, 75 m/s velocity, 12 direct hit bonus, 8 near hit bonus, 4 far hit bonus, 5 sec. reload (4 pts)
+        /// </summary>
+        BFG
     }
 }

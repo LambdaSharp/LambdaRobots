@@ -24,11 +24,12 @@
 
 using System;
 using System.Threading.Tasks;
-using LambdaRobots.Protocol;
+using LambdaRobots.Bot.Model;
+using LambdaRobots.Function;
 
 namespace LambdaRobots.HotShotRobot.RobotFunction {
 
-    public class LambdaRobotState {
+    public sealed class BotState {
 
         //--- Properties ---
         public bool Initialized { get; set; }
@@ -41,19 +42,19 @@ namespace LambdaRobots.HotShotRobot.RobotFunction {
         public double? GotoY { get; set; }
     }
 
-    public class Function : ALambdaRobotFunction<LambdaRobotState> {
+    public sealed class Function : ABotFunction<BotState> {
 
         //--- Properties ---
         private bool WasHurt => Damage > State.LastDamage;
 
         //--- Methods ---
-        public override async Task<LambdaRobotBuild> GetBuildAsync() {
-            return new LambdaRobotBuild {
+        public override async Task<GetBuildResponse> GetBuildAsync() {
+            return new GetBuildResponse {
                 Name = "HotShot",
-                Radar = LambdaRobotRadarType.LongRange,
-                Armor = LambdaRobotArmorType.Medium,
-                Engine = LambdaRobotEngineType.Compact,
-                Missile = LambdaRobotMissileType.Javelin
+                Radar = BotRadarType.LongRange,
+                Armor = BotArmorType.Medium,
+                Engine = BotEngineType.Compact,
+                Missile = BotMissileType.Javelin
             };
         }
 

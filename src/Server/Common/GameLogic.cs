@@ -26,7 +26,7 @@ using System;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using LambdaRobots.Protocol;
+using LambdaRobots.Bot.Model;
 
 namespace LambdaRobots.Server {
 
@@ -34,8 +34,8 @@ namespace LambdaRobots.Server {
 
         //--- Methods ---
         double NextRandomDouble();
-        Task<LambdaRobotBuild> GetRobotBuild(LambdaRobot robot);
-        Task<LambdaRobotAction> GetRobotAction(LambdaRobot robot);
+        Task<GetBuildResponse> GetRobotBuild(BotInfo robot);
+        Task<GetActionResponse> GetRobotAction(BotInfo robot);
     }
 
     public class GameLogic {
@@ -80,7 +80,7 @@ namespace LambdaRobots.Server {
             }
 
             // assign random locations to all robots
-            foreach(var robot in Game.Robots.Where(robot => robot.Status == LambdaRobotStatus.Alive)) {
+            foreach(var robot in Game.Robots.Where(robot => robot.Status == BotStatus.Alive)) {
                 robot.X = marginWidth + _provider.NextRandomDouble() * (Game.BoardWidth - 2.0 * marginWidth);
                 robot.Y = marginHeight + _provider.NextRandomDouble() * (Game.BoardHeight - 2.0 * marginHeight);
             }
@@ -88,7 +88,7 @@ namespace LambdaRobots.Server {
             // verify that none of the robots are too close to each other
             for(var i = 0; i < Game.Robots.Count; ++i) {
                 for(var j = i + 1; j < Game.Robots.Count; ++j) {
-                    if((Game.Robots[i].Status == LambdaRobotStatus.Alive) && (Game.Robots[j].Status == LambdaRobotStatus.Alive)) {
+                    if((Game.Robots[i].Status == BotStatus.Alive) && (Game.Robots[j].Status == BotStatus.Alive)) {
                         var distance = GameMath.Distance(Game.Robots[i].X, Game.Robots[i].Y, Game.Robots[j].X, Game.Robots[j].Y);
                         if(distance < Game.MinRobotStartDistance) {
                             ++attempts;
@@ -106,7 +106,7 @@ namespace LambdaRobots.Server {
 
             // invoke all robots to get their actions
             await Task.WhenAll(Game.Robots
-                .Where(robot => robot.Status == LambdaRobotStatus.Alive)
+                .Where(robot => robot.Status == BotStatus.Alive)
                 .Select(async robot => {
                     ApplyRobotAction(robot, await _provider.GetRobotAction(robot));
                     return true;
@@ -114,7 +114,7 @@ namespace LambdaRobots.Server {
             );
 
             // move robots
-            foreach(var robot in Game.Robots.Where(robot => robot.Status == LambdaRobotStatus.Alive)) {
+            foreach(var robot in Game.Robots.Where(robot => robot.Status == BotStatus.Alive)) {
                 MoveRobot(robot);
             }
 
@@ -154,7 +154,7 @@ namespace LambdaRobots.Server {
             Game.Missiles.RemoveAll(missile => missile.Status == MissileStatus.Destroyed);
 
             // update game state
-            var robotCount = Game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive);
+            var robotCount = Game.Robots.Count(robot => robot.Status == BotStatus.Alive);
             if(robotCount == 0) {
 
                 // no robots left
@@ -164,7 +164,7 @@ namespace LambdaRobots.Server {
             } else if(robotCount == 1) {
 
                 // last robot standing
-                AddMessage($"{Game.Robots.First(robot => robot.Status == LambdaRobotStatus.Alive).Name} is victorious! Game Over.");
+                AddMessage($"{Game.Robots.First(robot => robot.Status == BotStatus.Alive).Name} is victorious! Game Over.");
                 Game.Status = GameStatus.Finished;
                 Game.Missiles.Clear();
             } else if(Game.CurrentGameTurn >= Game.MaxTurns) {
@@ -176,8 +176,8 @@ namespace LambdaRobots.Server {
             }
         }
 
-        public LambdaRobot ScanRobots(LambdaRobot robot, double heading, double resolution) {
-            LambdaRobot result = null;
+        public BotInfo ScanRobots(BotInfo robot, double heading, double resolution) {
+            BotInfo result = null;
             resolution = GameMath.MinMax(0.01, resolution, robot.RadarMaxResolution);
             FindRobotsByDistance(robot.X, robot.Y, (other, distance) => {
 
@@ -212,13 +212,13 @@ namespace LambdaRobots.Server {
             return result;
         }
 
-        private async Task<string> InitializeRobotAsync(LambdaRobot robot) {
+        private async Task<string> InitializeRobotAsync(BotInfo robot) {
             var config = await _provider.GetRobotBuild(robot);
             robot.Name = config?.Name ?? $"#{robot.Index}";
             if(config == null) {
 
                 // missing config information, consider robot dead
-                robot.Status = LambdaRobotStatus.Dead;
+                robot.Status = BotStatus.Dead;
                 robot.TimeOfDeathGameTurn = 0;
                 return $"{robot.Name} (R{robot.Index}) was disqualified due to failure to initialize";
             }
@@ -255,15 +255,15 @@ namespace LambdaRobots.Server {
 
             // check if robot is disqualified due to a bad build
             if(!success) {
-                robot.Status = LambdaRobotStatus.Dead;
+                robot.Status = BotStatus.Dead;
                 robot.TimeOfDeathGameTurn = Game.CurrentGameTurn;
                 return $"{robot.Name} (R{robot.Index}) was disqualified due to bad configuration ({buildDescription}: {buildPoints} points)";
             }
-            robot.State = config.StartState;
+            robot.InternalState = config.InternalStartState;
             return $"{robot.Name} (R{robot.Index}) has joined the battle ({buildDescription}: {buildPoints} points)";
         }
 
-        private void ApplyRobotAction(LambdaRobot robot, LambdaRobotAction action) {
+        private void ApplyRobotAction(BotInfo robot, GetActionResponse action) {
 
             // reduce reload time if any is active
             if(robot.ReloadCoolDown > 0) {
@@ -274,14 +274,14 @@ namespace LambdaRobots.Server {
             if(action == null) {
 
                 // robot didn't respond with an action; consider it dead
-                robot.Status = LambdaRobotStatus.Dead;
+                robot.Status = BotStatus.Dead;
                 robot.TimeOfDeathGameTurn = Game.CurrentGameTurn;
                 AddMessage($"{robot.Name} (R{robot.Index}) was disqualified by lack of action");
                 return;
             }
 
             // update robot state
-            robot.State = action.RobotState;
+            robot.InternalState = action.RobotState;
 
             // update speed and heading
             robot.TargetSpeed = GameMath.MinMax(0.0, action.Speed ?? robot.TargetSpeed, robot.MaxSpeed);
@@ -295,7 +295,7 @@ namespace LambdaRobots.Server {
                 robot.ReloadCoolDown = robot.MissileReloadCooldown;
 
                 // add missile
-                var missile = new LambdaRobotMissile {
+                var missile = new MissileInfo {
                     Id = $"{robot.Id}:M{robot.TotalMissileFiredCount}",
                     RobotId = robot.Id,
                     Status = MissileStatus.Flying,
@@ -312,7 +312,7 @@ namespace LambdaRobots.Server {
             }
         }
 
-        private void MoveMissile(LambdaRobotMissile missile) {
+        private void MoveMissile(MissileInfo missile) {
             bool collision;
             Move(
                 missile.X,
@@ -335,7 +335,7 @@ namespace LambdaRobots.Server {
             }
         }
 
-        private void AssessMissileDamage(LambdaRobotMissile missile) {
+        private void AssessMissileDamage(MissileInfo missile) {
             FindRobotsByDistance(missile.X, missile.Y, (robot, distance) => {
 
                 // compute damage dealt by missile
@@ -399,7 +399,7 @@ namespace LambdaRobots.Server {
             });
         }
 
-        private void MoveRobot(LambdaRobot robot) {
+        private void MoveRobot(BotInfo robot) {
 
             // compute new heading
             if(robot.Heading != robot.TargetHeading) {
@@ -466,7 +466,7 @@ namespace LambdaRobots.Server {
                 }
 
                 // keep looking for more collisions unless robot is dead or nearest robot is out of range
-                return (robot.Status == LambdaRobotStatus.Alive) && (distance < Game.CollisionRange);
+                return (robot.Status == BotStatus.Alive) && (distance < Game.CollisionRange);
             });
         }
 
@@ -534,9 +534,9 @@ namespace LambdaRobots.Server {
             }
         }
 
-        private void FindRobotsByDistance(double x, double y, Func<LambdaRobot, double, bool> callback) {
+        private void FindRobotsByDistance(double x, double y, Func<BotInfo, double, bool> callback) {
             foreach(var robotWithDistance in Game.Robots
-                .Where(robot => robot.Status == LambdaRobotStatus.Alive)
+                .Where(robot => robot.Status == BotStatus.Alive)
                 .Select(robot => new {
                     Robot = robot,
                     Distance = GameMath.Distance(robot.X, robot.Y, x, y)
@@ -550,11 +550,11 @@ namespace LambdaRobots.Server {
             }
         }
 
-        private bool Damage(LambdaRobot robot, double damage) {
+        private bool Damage(BotInfo robot, double damage) {
             robot.Damage += damage;
             if(robot.Damage >= robot.MaxDamage) {
                 robot.Damage = robot.MaxDamage;
-                robot.Status = LambdaRobotStatus.Dead;
+                robot.Status = BotStatus.Dead;
                 robot.TimeOfDeathGameTurn = Game.CurrentGameTurn;
                 return true;
             }

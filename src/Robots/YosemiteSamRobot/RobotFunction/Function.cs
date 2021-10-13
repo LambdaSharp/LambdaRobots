@@ -23,25 +23,26 @@
  */
 
 using System.Threading.Tasks;
-using LambdaRobots.Protocol;
+using LambdaRobots.Bot.Model;
+using LambdaRobots.Function;
 
 namespace LambdaRobots.YosemiteSamRobot.RobotFunction {
 
-    public class LambdaRobotState {
+    public sealed class BotState {
 
-        // NOTE: Yosemite Sam robot has no state
+        // NOTE: Yosemite Sam robot has no internal state
     }
 
-    public class Function : ALambdaRobotFunction<LambdaRobotState> {
+    public sealed class Function : ABotFunction<BotState> {
 
         //--- Methods ---
-        public override async Task<LambdaRobotBuild> GetBuildAsync() {
+        public override async Task<GetBuildResponse> GetBuildAsync() {
 
             // TODO: this method is always invoked at the beginning of a match
-            return new LambdaRobotBuild {
+            return new GetBuildResponse {
                 Name = "Yosemite Sam",
-                Engine = LambdaRobotEngineType.ExtraLarge,
-                Missile = LambdaRobotMissileType.Dart
+                Engine = BotEngineType.ExtraLarge,
+                Missile = BotMissileType.Dart
             };
         }
 

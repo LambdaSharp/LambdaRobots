@@ -22,39 +22,36 @@
  * SOFTWARE.
  */
 
-using System.Threading.Tasks;
-using LambdaRobots.Bot.Model;
-using LambdaRobots.Function;
+using System.Text.Json.Serialization;
 
-namespace LambdaRobots.BringYourOwnRobot.RobotFunction {
+namespace LambdaRobots {
 
-    public sealed class BotState {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum BotEngineType {
 
-        // TODO: use this to define the internal state of the bot
-    }
+        /// <summary>
+        /// 60 m/s max. speed, 7 m/s^2 acceleration (0 pts)
+        /// </summary>
+        Economy,
 
-    public sealed class Function : ABotFunction<BotState> {
+        /// <summary>
+        ///  80 m/s max. speed, 8 m/s^2 acceleration (1 pt)
+        /// </summary>
+        Compact,
 
-        //--- Methods ---
-        public override async Task<GetBuildResponse> GetBuildAsync() {
-            return new GetBuildResponse {
+        /// <summary>
+        /// 100 m/s max. speed, 10 m/s^2 acceleration (2 pts)
+        /// </summary>
+        Standard,
 
-                // TODO: give your robot a name!
-                Name = "BringYourOwnRobot",
+        /// <summary>
+        /// 120 m/s max. speed, 12 m/s^2 acceleration (3 pts)
+        /// </summary>
+        Large,
 
-                Armor = BotArmorType.Medium,
-                Engine = BotEngineType.Economy,
-                Missile = BotMissileType.Dart,
-                Radar = BotRadarType.UltraShortRange
-            };
-        }
-
-        public override async Task GetActionAsync() {
-
-            // TODO: breath life into your robots behavior
-
-            // NOTE: you can use the `State` property to fetch and store state across invocation.
-            //  The `State` property is of type `BotState`.
-        }
+        /// <summary>
+        /// 140 m/s max. speed, 13 m/s^2 acceleration (4 pts)
+        /// </summary>
+        ExtraLarge
     }
 }

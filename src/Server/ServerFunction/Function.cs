@@ -28,8 +28,8 @@ using System.Threading.Tasks;
 using Amazon.Lambda;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Model;
+using LambdaRobots.Bot.Model;
 using LambdaRobots.Game.Model;
-using LambdaRobots.Protocol;
 using LambdaRobots.Server.DataAccess;
 using LambdaRobots.Server.DataAccess.Records;
 using LambdaRobots.Server.ServerFunction.Model;
@@ -88,7 +88,7 @@ namespace LambdaRobots.Server.ServerFunction {
             var gameRecord = new GameRecord {
                 GameId = game.Id,
                 Game = game,
-                LambdaRobotArns = request.RobotArns,
+                BotArns = request.RobotArns,
                 ConnectionId = CurrentRequest.RequestContext.ConnectionId,
                 Expire = DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeSeconds()
             };
@@ -179,7 +179,7 @@ namespace LambdaRobots.Server.ServerFunction {
 
         //--- IGameDependencyProvider Members ---
         double IGameDependencyProvider.NextRandomDouble() => _random.NextDouble();
-        Task<LambdaRobotBuild> IGameDependencyProvider.GetRobotBuild(LambdaRobot robot) => throw new NotImplementedException();
-        Task<LambdaRobotAction> IGameDependencyProvider.GetRobotAction(LambdaRobot robot) => throw new NotImplementedException();
+        Task<GetBuildResponse> IGameDependencyProvider.GetRobotBuild(BotInfo robot) => throw new NotImplementedException();
+        Task<GetActionResponse> IGameDependencyProvider.GetRobotAction(BotInfo robot) => throw new NotImplementedException();
     }
 }

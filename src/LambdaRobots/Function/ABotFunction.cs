@@ -24,13 +24,13 @@
 
 using System;
 using System.Threading.Tasks;
+using LambdaRobots.Bot.Model;
 using LambdaRobots.Game;
-using LambdaRobots.Protocol;
 using LambdaSharp;
 
-namespace LambdaRobots {
+namespace LambdaRobots.Function {
 
-    public abstract class ALambdaRobotFunction<TState> : ALambdaFunction<LambdaRobotRequest, LambdaRobotResponse> where TState : class, new() {
+    public abstract class ABotFunction<TState> : ALambdaFunction<BotRequest, BotResponse> where TState : class, new() {
 
         //--- Class Fields ---
 
@@ -40,17 +40,17 @@ namespace LambdaRobots {
         public static Random Random { get ; private set; } = new Random();
 
         //--- Fields ---
-        private LambdaRobotAction _action;
+        private GetActionResponse _action;
 
         //--- Constructors ---
-        protected ALambdaRobotFunction() : base(new LambdaSharp.Serialization.LambdaSystemTextJsonSerializer()) { }
+        protected ABotFunction() : base(new LambdaSharp.Serialization.LambdaSystemTextJsonSerializer()) { }
 
         //--- Properties ---
 
         /// <summary>
         /// Robot data structure describing the state and characteristics of the robot.
         /// </summary>
-        public LambdaRobots.LambdaRobot Robot { get; set; }
+        public LambdaRobots.BotInfo Robot { get; set; }
 
         /// <summary>
         /// Game data structure describing the state and characteristics of the game;
@@ -100,31 +100,31 @@ namespace LambdaRobots {
         public ILambdaRobotsGame LambdaRobotsApi { get; set; }
 
         //--- Abstract Methods ---
-        public abstract Task<LambdaRobotBuild> GetBuildAsync();
+        public abstract Task<GetBuildResponse> GetBuildAsync();
         public abstract Task GetActionAsync();
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) { }
 
-        public override sealed async Task<LambdaRobotResponse> ProcessMessageAsync(LambdaRobotRequest request) {
+        public override sealed async Task<BotResponse> ProcessMessageAsync(BotRequest request) {
 
             // check if there is a state object to load
-            State = !string.IsNullOrEmpty(request.Robot?.State)
-                ? LambdaSerializer.Deserialize<TState>(request.Robot.State)
+            State = !string.IsNullOrEmpty(request.Robot?.InternalState)
+                ? LambdaSerializer.Deserialize<TState>(request.Robot.InternalState)
                 : new TState();
             LogInfo($"Starting State:\n{LambdaSerializer.Serialize(State)}");
 
             // dispatch to specific method based on request command
-            LambdaRobotResponse response;
+            BotResponse response;
             switch(request.Command) {
-            case LambdaRobotCommand.GetBuild:
+            case BotCommand.GetBuild:
 
                 // robot configuration request
-                response = new LambdaRobotResponse {
+                response = new BotResponse {
                     RobotBuild = await GetBuildAsync()
                 };
                 break;
-            case LambdaRobotCommand.GetAction:
+            case BotCommand.GetAction:
 
                 // robot action request
                 try {
@@ -135,14 +135,14 @@ namespace LambdaRobots {
                     LambdaRobotsApi = new LambdaRobotsGameClient(Game.ApiUrl, Robot.Id, HttpClient);
 
                     // initialize a default empty action
-                    _action = new LambdaRobotAction();
+                    _action = new GetActionResponse();
 
                     // get robot action
                     await GetActionAsync();
 
                     // generate response
                     _action.RobotState = LambdaSerializer.Serialize(State);
-                    response = new LambdaRobotResponse {
+                    response = new BotResponse {
                         RobotAction = _action,
                     };
                 } finally {

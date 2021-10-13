@@ -22,39 +22,26 @@
  * SOFTWARE.
  */
 
-using System.Threading.Tasks;
-using LambdaRobots.Bot.Model;
-using LambdaRobots.Function;
+using System.Text.Json.Serialization;
 
-namespace LambdaRobots.BringYourOwnRobot.RobotFunction {
+namespace LambdaRobots {
 
-    public sealed class BotState {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum BotStatus {
 
-        // TODO: use this to define the internal state of the bot
-    }
+        /// <summary>
+        /// Status has not been initialized.
+        /// </summary>
+        Undefined,
 
-    public sealed class Function : ABotFunction<BotState> {
+        /// <summary>
+        /// Robot is alive.
+        /// </summary>
+        Alive,
 
-        //--- Methods ---
-        public override async Task<GetBuildResponse> GetBuildAsync() {
-            return new GetBuildResponse {
-
-                // TODO: give your robot a name!
-                Name = "BringYourOwnRobot",
-
-                Armor = BotArmorType.Medium,
-                Engine = BotEngineType.Economy,
-                Missile = BotMissileType.Dart,
-                Radar = BotRadarType.UltraShortRange
-            };
-        }
-
-        public override async Task GetActionAsync() {
-
-            // TODO: breath life into your robots behavior
-
-            // NOTE: you can use the `State` property to fetch and store state across invocation.
-            //  The `State` property is of type `BotState`.
-        }
+        /// <summary>
+        /// Robot is dead.
+        /// </summary>
+        Dead
     }
 }

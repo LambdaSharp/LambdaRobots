@@ -22,30 +22,9 @@
  * SOFTWARE.
  */
 
-using System.Text.Json.Serialization;
-
 namespace LambdaRobots {
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum LambdaRobotStatus {
-
-        /// <summary>
-        /// Status has not been initialized.
-        /// </summary>
-        Undefined,
-
-        /// <summary>
-        /// Robot is alive.
-        /// </summary>
-        Alive,
-
-        /// <summary>
-        /// Robot is dead.
-        /// </summary>
-        Dead
-    }
-
-    public class LambdaRobot {
+    public class BotInfo {
 
         //--- Properties ---
 
@@ -69,7 +48,7 @@ namespace LambdaRobots {
         /// <summary>
         /// Robot status. Either `Alive` or `Dead`.
         /// </summary>
-        public LambdaRobotStatus Status { get; set; }
+        public BotStatus Status { get; set; }
 
         /// <summary>
         /// Robot horizontal position.
@@ -242,6 +221,6 @@ namespace LambdaRobots {
         /// <summary>
         /// Internal robot state.
         /// </summary>
-        public string State { get; set; }
+        public string InternalState { get; set; }
     }
 }

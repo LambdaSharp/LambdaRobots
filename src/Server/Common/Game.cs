@@ -45,8 +45,8 @@ namespace LambdaRobots.Server {
         // current state
         public GameStatus Status { get; set; }
         public int CurrentGameTurn { get; set; }
-        public List<LambdaRobotMissile> Missiles { get; set; } = new List<LambdaRobotMissile>();
-        public List<LambdaRobot> Robots { get; set; } = new List<LambdaRobot>();
+        public List<MissileInfo> Missiles { get; set; } = new List<MissileInfo>();
+        public List<BotInfo> Robots { get; set; } = new List<BotInfo>();
         public List<Message> Messages { get; set; } = new List<Message>();
 
         // game characteristics
@@ -80,7 +80,7 @@ namespace LambdaRobots.Server {
         Destroyed
     }
 
-    public class LambdaRobotMissile {
+    public class MissileInfo {
 
         //--- Fields ---
 

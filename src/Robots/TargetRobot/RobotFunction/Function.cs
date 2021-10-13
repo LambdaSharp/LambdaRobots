@@ -23,25 +23,26 @@
  */
 
 using System.Threading.Tasks;
-using LambdaRobots.Protocol;
+using LambdaRobots.Bot.Model;
+using LambdaRobots.Function;
 
 namespace LambdaRobots.TargetRobot.RobotFunction {
 
-    public class LambdaRobotState {
+    public sealed class BotState {
 
-        // NOTE: target robot has no state
+        // NOTE: target robot has no internal state
     }
 
-    public class Function : ALambdaRobotFunction<LambdaRobotState> {
+    public sealed class Function : ABotFunction<BotState> {
 
         //--- Methods ---
-        public override async Task<LambdaRobotBuild> GetBuildAsync() {
-            return new LambdaRobotBuild {
+        public override async Task<GetBuildResponse> GetBuildAsync() {
+            return new GetBuildResponse {
                 Name = "Target",
-                Armor = LambdaRobotArmorType.Medium,
-                Engine = LambdaRobotEngineType.Economy,
-                Missile = LambdaRobotMissileType.Dart,
-                Radar = LambdaRobotRadarType.UltraShortRange
+                Armor = BotArmorType.Medium,
+                Engine = BotEngineType.Economy,
+                Missile = BotMissileType.Dart,
+                Radar = BotRadarType.UltraShortRange
             };
         }
 
