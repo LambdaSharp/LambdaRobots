@@ -97,7 +97,7 @@ namespace LambdaRobots {
         /// </summary>
         public TState State { get; set; }
 
-        public ILambdaRobotsApi LambdaRobotsApi { get; set; }
+        public ILambdaRobotsGame LambdaRobotsApi { get; set; }
 
         //--- Abstract Methods ---
         public abstract Task<LambdaRobotBuild> GetBuildAsync();
@@ -109,7 +109,7 @@ namespace LambdaRobots {
         public override sealed async Task<LambdaRobotResponse> ProcessMessageAsync(LambdaRobotRequest request) {
 
             // check if there is a state object to load
-            State = !string.IsNullOrEmpty(request.Robot.State)
+            State = !string.IsNullOrEmpty(request.Robot?.State)
                 ? LambdaSerializer.Deserialize<TState>(request.Robot.State)
                 : new TState();
             LogInfo($"Starting State:\n{LambdaSerializer.Serialize(State)}");
@@ -132,7 +132,7 @@ namespace LambdaRobots {
                     // capture request fields for easy access
                     Game = request.Game;
                     Robot = request.Robot;
-                    LambdaRobotsApi = new LambdaRobotsApiClient(HttpClient, Game.ApiUrl, Robot.Id);
+                    LambdaRobotsApi = new LambdaRobotsGameClient(Game.ApiUrl, Robot.Id, HttpClient);
 
                     // initialize a default empty action
                     _action = new LambdaRobotAction();

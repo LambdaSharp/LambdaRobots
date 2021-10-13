@@ -22,17 +22,35 @@
  * SOFTWARE.
  */
 
-using System.Collections.Generic;
+namespace LambdaRobots.Api.Model {
 
-namespace LambdaRobots.Server.DataAccess.Records {
-
-    public class GameRecord {
+    public sealed class GetBuildRequest {
 
         //--- Properties ---
-        public string GameId { get; set; }
-        public Game Game { get; set; }
-        public List<string> LambdaRobotArns { get; set; }
-        public string ConnectionId { get; set; }
-        public long Expire { get; set; }
+
+        /// <summary>
+        /// Current game state. Used only by `GetAction` command
+        /// </summary>
+        public GameInfo GameInfo { get; set; }
+
+        /// <summary>
+        /// Current robot state. Used only by `GetAction` command
+        /// </summary>
+        public LambdaRobot Robot { get; set; }
+    }
+
+    public sealed class GetActionRequest {
+
+        //--- Properties ---
+
+        /// <summary>
+        /// Current game state. Used only by `GetAction` command
+        /// </summary>
+        public GameInfo GameInfo { get; set; }
+
+        /// <summary>
+        /// Current robot state. Used only by `GetAction` command
+        /// </summary>
+        public LambdaRobot Robot { get; set; }
     }
 }

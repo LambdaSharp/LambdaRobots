@@ -86,9 +86,11 @@ namespace LambdaRobots.Server.ServerFunction {
                 RobotTimeoutSeconds = request.RobotTimeoutSeconds ?? 15.0
             };
             var gameRecord = new GameRecord {
+                GameId = game.Id,
                 Game = game,
                 LambdaRobotArns = request.RobotArns,
-                ConnectionId = CurrentRequest.RequestContext.ConnectionId
+                ConnectionId = CurrentRequest.RequestContext.ConnectionId,
+                Expire = DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeSeconds()
             };
 
             // store game record

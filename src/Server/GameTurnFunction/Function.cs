@@ -30,8 +30,9 @@ using System.Threading.Tasks;
 using Amazon.ApiGatewayManagementApi;
 using Amazon.ApiGatewayManagementApi.Model;
 using Amazon.Lambda;
-using Amazon.Lambda.Model;
 using Amazon.Runtime;
+using LambdaRobots.Api;
+using LambdaRobots.Api.Model;
 using LambdaRobots.Protocol;
 using LambdaRobots.Server.DataAccess;
 using LambdaRobots.Server.DataAccess.Records;
@@ -89,8 +90,6 @@ namespace LambdaRobots.Server.GameTurnFunction {
         }
 
         public override async Task<FunctionResponse> ProcessMessageAsync(FunctionRequest request) {
-
-            // run game
             try {
                 await GameLoopAsync(request.GameId);
             } catch(Exception) {
@@ -114,7 +113,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                 if(GameRecord?.Game?.Status != GameStatus.Start) {
 
                     // TODO: better log diagnostics
-                    LogWarn($"Game state is not valid");
+                    LogWarn($"Game state is invalid");
                     return;
                 }
                 try {
@@ -145,7 +144,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                         if(!await _dataClient.UpdateGameRecordAsync(gameId, Game)) {
 
                             // TODO: better exception
-                            throw new Exception("unable to update recor");
+                            throw new Exception("unable to update record");
                         }
 
                         // notify WebSocket of new game state
@@ -196,93 +195,52 @@ namespace LambdaRobots.Server.GameTurnFunction {
         //--- IGameDependencyProvider Members ---
         double IGameDependencyProvider.NextRandomDouble() => _random.NextDouble();
 
-        async Task<LambdaRobotBuild> IGameDependencyProvider.GetRobotBuild(LambdaRobot robot) {
-            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        Task<LambdaRobotBuild> IGameDependencyProvider.GetRobotBuild(LambdaRobot robot) {
             try {
-                var lambdaArn = GameRecord.LambdaRobotArns[robot.Index];
-                try {
-                    var getBuildTask = _lambdaClient.InvokeAsync(new InvokeRequest {
-                        Payload = LambdaSerializer.Serialize(new LambdaRobotRequest {
-                            Command = LambdaRobotCommand.GetBuild,
-                            Game = new GameInfo {
-                                Id = Game.Id,
-                                BoardWidth = Game.BoardWidth,
-                                BoardHeight = Game.BoardHeight,
-                                DirectHitRange = Game.DirectHitRange,
-                                NearHitRange = Game.NearHitRange,
-                                FarHitRange = Game.FarHitRange,
-                                CollisionRange = Game.CollisionRange,
-                                GameTurn = Game.CurrentGameTurn,
-                                MaxGameTurns = Game.MaxTurns,
-                                MaxBuildPoints = Game.MaxBuildPoints,
-                                SecondsPerTurn = Game.SecondsPerTurn
-                            },
-                            Robot = robot
-                        }),
-                        FunctionName = lambdaArn,
-                        InvocationType = InvocationType.RequestResponse
-                    });
-
-                    // check if lambda responds within time limit
-                    if(await Task.WhenAny(getBuildTask, Task.Delay(TimeSpan.FromSeconds(Game.RobotTimeoutSeconds))) != getBuildTask) {
-                        LogInfo($"Robot {robot.Id} GetBuild timed out after {stopwatch.Elapsed.TotalSeconds:N2}s");
-                        return null;
-                    }
-                    var response = Encoding.UTF8.GetString(getBuildTask.Result.Payload.ToArray());
-                    var result = LambdaSerializer.Deserialize<LambdaRobotResponse>(response);
-                    LogInfo($"Robot {robot.Id} GetBuild responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
-                    return result.RobotBuild;
-                } catch(Exception e) {
-                    LogErrorAsInfo(e, $"Robot {robot.Id} GetBuild failed (arn: {lambdaArn ?? "<NULL>"})");
-                    return null;
-                }
+                var client = new LambdaRobotClient(robot.Id, GameRecord.LambdaRobotArns[robot.Index], TimeSpan.FromSeconds(Game.RobotTimeoutSeconds), _lambdaClient, this);
+                return client.GetBuild(new GetBuildRequest {
+                    GameInfo = new GameInfo {
+                        Id = Game.Id,
+                        BoardWidth = Game.BoardWidth,
+                        BoardHeight = Game.BoardHeight,
+                        DirectHitRange = Game.DirectHitRange,
+                        NearHitRange = Game.NearHitRange,
+                        FarHitRange = Game.FarHitRange,
+                        CollisionRange = Game.CollisionRange,
+                        CurrentGameTurn = Game.CurrentGameTurn,
+                        MaxGameTurns = Game.MaxTurns,
+                        MaxBuildPoints = Game.MaxBuildPoints,
+                        SecondsPerTurn = Game.SecondsPerTurn
+                    },
+                    Robot = robot
+                });
             } catch(Exception e) {
                 LogErrorAsWarning(e, $"Robot R{robot.Index} is out of range");
                 return null;
             }
         }
 
-        async Task<LambdaRobotAction> IGameDependencyProvider.GetRobotAction(LambdaRobot robot) {
+        Task<LambdaRobotAction> IGameDependencyProvider.GetRobotAction(LambdaRobot robot) {
             var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
-                var lambdaArn = GameRecord.LambdaRobotArns[robot.Index];
-                try {
-                    var getActionTask = _lambdaClient.InvokeAsync(new InvokeRequest {
-                        Payload = LambdaSerializer.Serialize(new LambdaRobotRequest {
-                            Command = LambdaRobotCommand.GetAction,
-                            Game = new GameInfo {
-                                Id = Game.Id,
-                                BoardWidth = Game.BoardWidth,
-                                BoardHeight = Game.BoardHeight,
-                                DirectHitRange = Game.DirectHitRange,
-                                NearHitRange = Game.NearHitRange,
-                                FarHitRange = Game.FarHitRange,
-                                CollisionRange = Game.CollisionRange,
-                                GameTurn = Game.CurrentGameTurn,
-                                MaxGameTurns = Game.MaxTurns,
-                                MaxBuildPoints = Game.MaxBuildPoints,
-                                SecondsPerTurn = Game.SecondsPerTurn,
-                                ApiUrl = _gameApiUrl + $"/{Game.Id}"
-                            },
-                            Robot = robot
-                        }),
-                        FunctionName = lambdaArn,
-                        InvocationType = InvocationType.RequestResponse
-                    });
-
-                    // check if lambda responds within time limit
-                    if(await Task.WhenAny(getActionTask, Task.Delay(TimeSpan.FromSeconds(Game.RobotTimeoutSeconds))) != getActionTask) {
-                        LogInfo($"Robot {robot.Id} GetAction timed out after {stopwatch.Elapsed.TotalSeconds:N2}s");
-                        return null;
-                    }
-                    var response = Encoding.UTF8.GetString(getActionTask.Result.Payload.ToArray());
-                    var result = LambdaSerializer.Deserialize<LambdaRobotResponse>(response);
-                    LogInfo($"Robot {robot.Id} GetAction responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
-                    return result.RobotAction;
-                } catch(Exception e) {
-                    LogErrorAsInfo(e, $"Robot {robot.Id} GetAction failed (arn: {lambdaArn})");
-                    return null;
-                }
+                var client = new LambdaRobotClient(robot.Id, GameRecord.LambdaRobotArns[robot.Index], TimeSpan.FromSeconds(Game.RobotTimeoutSeconds), _lambdaClient, this);
+                return client.GetAction(new GetActionRequest {
+                    GameInfo = new GameInfo {
+                        Id = Game.Id,
+                        BoardWidth = Game.BoardWidth,
+                        BoardHeight = Game.BoardHeight,
+                        DirectHitRange = Game.DirectHitRange,
+                        NearHitRange = Game.NearHitRange,
+                        FarHitRange = Game.FarHitRange,
+                        CollisionRange = Game.CollisionRange,
+                        CurrentGameTurn = Game.CurrentGameTurn,
+                        MaxGameTurns = Game.MaxTurns,
+                        MaxBuildPoints = Game.MaxBuildPoints,
+                        SecondsPerTurn = Game.SecondsPerTurn,
+                        ApiUrl = _gameApiUrl + $"/{Game.Id}"
+                    },
+                    Robot = robot
+                });
             } catch(Exception e) {
                 LogErrorAsWarning(e, $"Robot R{robot.Index} is out of range");
                 return null;

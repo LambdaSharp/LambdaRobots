@@ -73,7 +73,7 @@ namespace LambdaRobots {
         /// <summary>
         /// Current game turn. Starts at `1`.
         /// </summary>
-        public int GameTurn { get; set; }
+        public int CurrentGameTurn { get; set; }
 
         /// <summary>
         /// Maximum number of turns before the game ends in a draw.

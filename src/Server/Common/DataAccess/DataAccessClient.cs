@@ -52,7 +52,7 @@ namespace LambdaRobots.Server.DataAccess {
                 .ExecuteAsync(cancellationToken);
 
         public Task<GameRecord> GetGameRecordAsync(string gameId, CancellationToken cancellationToken = default)
-            => Table.GetItemAsync(DataModel.GetPrimaryKeyForGameRecord(gameId), cancellationToken: cancellationToken);
+            => Table.GetItemAsync(DataModel.GetPrimaryKeyForGameRecord(gameId), consistentRead: true, cancellationToken);
 
         public Task<bool> UpdateGameRecordAsync(string gameId, Game game, CancellationToken cancellationToken = default)
             => Table.UpdateItem(DataModel.GetPrimaryKeyForGameRecord(gameId))
@@ -66,7 +66,7 @@ namespace LambdaRobots.Server.DataAccess {
                 // execute UpdateItem operation
                 .ExecuteAsync(cancellationToken);
 
-        public Task<bool> DeleteGameRecordAsync(string gameId, CancellationToken cancellationToken = default) 
+        public Task<bool> DeleteGameRecordAsync(string gameId, CancellationToken cancellationToken = default)
             => Table.DeleteItemAsync(DataModel.GetPrimaryKeyForGameRecord(gameId), cancellationToken);
     }
 }

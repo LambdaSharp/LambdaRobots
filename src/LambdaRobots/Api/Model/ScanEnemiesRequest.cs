@@ -24,7 +24,7 @@
 
 namespace LambdaRobots.Api.Model {
 
-    public class ScanEnemiesRequest {
+    public sealed class ScanEnemiesRequest {
 
         //--- Properties ---
         public string RobotId { get; set; }
