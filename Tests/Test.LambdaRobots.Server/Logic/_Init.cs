@@ -52,8 +52,9 @@ namespace Test.LambdaRobots.Server {
             MinRobotStartDistance = 100.0f,
             RobotTimeoutSeconds = 10.0f,
             CurrentGameTurn = 0,
-            MaxTurns = 300,
-            MaxBuildPoints = 8
+            MaxTurns = 1000,
+            MaxBuildPoints = 8,
+            LastStatusUpdate = DateTimeOffset.UtcNow
         };
 
         protected BotInfo NewRobot(string id, float x, float y) => new BotInfo {
@@ -104,6 +105,7 @@ namespace Test.LambdaRobots.Server {
         }
 
         //--- IGameDependencyProvider Members ---
+        DateTimeOffset IGameDependencyProvider.UtcNow => DateTimeOffset.UtcNow;
         float IGameDependencyProvider.NextRandomFloat() => (float)_random.NextDouble();
 
         async Task<GetBuildResponse> IGameDependencyProvider.GetRobotBuild(BotInfo robot) => new GetBuildResponse {

@@ -192,6 +192,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
         }
 
         //--- IGameDependencyProvider Members ---
+        DateTimeOffset IGameDependencyProvider.UtcNow => DateTimeOffset.UtcNow;
         float IGameDependencyProvider.NextRandomFloat() => (float)_random.NextDouble();
 
         Task<GetBuildResponse> IGameDependencyProvider.GetRobotBuild(BotInfo robot) {
@@ -209,7 +210,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                         CurrentGameTurn = Game.CurrentGameTurn,
                         MaxGameTurns = Game.MaxTurns,
                         MaxBuildPoints = Game.MaxBuildPoints,
-                        SecondsPerTurn = Game.SecondsPerTurn
+                        SecondsPerTurn = (float)GameInfo.MinimumTurnTimespan.TotalSeconds
                     },
                     Robot = robot
                 });
@@ -234,7 +235,10 @@ namespace LambdaRobots.Server.GameTurnFunction {
                         CurrentGameTurn = Game.CurrentGameTurn,
                         MaxGameTurns = Game.MaxTurns,
                         MaxBuildPoints = Game.MaxBuildPoints,
-                        SecondsPerTurn = Game.SecondsPerTurn,
+
+                        // TODO: must be read from _provider
+                        SecondsPerTurn = (float)(Game.LastStatusUpdate - robot.LastStatusUpdate).TotalSeconds,
+
                         ApiUrl = _gameApiUrl + $"/{Game.Id}"
                     },
                     Robot = robot

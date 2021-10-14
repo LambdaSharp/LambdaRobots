@@ -22,6 +22,7 @@
  * SOFTWARE.
  */
 
+using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
@@ -43,6 +44,7 @@ namespace LambdaRobots.Server {
 
         // current state
         public GameStatus Status { get; set; }
+        public DateTimeOffset LastStatusUpdate { get; set; }
         public int CurrentGameTurn { get; set; }
         public List<MissileInfo> Missiles { get; set; } = new List<MissileInfo>();
         public List<BotInfo> Robots { get; set; } = new List<BotInfo>();

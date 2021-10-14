@@ -287,7 +287,7 @@ namespace LambdaRobots.Function {
             //  solving for Speed, gives us the maximum travel speed to avoid overshooting our target
             var speed = MathF.Sqrt(distance * 2.0f * Robot.Deceleration) * Game.SecondsPerTurn;
 
-            // check if angle needs to be adjusted
+            // check if heading needs to be adjusted
             if(MathF.Abs(NormalizeAngle(Heading - heading)) > 0.1) {
 
                 // check if robot is moving slow enough to turn

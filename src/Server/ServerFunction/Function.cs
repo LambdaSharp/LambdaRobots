@@ -76,7 +76,7 @@ namespace LambdaRobots.Server.ServerFunction {
                 BoardWidth = request.BoardWidth ?? 1000.0f,
                 BoardHeight = request.BoardHeight ?? 1000.0f,
                 SecondsPerTurn = request.SecondsPerTurn ?? 0.5f,
-                MaxTurns = request.MaxTurns ?? 300,
+                MaxTurns = request.MaxTurns ?? 1000,
                 MaxBuildPoints = request.MaxBuildPoints ?? 8,
                 DirectHitRange = request.DirectHitRange ?? 5.0f,
                 NearHitRange = request.NearHitRange ?? 20.0f,
@@ -178,6 +178,7 @@ namespace LambdaRobots.Server.ServerFunction {
         }
 
         //--- IGameDependencyProvider Members ---
+        DateTimeOffset IGameDependencyProvider.UtcNow => DateTimeOffset.UtcNow;
         float IGameDependencyProvider.NextRandomFloat() => (float)_random.NextDouble();
         Task<GetBuildResponse> IGameDependencyProvider.GetRobotBuild(BotInfo robot) => throw new NotImplementedException();
         Task<GetActionResponse> IGameDependencyProvider.GetRobotAction(BotInfo robot) => throw new NotImplementedException();

@@ -22,6 +22,8 @@
  * SOFTWARE.
  */
 
+using System;
+
 namespace LambdaRobots {
 
     public class BotInfo {
@@ -49,6 +51,11 @@ namespace LambdaRobots {
         /// Robot status. Either `Alive` or `Dead`.
         /// </summary>
         public BotStatus Status { get; set; }
+
+        /// <summary>
+        /// Timestamp of when the robot status was last updated.
+        /// </summary>
+        public DateTimeOffset LastStatusUpdate { get; set; }
 
         /// <summary>
         /// Robot horizontal position.

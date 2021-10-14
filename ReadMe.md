@@ -148,9 +148,10 @@ The most commonly needed properties are readily available as properties from the
 |`Deceleration`|`float`|Deceleration when speeding up. (m/s^2)|
 |`DirectHitDamage`|`float`|Amount of damage the robot receives from a direct hit.|
 |`FarHitDamage`|`float`|Amount of damage the robot receives from a far hit.|
-|`heading`|`float`|Robot heading. Between `0` and `360`. (degrees)|
+|`Heading`|`float`|Robot heading. Between `0` and `360`. (degrees)|
 |`Id`|`string`|Globally unique robot ID.|
 |`Index`|`int`|Index position of robot. Starts at `0`.|
+|`LastStatusUpdate`|`string`|Timestamp of when the robot status was last updated.|
 |`MaxDamage`|`float`|Maximum damage before the robot is destroyed.|
 |`MaxSpeed`|`float`|Maximum speed for robot. (m/s)|
 |`MaxTurnSpeed`|`float`|Maximum speed at which the robot can change heading without a sudden stop. (m/s)|
@@ -182,18 +183,19 @@ The most commonly needed properties are readily available as properties from the
 ##### `Game` Properties
 |Property           |Type    |Description |
 |-------------------|--------|------------|
-|`Id`               |`string`|Unique Game ID.|
-|`BoardWidth`       |`float` |Width of the game board.|
-|`BoardHeight`      |`float` |Height of the game board.|
-|`SecondsPerTurn`   |`float` |Number of seconds elapsed per game turn.|
-|`DirectHitRange`   |`float` |Distance for missile impact to count as direct hit.|
-|`NearHitRange`     |`float` |Distance for missile impact to count as near hit.|
-|`FarHitRange`      |`float` |Distance for missile impact to count as far hit.|
-|`CollisionRange`   |`float` |Distance between robots to count as a collision.|
-|`GameTurn`         |`int`   |Current game turn. Starts at `1`.|
-|`MaxGameTurns`     |`int`   |Maximum number of turns before the game ends in a draw.|
-|`MaxBuildPoints`   |`int`   |Maximum number of build points a robot can use.|
 |`ApiUrl`           |`string`|URL for game server API.|
+|`BoardHeight`      |`float` |Height of the game board.|
+|`BoardWidth`       |`float` |Width of the game board.|
+|`CollisionRange`   |`float` |Distance between robots to count as a collision.|
+|`DirectHitRange`   |`float` |Distance for missile impact to count as direct hit.|
+|`FarHitRange`      |`float` |Distance for missile impact to count as far hit.|
+|`GameTurn`         |`int`   |Current game turn. Starts at `1`.|
+|`Id`               |`string`|Unique Game ID.|
+|`LastStatusUpdate` |`string`|Timestamp of when the board status was last updated.|
+|`MaxBuildPoints`   |`int`   |Maximum number of build points a robot can use.|
+|`MaxGameTurns`     |`int`   |Maximum number of turns before the game ends in a draw.|
+|`NearHitRange`     |`float` |Distance for missile impact to count as near hit.|
+|`SecondsPerTurn`   |`float` |Number of seconds elapsed per game turn.|
 
 #### Primary Methods
 The following methods represent the core capabilities of the robot. They are used to move, fire missiles, and scan its surroundings.

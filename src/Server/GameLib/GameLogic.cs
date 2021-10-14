@@ -32,6 +32,9 @@ namespace LambdaRobots.Server {
 
     public interface IGameDependencyProvider {
 
+        //--- Properties ---
+        DateTimeOffset UtcNow { get; }
+
         //--- Methods ---
         float NextRandomFloat();
         Task<GetBuildResponse> GetRobotBuild(BotInfo robot);
@@ -42,6 +45,7 @@ namespace LambdaRobots.Server {
 
         //--- Fields ---
         private IGameDependencyProvider _provider;
+        private Task<GetActionResponse>[] _pendingGetActions;
 
         //--- Constructors ---
         public GameLogic(Game game, IGameDependencyProvider provider) {
@@ -56,6 +60,7 @@ namespace LambdaRobots.Server {
         public async Task StartAsync(int robotCount) {
 
             // reset game state
+            Game.LastStatusUpdate = _provider.UtcNow;
             Game.CurrentGameTurn = 0;
             Game.Missiles.Clear();
             Game.Messages.Clear();
@@ -101,17 +106,47 @@ namespace LambdaRobots.Server {
 
         public async Task NextTurnAsync() {
 
+            // make sure turns are not too fast
+            var timeSinceLastTurn = Game.LastStatusUpdate - _provider.UtcNow;
+            if(timeSinceLastTurn < GameInfo.MinimumTurnTimespan) {
+                await Task.Delay(GameInfo.MinimumTurnTimespan - timeSinceLastTurn);
+            }
+            Game.LastStatusUpdate = _provider.UtcNow;
+
+            // allocate array for bot action responses
+            if(_pendingGetActions is null) {
+                _pendingGetActions = new Task<GetActionResponse>[Game.Robots.Count];
+            }
+
             // increment turn counter
             ++Game.CurrentGameTurn;
 
-            // invoke all robots to get their actions
-            await Task.WhenAll(Game.Robots
-                .Where(robot => robot.Status == BotStatus.Alive)
-                .Select(async robot => {
-                    ApplyRobotAction(robot, await _provider.GetRobotAction(robot));
-                    return true;
-                })
-            );
+            // get the next action of all robots that are still alive
+            for(var i = 0; i < _pendingGetActions.Length; ++i) {
+                var task = _pendingGetActions[i];
+                var robot = Game.Robots[i];
+                if(robot.Status == BotStatus.Alive) {
+
+                    // if no tasks are pending for a robot that is alive, fetch the next robot action
+                    if(task is null) {
+                        _pendingGetActions[i] = _provider.GetRobotAction(robot);
+                    }
+                } else if(!(task is null)) {
+
+                    // robot is destroyed, clear out any pending tasks
+                    _pendingGetActions[i] = null;
+                }
+            }
+
+            // check which robots have a completed response and apply it
+            for(var i = 0; i < _pendingGetActions.Length; ++i) {
+                var task = _pendingGetActions[i];
+                if(task?.IsCompleted ?? false) {
+                    ApplyRobotAction(Game.Robots[i], task.Result);
+                    _pendingGetActions[i] = null;
+                }
+
+            }
 
             // move robots
             foreach(var robot in Game.Robots.Where(robot => robot.Status == BotStatus.Alive)) {
@@ -260,10 +295,12 @@ namespace LambdaRobots.Server {
                 return $"{robot.Name} (R{robot.Index}) was disqualified due to bad configuration ({buildDescription}: {buildPoints} points)";
             }
             robot.InternalState = config.InternalStartState;
+            robot.LastStatusUpdate = _provider.UtcNow;
             return $"{robot.Name} (R{robot.Index}) has joined the battle ({buildDescription}: {buildPoints} points)";
         }
 
         private void ApplyRobotAction(BotInfo robot, GetActionResponse action) {
+            robot.LastStatusUpdate = _provider.UtcNow;
 
             // reduce reload time if any is active
             if(robot.ReloadCoolDown > 0) {
@@ -383,7 +420,7 @@ namespace LambdaRobots.Server {
                         if(robot.Id == from.Id) {
                             AddMessage($"{robot.Name} (R{robot.Index}) killed itself");
                         } else {
-                            AddMessage($"{robot.Name} (R{robot.Index}) was killed by {from.Name}");
+                            AddMessage($"{robot.Name} (R{robot.Index}) was killed by {from.Name} (R{from.Index})");
                         }
                     } else {
 
