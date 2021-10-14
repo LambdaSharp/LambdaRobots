@@ -12,10 +12,7 @@
     <PackageReference Include="AWSSDK.ApiGatewayManagementApi" Version="3.7.0.75"/>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../LambdaRobots/LambdaRobots.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="../Common/**"/>
+    <ProjectReference Include="../GameLib/GameLib.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp" Version="0.8.3.*"/>
