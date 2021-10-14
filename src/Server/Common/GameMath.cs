@@ -29,18 +29,18 @@ namespace LambdaRobots.Server {
     public static class GameMath {
 
         //--- Class Methods ---
-        public static double Distance(double x1, double y1, double x2, double y2)
-            => Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
+        public static float Distance(float x1, float y1, float x2, float y2)
+            => MathF.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 
-        public static double MinMax(double min, double value, double max)
-            => Math.Max(min, Math.Min(max, value));
+        public static float MinMax(float min, float value, float max)
+            => MathF.Max(min, MathF.Min(max, value));
 
-        public static double NormalizeAngle(double angle) {
+        public static float NormalizeAngle(float angle) {
             var result = angle % 360;
-            return (result <= -180.0)
-                ? (result + 360.0)
-                : (result > 180.0)
-                ? (result - 360.0)
+            return (result <= -180.0f)
+                ? (result + 360.0f)
+                : (result > 180.0f)
+                ? (result - 360.0f)
                 : result;
         }
     }

@@ -192,7 +192,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
         }
 
         //--- IGameDependencyProvider Members ---
-        double IGameDependencyProvider.NextRandomDouble() => _random.NextDouble();
+        float IGameDependencyProvider.NextRandomFloat() => (float)_random.NextDouble();
 
         Task<GetBuildResponse> IGameDependencyProvider.GetRobotBuild(BotInfo robot) {
             try {

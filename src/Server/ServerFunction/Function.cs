@@ -73,17 +73,17 @@ namespace LambdaRobots.Server.ServerFunction {
             var game = new Game {
                 Id = Guid.NewGuid().ToString("N"),
                 Status = GameStatus.Start,
-                BoardWidth = request.BoardWidth ?? 1000.0,
-                BoardHeight = request.BoardHeight ?? 1000.0,
-                SecondsPerTurn = request.SecondsPerTurn ?? 0.5,
+                BoardWidth = request.BoardWidth ?? 1000.0f,
+                BoardHeight = request.BoardHeight ?? 1000.0f,
+                SecondsPerTurn = request.SecondsPerTurn ?? 0.5f,
                 MaxTurns = request.MaxTurns ?? 300,
                 MaxBuildPoints = request.MaxBuildPoints ?? 8,
-                DirectHitRange = request.DirectHitRange ?? 5.0,
-                NearHitRange = request.NearHitRange ?? 20.0,
-                FarHitRange = request.FarHitRange ?? 40.0,
-                CollisionRange = request.CollisionRange ?? 8.0,
-                MinRobotStartDistance = request.MinRobotStartDistance ?? 50.0,
-                RobotTimeoutSeconds = request.RobotTimeoutSeconds ?? 15.0
+                DirectHitRange = request.DirectHitRange ?? 5.0f,
+                NearHitRange = request.NearHitRange ?? 20.0f,
+                FarHitRange = request.FarHitRange ?? 40.0f,
+                CollisionRange = request.CollisionRange ?? 8.0f,
+                MinRobotStartDistance = request.MinRobotStartDistance ?? 50.0f,
+                RobotTimeoutSeconds = request.RobotTimeoutSeconds ?? 15.0f
             };
             var gameRecord = new GameRecord {
                 GameId = game.Id,
@@ -162,7 +162,7 @@ namespace LambdaRobots.Server.ServerFunction {
             var found = gameLogic.ScanRobots(robot, request.Heading, request.Resolution);
             if(found != null) {
                 var distance = GameMath.Distance(robot.X, robot.Y, found.X, found.Y);
-                var angle = GameMath.NormalizeAngle(Math.Atan2(found.X - robot.X, found.Y - robot.Y) * 180.0 / Math.PI);
+                var angle = GameMath.NormalizeAngle(MathF.Atan2(found.X - robot.X, found.Y - robot.Y) * 180.0f / MathF.PI);
                 LogInfo($"Scanning: Heading = {GameMath.NormalizeAngle(request.Heading):N2}, Resolution = {request.Resolution:N2}, Found = R{found.Index}, Distance = {distance:N2}, Angle = {angle:N2}");
                 return new ScanResponse {
                     Found = true,
@@ -172,13 +172,13 @@ namespace LambdaRobots.Server.ServerFunction {
                LogInfo($"Scanning: Heading = {GameMath.NormalizeAngle(request.Heading):N2}, Resolution = {request.Resolution:N2}, Found = nothing");
                 return new ScanResponse {
                     Found = false,
-                    Distance = 0.0
+                    Distance = 0.0f
                 };
             }
         }
 
         //--- IGameDependencyProvider Members ---
-        double IGameDependencyProvider.NextRandomDouble() => _random.NextDouble();
+        float IGameDependencyProvider.NextRandomFloat() => (float)_random.NextDouble();
         Task<GetBuildResponse> IGameDependencyProvider.GetRobotBuild(BotInfo robot) => throw new NotImplementedException();
         Task<GetActionResponse> IGameDependencyProvider.GetRobotAction(BotInfo robot) => throw new NotImplementedException();
     }

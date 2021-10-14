@@ -27,10 +27,10 @@ namespace LambdaRobots.Bot.Model {
     public class GetActionResponse {
 
         //--- Properties ---
-        public double? Speed { get; set; }
-        public double? Heading { get; set; }
-        public double? FireMissileHeading { get; set; }
-        public double? FireMissileDistance { get; set; }
+        public float? Speed { get; set; }
+        public float? Heading { get; set; }
+        public float? FireMissileHeading { get; set; }
+        public float? FireMissileDistance { get; set; }
         public string RobotState { get; set; }
     }
 }

@@ -28,7 +28,7 @@ namespace LambdaRobots.Game.Model {
 
         //--- Properties ---
         public string RobotId { get; set; }
-        public double Heading { get; set; }
-        public double Resolution { get; set; }
+        public float Heading { get; set; }
+        public float Resolution { get; set; }
     }
 }

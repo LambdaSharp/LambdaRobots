@@ -127,69 +127,69 @@ The most commonly needed properties are readily available as properties from the
 
 |Property           |Type    |Description |
 |-------------------|--------|------------|
-|`BreakingDistance` |`double`|Distance required to stop at the current speed.|
-|`Damage`           |`double`|Robot damage. Value is always between 0 and `Robot.MaxDamage`. When the value is equal to `Robot.MaxDamage` the robot is considered killed.|
+|`BreakingDistance` |`float` |Distance required to stop at the current speed.|
+|`Damage`           |`float` |Robot damage. Value is always between 0 and `Robot.MaxDamage`. When the value is equal to `Robot.MaxDamage` the robot is considered killed.|
 |`Game`             |`Game`  |Game information data structure. _See below._|
-|`Heading`          |`double`|Robot heading. Value is always between `-180` and `180`.|
+|`Heading`          |`float` |Robot heading. Value is always between `-180` and `180`.|
 |`Random`           |`Random`|Initialized random number generator. Instance of [Random Class](https://docs.microsoft.com/en-us/dotnet/api/system.random?view=netstandard-2.0).|
-|`ReloadCoolDown`   |`double`|Number of seconds until the missile launcher is ready again.|
+|`ReloadCoolDown`   |`float` |Number of seconds until the missile launcher is ready again.|
 |`Robot`            |`LambdaRobot` |Robot information data structure. _See below._|
-|`Speed`            |`double`|Robot speed. Value is between `0` and `Robot.MaxSpeed`.|
+|`Speed`            |`float` |Robot speed. Value is between `0` and `Robot.MaxSpeed`.|
 |`State`            |`TState`|Robot state based on custom type. Used to store information between turns.|
-|`X`                |`double`|Horizontal position of robot. Value is between `0` and `Game.BoardWidth`.|
-|`Y`                |`double`|Vertical position of robot. Value is between `0` and `Game.BoardHeight`.|
+|`X`                |`float` |Horizontal position of robot. Value is between `0` and `Game.BoardWidth`.|
+|`Y`                |`float` |Vertical position of robot. Value is between `0` and `Game.BoardHeight`.|
 
 ##### `Robot` Properties
 |Property           |Type    |Description |
 |-------------------|--------|------------|
-|`Acceleration`|`double`|Acceleration when speeding up. (m/s^2)|
-|`CollisionDamage`|`double`|Amount of damage the robot receives from a collision.|
-|`Damage`|`double`|Accumulated robot damage. Between `0` and `MaxDamage`.|
-|`Deceleration`|`double`|Deceleration when speeding up. (m/s^2)|
-|`DirectHitDamage`|`double`|Amount of damage the robot receives from a direct hit.|
-|`FarHitDamage`|`double`|Amount of damage the robot receives from a far hit.|
-|`heading`|`double`|Robot heading. Between `0` and `360`. (degrees)|
+|`Acceleration`|`float`|Acceleration when speeding up. (m/s^2)|
+|`CollisionDamage`|`float`|Amount of damage the robot receives from a collision.|
+|`Damage`|`float`|Accumulated robot damage. Between `0` and `MaxDamage`.|
+|`Deceleration`|`float`|Deceleration when speeding up. (m/s^2)|
+|`DirectHitDamage`|`float`|Amount of damage the robot receives from a direct hit.|
+|`FarHitDamage`|`float`|Amount of damage the robot receives from a far hit.|
+|`heading`|`float`|Robot heading. Between `0` and `360`. (degrees)|
 |`Id`|`string`|Globally unique robot ID.|
 |`Index`|`int`|Index position of robot. Starts at `0`.|
-|`MaxDamage`|`double`|Maximum damage before the robot is destroyed.|
-|`MaxSpeed`|`double`|Maximum speed for robot. (m/s)|
-|`MaxTurnSpeed`|`double`|Maximum speed at which the robot can change heading without a sudden stop. (m/s)|
-|`MissileDirectHitDamageBonus`|`double`|Bonus damage on target for a direct hit.|
-|`MissileFarHitDamageBonus`|`double`|Bonus damage on target for a far hit.|
-|`MissileNearHitDamageBonus`|`double`|Bonus damage on target for a near hit.|
-|`MissileRange`|`double`|Maximum range for missile. (m)|
-|`MissileReloadCooldown`|`double`|Number of seconds between each missile launch. (s)|
-|`MissileVelocity`|`double`|Travel velocity for missile. (m/s)|
+|`MaxDamage`|`float`|Maximum damage before the robot is destroyed.|
+|`MaxSpeed`|`float`|Maximum speed for robot. (m/s)|
+|`MaxTurnSpeed`|`float`|Maximum speed at which the robot can change heading without a sudden stop. (m/s)|
+|`MissileDirectHitDamageBonus`|`float`|Bonus damage on target for a direct hit.|
+|`MissileFarHitDamageBonus`|`float`|Bonus damage on target for a far hit.|
+|`MissileNearHitDamageBonus`|`float`|Bonus damage on target for a near hit.|
+|`MissileRange`|`float`|Maximum range for missile. (m)|
+|`MissileReloadCooldown`|`float`|Number of seconds between each missile launch. (s)|
+|`MissileVelocity`|`float`|Travel velocity for missile. (m/s)|
 |`Name`|`string`|Robot display name.|
-|`NearHitDamage`|`double`|Amount of damage the robot receives from a near hit.|
-|`RadarMaxResolution`|`double`|Maximum degrees the radar can scan beyond the selected heading. (degrees)|
-|`RadarRange`|`double`|Maximum range at which the radar can detect an opponent. (m)|
-|`ReloadCoolDown`|`double`|Number of seconds before the robot can fire another missile. (s)|
-|`Speed`|`double`|Robot speed. Between `0` and `MaxSpeed`. (m/s)|
+|`NearHitDamage`|`float`|Amount of damage the robot receives from a near hit.|
+|`RadarMaxResolution`|`float`|Maximum degrees the radar can scan beyond the selected heading. (degrees)|
+|`RadarRange`|`float`|Maximum range at which the radar can detect an opponent. (m)|
+|`ReloadCoolDown`|`float`|Number of seconds before the robot can fire another missile. (s)|
+|`Speed`|`float`|Robot speed. Between `0` and `MaxSpeed`. (m/s)|
 |`Status`|`LambdaRobotStatus`|Robot status. Either `Alive` or `Dead`.|
-|`TargetHeading`|`double`|Desired heading for robot. The heading will be adjusted accordingly every turn. (degrees)|
-|`TargetSpeed`|`double`|Desired speed for robot. The current speed will be adjusted accordingly every turn. (m/s)|
+|`TargetHeading`|`float`|Desired heading for robot. The heading will be adjusted accordingly every turn. (degrees)|
+|`TargetSpeed`|`float`|Desired speed for robot. The current speed will be adjusted accordingly every turn. (m/s)|
 |`TimeOfDeathGameTurn`|`int`|Game turn during which the robot died. `-1` if robot is alive.|
 |`TotalCollisions`|`int`|Number of collisions with walls or other robots during match.|
-|`TotalDamageDealt`|`double`|Damage dealt by missiles during match.|
+|`TotalDamageDealt`|`float`|Damage dealt by missiles during match.|
 |`TotalKills`|`int`|Number of confirmed kills during match.|
 |`TotalMissileFiredCount`|`int`|Number of missiles fired by robot during match.|
 |`TotalMissileHitCount`|`int`|Number of missiles that hit a target during match.|
-|`TotalTravelDistance`|`double`|Total distance traveled by robot during the match. (m)|
-|`X`|`double`|Robot horizontal position.|
-|`Y`|`double`|Robot vertical position.|
+|`TotalTravelDistance`|`float`|Total distance traveled by robot during the match. (m)|
+|`X`|`float`|Robot horizontal position.|
+|`Y`|`float`|Robot vertical position.|
 
 ##### `Game` Properties
 |Property           |Type    |Description |
 |-------------------|--------|------------|
 |`Id`               |`string`|Unique Game ID.|
-|`BoardWidth`       |`double`|Width of the game board.|
-|`BoardHeight`      |`double`|Height of the game board.|
-|`SecondsPerTurn`   |`double`|Number of seconds elapsed per game turn.|
-|`DirectHitRange`   |`double`|Distance for missile impact to count as direct hit.|
-|`NearHitRange`     |`double`|Distance for missile impact to count as near hit.|
-|`FarHitRange`      |`double`|Distance for missile impact to count as far hit.|
-|`CollisionRange`   |`double`|Distance between robots to count as a collision.|
+|`BoardWidth`       |`float` |Width of the game board.|
+|`BoardHeight`      |`float` |Height of the game board.|
+|`SecondsPerTurn`   |`float` |Number of seconds elapsed per game turn.|
+|`DirectHitRange`   |`float` |Distance for missile impact to count as direct hit.|
+|`NearHitRange`     |`float` |Distance for missile impact to count as near hit.|
+|`FarHitRange`      |`float` |Distance for missile impact to count as far hit.|
+|`CollisionRange`   |`float` |Distance between robots to count as a collision.|
 |`GameTurn`         |`int`   |Current game turn. Starts at `1`.|
 |`MaxGameTurns`     |`int`   |Maximum number of turns before the game ends in a draw.|
 |`MaxBuildPoints`   |`int`   |Maximum number of build points a robot can use.|
@@ -200,21 +200,21 @@ The following methods represent the core capabilities of the robot. They are use
 
 |Method             |Description|
 |-------------------|-----------|
-|`void FireMissile(double heading, double distance)`|Fire a missile in a given direction with impact at a given distance. A missile can only be fired if `Robot.ReloadCoolDown` is `0`.|
-|`Task<double?> ScanAsync(double heading, double resolution)`|Scan the game board in a given heading and resolution. The resolution specifies in the scan arc centered on `heading` with +/- `resolution` tolerance. The max resolution is limited to `Robot.RadarMaxResolution`.|
-|`void SetHeading(double heading)`|Set heading in which the robot is moving. Current speed must be below `Robot.MaxTurnSpeed` to avoid a sudden stop.|
-|`void SetSpeed(double speed)`|Set the speed for the robot. Speed is adjusted according to `Robot.Acceleration` and `Robot.Deceleration` characteristics.|
+|`void FireMissile(float heading, float distance)`|Fire a missile in a given direction with impact at a given distance. A missile can only be fired if `Robot.ReloadCoolDown` is `0`.|
+|`Task<float?> ScanAsync(float heading, float resolution)`|Scan the game board in a given heading and resolution. The resolution specifies in the scan arc centered on `heading` with +/- `resolution` tolerance. The max resolution is limited to `Robot.RadarMaxResolution`.|
+|`void SetHeading(float heading)`|Set heading in which the robot is moving. Current speed must be below `Robot.MaxTurnSpeed` to avoid a sudden stop.|
+|`void SetSpeed(float speed)`|Set the speed for the robot. Speed is adjusted according to `Robot.Acceleration` and `Robot.Deceleration` characteristics.|
 
 #### Support Methods
 The following methods are provided to make some common operations easier, but do not introduce n
 
 |Method             |Description|
 |-------------------|-----------|
-|`double AngleToXY(double x, double y)`|Determine angle in degrees relative to current robot position. Return value range from `-180` to `180` degrees.|
-|`double DistanceToXY(double x, double y)`|Determine distance relative to current robot position.|
-|`void FireMissileToXY(double x, double y)`|Fire a missile in at the given position. A missile can only be fired if `Robot.ReloadCoolDown` is `0`.|
-|`bool MoveToXY(double x, double y)`|Adjust speed and heading to move robot to specified coordinates. Call this method on every turn to keep adjusting the speed and heading until the destination is reached.|
-|`double NormalizeAngle(double angle)`|Normalize angle to be between `-180` and `180` degrees.|
+|`float AngleToXY(float x, float y)`|Determine angle in degrees relative to current robot position. Return value range from `-180` to `180` degrees.|
+|`float DistanceToXY(float x, float y)`|Determine distance relative to current robot position.|
+|`void FireMissileToXY(float x, float y)`|Fire a missile in at the given position. A missile can only be fired if `Robot.ReloadCoolDown` is `0`.|
+|`bool MoveToXY(float x, float y)`|Adjust speed and heading to move robot to specified coordinates. Call this method on every turn to keep adjusting the speed and heading until the destination is reached.|
+|`float NormalizeAngle(float angle)`|Normalize angle to be between `-180` and `180` degrees.|
 
 ### Robot Build
 

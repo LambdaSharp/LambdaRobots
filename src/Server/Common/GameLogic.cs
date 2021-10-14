@@ -33,7 +33,7 @@ namespace LambdaRobots.Server {
     public interface IGameDependencyProvider {
 
         //--- Methods ---
-        double NextRandomDouble();
+        float NextRandomFloat();
         Task<GetBuildResponse> GetRobotBuild(BotInfo robot);
         Task<GetActionResponse> GetRobotAction(BotInfo robot);
     }
@@ -71,8 +71,8 @@ namespace LambdaRobots.Server {
             }
 
             // place robots on playfield
-            var marginWidth = Game.BoardWidth * 0.1;
-            var marginHeight = Game.BoardHeight * 0.1;
+            var marginWidth = Game.BoardWidth * 0.1f;
+            var marginHeight = Game.BoardHeight * 0.1f;
             var attempts = 0;
         again:
             if(attempts >= 100) {
@@ -81,8 +81,8 @@ namespace LambdaRobots.Server {
 
             // assign random locations to all robots
             foreach(var robot in Game.Robots.Where(robot => robot.Status == BotStatus.Alive)) {
-                robot.X = marginWidth + _provider.NextRandomDouble() * (Game.BoardWidth - 2.0 * marginWidth);
-                robot.Y = marginHeight + _provider.NextRandomDouble() * (Game.BoardHeight - 2.0 * marginHeight);
+                robot.X = marginWidth + _provider.NextRandomFloat() * (Game.BoardWidth - 2.0f * marginWidth);
+                robot.Y = marginHeight + _provider.NextRandomFloat() * (Game.BoardHeight - 2.0f * marginHeight);
             }
 
             // verify that none of the robots are too close to each other
@@ -176,9 +176,9 @@ namespace LambdaRobots.Server {
             }
         }
 
-        public BotInfo ScanRobots(BotInfo robot, double heading, double resolution) {
+        public BotInfo ScanRobots(BotInfo robot, float heading, float resolution) {
             BotInfo result = null;
-            resolution = GameMath.MinMax(0.01, resolution, robot.RadarMaxResolution);
+            resolution = GameMath.MinMax(0.01f, resolution, robot.RadarMaxResolution);
             FindRobotsByDistance(robot.X, robot.Y, (other, distance) => {
 
                 // skip ourselves
@@ -198,8 +198,8 @@ namespace LambdaRobots.Server {
                 }
 
                 // check if delta angle is within resolution limit
-                var angle = Math.Atan2(deltaX, deltaY) * 180.0 / Math.PI;
-                if(Math.Abs(GameMath.NormalizeAngle(heading - angle)) <= resolution) {
+                var angle = MathF.Atan2(deltaX, deltaY) * 180.0f / MathF.PI;
+                if(MathF.Abs(GameMath.NormalizeAngle(heading - angle)) <= resolution) {
 
                     // found a robot within range and resolution; stop enumerating
                     result = other;
@@ -267,7 +267,7 @@ namespace LambdaRobots.Server {
 
             // reduce reload time if any is active
             if(robot.ReloadCoolDown > 0) {
-                robot.ReloadCoolDown = Math.Max(0.0, robot.ReloadCoolDown - Game.SecondsPerTurn);
+                robot.ReloadCoolDown = MathF.Max(0.0f, robot.ReloadCoolDown - Game.SecondsPerTurn);
             }
 
             // check if any actions need to be applied
@@ -284,11 +284,11 @@ namespace LambdaRobots.Server {
             robot.InternalState = action.RobotState;
 
             // update speed and heading
-            robot.TargetSpeed = GameMath.MinMax(0.0, action.Speed ?? robot.TargetSpeed, robot.MaxSpeed);
+            robot.TargetSpeed = GameMath.MinMax(0.0f, action.Speed ?? robot.TargetSpeed, robot.MaxSpeed);
             robot.TargetHeading = GameMath.NormalizeAngle(action.Heading ?? robot.TargetHeading);
 
             // fire missile if requested and possible
-            if((action.FireMissileHeading.HasValue || action.FireMissileDistance.HasValue) && (robot.ReloadCoolDown == 0.0)) {
+            if((action.FireMissileHeading.HasValue || action.FireMissileDistance.HasValue) && (robot.ReloadCoolDown == 0.0f)) {
 
                 // update robot state
                 ++robot.TotalMissileFiredCount;
@@ -303,7 +303,7 @@ namespace LambdaRobots.Server {
                     Y = robot.Y,
                     Speed = robot.MissileVelocity,
                     Heading = GameMath.NormalizeAngle(action.FireMissileHeading ?? robot.Heading),
-                    Range = GameMath.MinMax(0.0, action.FireMissileDistance ?? robot.MissileRange, robot.MissileRange),
+                    Range = GameMath.MinMax(0.0f, action.FireMissileDistance ?? robot.MissileRange, robot.MissileRange),
                     DirectHitDamageBonus = robot.MissileDirectHitDamageBonus,
                     NearHitDamageBonus = robot.MissileNearHitDamageBonus,
                     FarHitDamageBonus = robot.MissileFarHitDamageBonus
@@ -331,7 +331,7 @@ namespace LambdaRobots.Server {
             missile.Distance = missileDistance;
             if(collision) {
                 missile.Status = MissileStatus.ExplodingDirect;
-                missile.Speed = 0.0;
+                missile.Speed = 0.0f;
             }
         }
 
@@ -339,7 +339,7 @@ namespace LambdaRobots.Server {
             FindRobotsByDistance(missile.X, missile.Y, (robot, distance) => {
 
                 // compute damage dealt by missile
-                double damage = 0.0;
+                float damage = 0.0f;
                 string damageType = null;
                 switch(missile.Status) {
                 case MissileStatus.ExplodingDirect:
@@ -363,7 +363,7 @@ namespace LambdaRobots.Server {
                 }
 
                 // check if any damage was dealt
-                if(damage == 0.0) {
+                if(damage == 0.0f) {
 
                     // stop enumerating more robots since they will be further away
                     return false;
@@ -415,11 +415,11 @@ namespace LambdaRobots.Server {
             // compute new speed
             var oldSpeed = robot.Speed;
             if(robot.TargetSpeed > robot.Speed) {
-                robot.Speed = Math.Min(robot.TargetSpeed, robot.Speed + robot.Acceleration * Game.SecondsPerTurn);
+                robot.Speed = MathF.Min(robot.TargetSpeed, robot.Speed + robot.Acceleration * Game.SecondsPerTurn);
             } else if(robot.TargetSpeed < robot.Speed) {
-                robot.Speed = Math.Max(robot.TargetSpeed, robot.Speed - robot.Deceleration * Game.SecondsPerTurn);
+                robot.Speed = MathF.Max(robot.TargetSpeed, robot.Speed - robot.Deceleration * Game.SecondsPerTurn);
             }
-            var effectiveSpeed = (robot.Speed + oldSpeed) / 2.0;
+            var effectiveSpeed = (robot.Speed + oldSpeed) / 2.0f;
 
             // move robot
             bool collision;
@@ -429,7 +429,7 @@ namespace LambdaRobots.Server {
                 robot.TotalTravelDistance,
                 effectiveSpeed,
                 robot.Heading,
-                double.MaxValue,
+                float.MaxValue,
                 out var robotX,
                 out var robotY,
                 out var robotTotalTravelDistance,
@@ -441,8 +441,8 @@ namespace LambdaRobots.Server {
 
             // check for collision with wall
             if(collision) {
-                robot.Speed = 0.0;
-                robot.TargetSpeed = 0.0;
+                robot.Speed = 0.0f;
+                robot.TargetSpeed = 0.0f;
                 ++robot.TotalCollisions;
                 if(Damage(robot, robot.CollisionDamage)) {
                     AddMessage($"{robot.Name} (R{robot.Index}) was destroyed by wall collision");
@@ -455,8 +455,8 @@ namespace LambdaRobots.Server {
             // check if robot collides with any other robot
             FindRobotsByDistance(robot.X, robot.Y, (other, distance) => {
                 if((other.Id != robot.Id) && (distance < Game.CollisionRange)) {
-                    robot.Speed = 0.0;
-                    robot.TargetSpeed = 0.0;
+                    robot.Speed = 0.0f;
+                    robot.TargetSpeed = 0.0f;
                     ++robot.TotalCollisions;
                     if(Damage(robot, robot.CollisionDamage)) {
                         AddMessage($"{robot.Name} (R{robot.Index}) was destroyed by collision with {other.Name}");
@@ -478,15 +478,15 @@ namespace LambdaRobots.Server {
         }
 
         private void Move(
-            double startX,
-            double startY,
-            double startDistance,
-            double speed,
-            double heading,
-            double range,
-            out double endX,
-            out double endY,
-            out double endDistance,
+            float startX,
+            float startY,
+            float startDistance,
+            float speed,
+            float heading,
+            float range,
+            out float endX,
+            out float endY,
+            out float endDistance,
             out bool collision
         ) {
             collision = false;
@@ -500,8 +500,8 @@ namespace LambdaRobots.Server {
 
             // compute new position for object
             var delta = endDistance - startDistance;
-            var sinHeading = Math.Sin(heading * Math.PI / 180.0);
-            var cosHeading = Math.Cos(heading * Math.PI / 180.0);
+            var sinHeading = MathF.Sin(heading * MathF.PI / 180.0f);
+            var cosHeading = MathF.Cos(heading * MathF.PI / 180.0f);
             endX = startX + delta * sinHeading;
             endY = startY + delta * cosHeading;
 
@@ -534,7 +534,7 @@ namespace LambdaRobots.Server {
             }
         }
 
-        private void FindRobotsByDistance(double x, double y, Func<BotInfo, double, bool> callback) {
+        private void FindRobotsByDistance(float x, float y, Func<BotInfo, float, bool> callback) {
             foreach(var robotWithDistance in Game.Robots
                 .Where(robot => robot.Status == BotStatus.Alive)
                 .Select(robot => new {
@@ -550,7 +550,7 @@ namespace LambdaRobots.Server {
             }
         }
 
-        private bool Damage(BotInfo robot, double damage) {
+        private bool Damage(BotInfo robot, float damage) {
             robot.Damage += damage;
             if(robot.Damage >= robot.MaxDamage) {
                 robot.Damage = robot.MaxDamage;

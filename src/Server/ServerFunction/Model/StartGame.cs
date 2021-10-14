@@ -37,17 +37,17 @@ namespace LambdaRobots.Server.ServerFunction.Model {
         public List<string> RobotArns { get; set; } = new List<string>();
 
         // optional board initialization settings
-        public double? BoardWidth { get; set; }
-        public double? BoardHeight { get; set; }
-        public double? SecondsPerTurn { get; set; }
+        public float? BoardWidth { get; set; }
+        public float? BoardHeight { get; set; }
+        public float? SecondsPerTurn { get; set; }
         public int? MaxTurns { get; set; }
         public int? MaxBuildPoints { get; set; }
-        public double? DirectHitRange { get; set; }
-        public double? NearHitRange { get; set; }
-        public double? FarHitRange { get; set; }
-        public double? CollisionRange { get; set; }
-        public double? MinRobotStartDistance { get; set; }
-        public double? RobotTimeoutSeconds { get; set; }
+        public float? DirectHitRange { get; set; }
+        public float? NearHitRange { get; set; }
+        public float? FarHitRange { get; set; }
+        public float? CollisionRange { get; set; }
+        public float? MinRobotStartDistance { get; set; }
+        public float? RobotTimeoutSeconds { get; set; }
     }
 
     public class StartGameResponse {

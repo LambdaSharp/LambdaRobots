@@ -28,6 +28,6 @@ namespace LambdaRobots.Game.Model {
 
         //--- Properties ---
         public bool Found { get; set; }
-        public double Distance { get; set; }
+        public float Distance { get; set; }
     }
 }

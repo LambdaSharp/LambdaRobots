@@ -51,8 +51,8 @@ namespace Test.LambdaRobots.Server {
             var logic = NewLogic(robot);
             _robotActions["Bob"] = new List<Func<GetActionResponse>> {
                 () => new GetActionResponse {
-                    Heading = 0.0,
-                    Speed = 100.0
+                    Heading = 0.0f,
+                    Speed = 100.0f
                 }
             };
 
@@ -60,9 +60,9 @@ namespace Test.LambdaRobots.Server {
             logic.NextTurnAsync().Wait();
 
             // assert
-            robot.X.Should().Be(500.0);
-            robot.Y.Should().Be(505.0);
-            robot.Speed.Should().Be(10.0);
+            robot.X.Should().Be(500.0f);
+            robot.Y.Should().Be(505.0f);
+            robot.Speed.Should().Be(10.0f);
         }
 
         [Fact]
@@ -73,8 +73,8 @@ namespace Test.LambdaRobots.Server {
             var logic = NewLogic(robot);
             _robotActions["Bob"] = new List<Func<GetActionResponse>> {
                 () => new GetActionResponse {
-                    Heading = 0.0,
-                    Speed = 100.0
+                    Heading = 0.0f,
+                    Speed = 100.0f
                 }
             };
 
@@ -83,9 +83,9 @@ namespace Test.LambdaRobots.Server {
             logic.NextTurnAsync().Wait();
 
             // assert
-            robot.X.Should().Be(500.0);
-            robot.Y.Should().Be(520.0);
-            robot.Speed.Should().Be(20.0);
+            robot.X.Should().Be(500.0f);
+            robot.Y.Should().Be(520.0f);
+            robot.Speed.Should().Be(20.0f);
         }
 
         [Fact]
@@ -96,8 +96,8 @@ namespace Test.LambdaRobots.Server {
             var logic = NewLogic(robot);
             _robotActions["Bob"] = new List<Func<GetActionResponse>> {
                 () => new GetActionResponse {
-                    Heading = 90.0,
-                    Speed = 100.0
+                    Heading = 90.0f,
+                    Speed = 100.0f
                 }
             };
 
@@ -105,9 +105,9 @@ namespace Test.LambdaRobots.Server {
             logic.NextTurnAsync().Wait();
 
             // assert
-            robot.X.Should().Be(505.0);
-            robot.Y.Should().Be(500.0);
-            robot.Speed.Should().Be(10.0);
+            robot.X.Should().Be(505.0f);
+            robot.Y.Should().Be(500.0f);
+            robot.Speed.Should().Be(10.0f);
         }
         #endregion
 
@@ -116,8 +116,8 @@ namespace Test.LambdaRobots.Server {
         public void MoveRobotCollideWithWall() {
 
             // arrange
-            var robot = NewRobot("Bob", 990.0, 990.0);
-            robot.Heading = 30.0;
+            var robot = NewRobot("Bob", 990.0f, 990.0f);
+            robot.Heading = 30.0f;
             robot.TargetHeading = robot.Heading;
             robot.Speed = robot.MaxSpeed;
             robot.TargetSpeed = robot.Speed;
@@ -127,9 +127,9 @@ namespace Test.LambdaRobots.Server {
             logic.NextTurnAsync().Wait();
 
             // assert
-            robot.X.Should().BeLessThan(1000.0);
-            robot.Y.Should().Be(1000.0);
-            robot.Speed.Should().Be(0.0);
+            robot.X.Should().BeLessThan(1000.0f);
+            robot.Y.Should().Be(1000.0f);
+            robot.Speed.Should().Be(0.0f);
             robot.Damage.Should().Be(robot.CollisionDamage);
             logic.Game.Messages.Count.Should().Be(2);
             logic.Game.Messages[0].Text.Should().Be("Bob (R0) received 2 damage by wall collision");
@@ -140,8 +140,8 @@ namespace Test.LambdaRobots.Server {
         public void MoveRobotColliedWithOtherRobot() {
 
             // arrange
-            var bob = NewRobot("Bob", 500.0, 500.0);
-            var dave = NewRobot("Dave", 500.0, 500.0);
+            var bob = NewRobot("Bob", 500.0f, 500.0f);
+            var dave = NewRobot("Dave", 500.0f, 500.0f);
             var logic = NewLogic(bob, dave);
 
             // act
@@ -161,12 +161,12 @@ namespace Test.LambdaRobots.Server {
         public void ScanRobotInRange() {
 
             // arrange
-            var bob = NewRobot("Bob", 500.0, 500.0);
-            var dave = NewRobot("Dave", 600.0, 600.0);
+            var bob = NewRobot("Bob", 500.0f, 500.0f);
+            var dave = NewRobot("Dave", 600.0f, 600.0f);
             var logic = NewLogic(bob, dave);
 
             // act
-            var robot = logic.ScanRobots(bob, 45.0, 10.0);
+            var robot = logic.ScanRobots(bob, 45.0f, 10.0f);
 
             // assert
             robot.Should().NotBe(null);
@@ -177,12 +177,12 @@ namespace Test.LambdaRobots.Server {
         public void ScanRobotOutOfRange() {
 
             // arrange
-            var bob = NewRobot("Bob", 100.0, 100.0);
-            var dave = NewRobot("Dave", 800.0, 800.0);
+            var bob = NewRobot("Bob", 100.0f, 100.0f);
+            var dave = NewRobot("Dave", 800.0f, 800.0f);
             var logic = NewLogic(bob, dave);
 
             // act
-            var robot = logic.ScanRobots(bob, 45.0, 10.0);
+            var robot = logic.ScanRobots(bob, 45.0f, 10.0f);
 
             // assert
             robot.Should().Be(null);
@@ -192,12 +192,12 @@ namespace Test.LambdaRobots.Server {
         public void ScanRobotOutOfResolution() {
 
             // arrange
-            var bob = NewRobot("Bob", 500.0, 500.0);
-            var dave = NewRobot("Dave", 600.0, 500.0);
+            var bob = NewRobot("Bob", 500.0f, 500.0f);
+            var dave = NewRobot("Dave", 600.0f, 500.0f);
             var logic = NewLogic(bob, dave);
 
             // act
-            var robot = logic.ScanRobots(bob, 45.0, 10.0);
+            var robot = logic.ScanRobots(bob, 45.0f, 10.0f);
 
             // assert
             robot.Should().Be(null);

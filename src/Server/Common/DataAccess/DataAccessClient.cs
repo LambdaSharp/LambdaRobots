@@ -22,19 +22,47 @@
  * SOFTWARE.
  */
 
+using System;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.Model;
 using LambdaRobots.Server.DataAccess.Records;
 using LambdaSharp.DynamoDB.Native;
+using LambdaSharp.DynamoDB.Serialization;
+using LambdaSharp.DynamoDB.Serialization.Converters;
 
 namespace LambdaRobots.Server.DataAccess {
 
     public class DataAccessClient {
 
+        //--- Types ---
+        private class DynamoFloatConverter : ADynamoAttributeConverter {
+
+            //--- Class Fields ---
+            public static readonly DynamoFloatConverter Instance = new DynamoFloatConverter();
+
+            //--- Methods ---
+            public override bool CanConvert(Type typeToConvert) => (typeToConvert == typeof(float)) || (typeToConvert == typeof(float?));
+
+            public override AttributeValue ToAttributeValue(object value, Type targetType, DynamoSerializerOptions options)
+                => new AttributeValue {
+                    N = ((float)value).ToString(CultureInfo.InvariantCulture)
+                };
+
+            public override object FromNumber(string value, Type targetType, DynamoSerializerOptions options) => float.Parse(value, CultureInfo.InvariantCulture);
+        }
+
         //--- Constructors ---
         public DataAccessClient(string tableName, IAmazonDynamoDB dynamoClient = null)
-            => Table = new DynamoTable(tableName, dynamoClient);
+            => Table = new DynamoTable(tableName, dynamoClient, new DynamoTableOptions {
+                SerializerOptions = new DynamoSerializerOptions {
+                    Converters = {
+                        new DynamoFloatConverter()
+                    }
+                }
+            });
 
         //--- Properties ---
         private IDynamoTable Table { get; }

@@ -43,7 +43,7 @@ namespace LambdaRobots.Game {
         /// <param name="heading">Scan heading in degrees</param>
         /// <param name="resolution">Scan resolution in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
-        Task<ScanResponse> ScanAsync(double heading, double resolution);
+        Task<ScanResponse> ScanAsync(float heading, float resolution);
     }
 
     public class LambdaRobotsGameClient : ILambdaRobotsGame {
@@ -61,7 +61,7 @@ namespace LambdaRobots.Game {
         }
 
         //--- Methods ---
-        public async Task<ScanResponse> ScanAsync(double heading, double resolution) {
+        public async Task<ScanResponse> ScanAsync(float heading, float resolution) {
 
             // issue scan request to game API
             var postTask = _httpClient.PostAsync($"{_gameApi}/scan", new StringContent(JsonSerializer.Serialize(new ScanEnemiesRequest {
