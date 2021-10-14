@@ -124,7 +124,7 @@ namespace LambdaRobots.HotShotRobot.RobotFunction {
             }
 
             // check if we're not moving
-            if((State.GotoX == null) || (State.GotoY == null)) {
+            if((State.GotoX is null) || (State.GotoY is null)) {
 
                 // check if we were hurt or having found a target after a full sweep
                 if(WasHurt) {
@@ -133,7 +133,7 @@ namespace LambdaRobots.HotShotRobot.RobotFunction {
                     // take evasive action!
                     State.GotoX = Game.CollisionRange + RandomFloat() * (Game.BoardWidth - 2.0f * Game.CollisionRange);
                     State.GotoY = Game.CollisionRange + RandomFloat() * (Game.BoardHeight - 2.0f * Game.CollisionRange);
-                } else if((State.NoHitSweep >= 360.0) && ((State.GotoX == null) || (State.GotoY == null))) {
+                } else if((State.NoHitSweep >= 360.0) && ((State.GotoX is null) || (State.GotoY is null))) {
                     LogInfo("Nothing found in immediate surroundings. Moving to new location.");
 
                     // time to move to a new random location on the board

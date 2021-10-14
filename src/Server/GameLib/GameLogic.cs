@@ -215,7 +215,7 @@ namespace LambdaRobots.Server {
         private async Task<string> InitializeRobotAsync(BotInfo robot) {
             var config = await _provider.GetRobotBuild(robot);
             robot.Name = config?.Name ?? $"#{robot.Index}";
-            if(config == null) {
+            if(config is null) {
 
                 // missing config information, consider robot dead
                 robot.Status = BotStatus.Dead;
@@ -271,7 +271,7 @@ namespace LambdaRobots.Server {
             }
 
             // check if any actions need to be applied
-            if(action == null) {
+            if(action is null) {
 
                 // robot didn't respond with an action; consider it dead
                 robot.Status = BotStatus.Dead;

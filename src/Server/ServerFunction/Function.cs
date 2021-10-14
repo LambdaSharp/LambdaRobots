@@ -118,7 +118,7 @@ namespace LambdaRobots.Server.ServerFunction {
 
             // fetch game record from table
             var gameRecord = await _dataClient.GetGameRecordAsync(request.GameId);
-            if(gameRecord == null) {
+            if(gameRecord is null) {
                 LogInfo("No game found to stop");
 
                 // game is already stopped, nothing further to do
@@ -147,14 +147,14 @@ namespace LambdaRobots.Server.ServerFunction {
 
             // fetch game record from table
             var gameRecord = await _dataClient.GetGameRecordAsync(gameId);
-            if(gameRecord == null) {
+            if(gameRecord is null) {
                 throw AbortNotFound($"could not find a game session: ID = {gameId ?? "<NULL>"}");
             }
             var gameLogic = new GameLogic(gameRecord.Game, this);
 
             // identify scanning robot
             var robot = gameRecord.Game.Robots.FirstOrDefault(r => r.Id == request.RobotId);
-            if(robot == null) {
+            if(robot is null) {
                 throw AbortNotFound($"could not find a robot: ID = {request.RobotId}");
             }
 
