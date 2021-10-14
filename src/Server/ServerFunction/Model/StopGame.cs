@@ -22,18 +22,12 @@
  * SOFTWARE.
  */
 
-using System.Runtime.Serialization;
-using LambdaRobots.Server;
-
 namespace LambdaRobots.Server.ServerFunction.Model {
 
     public class StopGameRequest {
 
         //--- Properties ---
-        [DataMember(IsRequired = true)]
         public string Action { get; set; }
-
-        [DataMember(IsRequired = true)]
         public string GameId { get; set; }
     }
 

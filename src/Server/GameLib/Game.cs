@@ -23,7 +23,6 @@
  */
 
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
 namespace LambdaRobots.Server {
@@ -78,50 +77,5 @@ namespace LambdaRobots.Server {
         ExplodingNear,
         ExplodingFar,
         Destroyed
-    }
-
-    public class MissileInfo {
-
-        //--- Fields ---
-
-        [DataMember(IsRequired = true)]
-        public string Id { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public string RobotId { get; set; }
-
-        // current state
-
-        [DataMember(IsRequired = true)]
-        public MissileStatus Status { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public float X { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public float Y { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public float Distance { get; set; }
-
-        // missile characteristics
-
-        [DataMember(IsRequired = true)]
-        public float Speed { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public float Heading { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public float Range { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public float DirectHitDamageBonus { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public float NearHitDamageBonus { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public float FarHitDamageBonus { get; set; }
     }
 }
