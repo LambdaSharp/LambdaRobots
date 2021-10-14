@@ -76,7 +76,7 @@ namespace LambdaRobots.Server.ServerFunction {
                 BoardWidth = request.BoardWidth ?? 1000.0f,
                 BoardHeight = request.BoardHeight ?? 1000.0f,
                 SecondsPerTurn = request.SecondsPerTurn ?? 0.5f,
-                MaxTurns = request.MaxTurns ?? 1000,
+                MaxTurns = request.MaxTurns ?? 1500,
                 MaxBuildPoints = request.MaxBuildPoints ?? 8,
                 DirectHitRange = request.DirectHitRange ?? 5.0f,
                 NearHitRange = request.NearHitRange ?? 20.0f,
