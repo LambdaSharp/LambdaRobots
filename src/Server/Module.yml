@@ -84,7 +84,7 @@ Items:
 
   - Package: WebsiteFiles
     Description: Website files to deploy
-    Files: Packages/wwwroot
+    Files: Website
 
   - Resource: DeployWebsiteFiles
     Type: LambdaSharp::S3::Unzip
