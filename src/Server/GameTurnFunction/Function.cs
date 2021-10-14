@@ -220,7 +220,6 @@ namespace LambdaRobots.Server.GameTurnFunction {
         }
 
         Task<GetActionResponse> IGameDependencyProvider.GetRobotAction(BotInfo robot) {
-            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
             try {
                 var client = new LambdaRobotsBotClient(robot.Id, GameRecord.BotArns[robot.Index], TimeSpan.FromSeconds(Game.RobotTimeoutSeconds), _lambdaClient, this);
                 return client.GetAction(new GetActionRequest {
