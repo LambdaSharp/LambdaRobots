@@ -77,29 +77,32 @@ namespace LambdaRobots.HotShotRobot.RobotFunction {
             //  each turn, similar to binary search.
 
             // check if target is found in left scan area
-            State.TargetRange = await ScanAsync(State.ScanHeading - State.ScanResolution, State.ScanResolution);
+            float scanHeading = State.ScanHeading - State.ScanResolution;
+            State.TargetRange = await ScanAsync(scanHeading, State.ScanResolution);
             if((State.TargetRange != null) && (State.TargetRange > Game.FarHitRange) && (State.TargetRange <= Robot.MissileRange)) {
-                LogInfo($"Target found: ScanHeading = {State.ScanHeading:N2}, Range = {State.TargetRange:N2}");
+                LogInfo($"Target found: ScanHeading = {scanHeading:N2}, Range = {State.TargetRange:N2}");
 
                 // update scan heading
-                State.ScanHeading -= State.ScanResolution;
+                State.ScanHeading = scanHeading;
 
                 // narrow scan resolution
                 State.ScanResolution = MathF.Max(0.1f, State.ScanResolution / 2.0f);
             } else {
 
                 // check if target is found in right scan area
-                State.TargetRange = await ScanAsync(State.ScanHeading + State.ScanResolution, State.ScanResolution);
+                scanHeading = State.ScanHeading + State.ScanResolution;
+                State.TargetRange = await ScanAsync(scanHeading, State.ScanResolution);
                 if((State.TargetRange != null) && (State.TargetRange > Game.FarHitRange) && (State.TargetRange <= Robot.MissileRange)) {
-                    LogInfo($"Target found: ScanHeading = {State.ScanHeading:N2}, Range = {State.TargetRange:N2}");
+                    LogInfo($"Target found: ScanHeading = {scanHeading:N2}, Range = {State.TargetRange:N2}");
 
                     // update scan heading
-                    State.ScanHeading += State.ScanResolution;
+                    State.ScanHeading = scanHeading;
 
                     // narrow scan resolution
                     State.ScanResolution = MathF.Max(0.1f, State.ScanResolution / 2.0f);
                 } else {
-                    LogInfo($"No target found: ScanHeading = {State.ScanHeading:N2}");
+                    State.TargetRange = null;
+                    LogInfo($"No target found: ScanHeading = {State.ScanHeading:N2} +/- {State.ScanResolution:N2}");
 
                     // look in adjacent area
                     State.ScanHeading += 3.0f * Robot.RadarMaxResolution;
