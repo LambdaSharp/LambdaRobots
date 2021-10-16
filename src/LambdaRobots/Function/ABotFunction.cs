@@ -24,33 +24,40 @@
 
 using System;
 using System.Threading.Tasks;
-using LambdaRobots.Api;
-using LambdaRobots.Protocol;
+using LambdaRobots.Bot.Model;
+using LambdaRobots.Game;
 using LambdaSharp;
 
-namespace LambdaRobots {
+namespace LambdaRobots.Function {
 
-    public abstract class ALambdaRobotFunction<TState> : ALambdaFunction<LambdaRobotRequest, LambdaRobotResponse> where TState : class, new() {
+    public abstract class ABotFunction<TState> : ALambdaFunction<BotRequest, BotResponse> where TState : class, new() {
 
         //--- Class Fields ---
 
         /// <summary>
         /// Initialized random number generator. Instance of [Random Class](https://docs.microsoft.com/en-us/dotnet/api/system.random?view=netstandard-2.0).
         /// </summary>
-        public static Random Random { get ; private set; } = new Random();
+        private static Random g_random { get ; set; } = new Random();
+
+        //--- Class Methods ---
+
+        /// <summary>
+        /// Returns a random <c>float</c> number.
+        /// </summary>
+        protected static float RandomFloat() => (float)g_random.NextDouble();
 
         //--- Fields ---
-        private LambdaRobotAction _action;
+        private GetActionResponse _action;
 
         //--- Constructors ---
-        protected ALambdaRobotFunction() : base(new LambdaSharp.Serialization.LambdaSystemTextJsonSerializer()) { }
+        protected ABotFunction() : base(new LambdaSharp.Serialization.LambdaSystemTextJsonSerializer()) { }
 
         //--- Properties ---
 
         /// <summary>
         /// Robot data structure describing the state and characteristics of the robot.
         /// </summary>
-        public LambdaRobots.LambdaRobot Robot { get; set; }
+        public LambdaRobots.BotInfo Robot { get; set; }
 
         /// <summary>
         /// Game data structure describing the state and characteristics of the game;
@@ -60,71 +67,71 @@ namespace LambdaRobots {
         /// <summary>
         /// Horizontal position of robot. Value is between `0` and `Game.BoardWidth`.
         /// </summary>
-        public double X => Robot.X;
+        public float X => Robot.X;
 
         /// <summary>
         /// Vertical position of robot. Value is between `0` and `Game.BoardHeight`.
         /// </summary>
-        public double Y => Robot.Y;
+        public float Y => Robot.Y;
 
         /// <summary>
         /// Robot speed. Value is between `0` and `Robot.MaxSpeed`.
         /// </summary>
-        public double Speed => Robot.Speed;
+        public float Speed => Robot.Speed;
 
         /// <summary>
         /// Robot heading. Value is always between `-180` and `180`.
         /// </summary>
-        public double Heading => Robot.Heading;
+        public float Heading => Robot.Heading;
 
         /// <summary>
         /// Robot damage. Value is always between 0 and `Robot.MaxDamage`. When the value is equal to `Robot.MaxDamage` the robot is considered killed.
         /// </summary>
-        public double Damage => Robot.Damage;
+        public float Damage => Robot.Damage;
 
         /// <summary>
         /// Number of seconds until the missile launcher is ready again.
         /// </summary>
-        public double ReloadCoolDown => Robot.ReloadCoolDown;
+        public float ReloadCoolDown => Robot.ReloadCoolDown;
 
         /// <summary>
         /// How long it will take for the robot to stop.
         /// </summary>
-        public double BreakingDistance => (Speed * Speed) / (2.0 * Robot.Deceleration);
+        public float BreakingDistance => (Speed * Speed) / (2.0f * Robot.Deceleration);
 
         /// <summary>
         /// Robot state is automatically saved and loaded for each invocation when available.
         /// </summary>
         public TState State { get; set; }
 
-        public ILambdaRobotsGame LambdaRobotsApi { get; set; }
+        public ILambdaRobotsGame GameClient { get; set; }
 
         //--- Abstract Methods ---
-        public abstract Task<LambdaRobotBuild> GetBuildAsync();
+        public abstract Task<GetBuildResponse> GetBuildAsync();
         public abstract Task GetActionAsync();
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) { }
 
-        public override sealed async Task<LambdaRobotResponse> ProcessMessageAsync(LambdaRobotRequest request) {
+        public override sealed async Task<BotResponse> ProcessMessageAsync(BotRequest request) {
 
             // check if there is a state object to load
-            State = !string.IsNullOrEmpty(request.Robot?.State)
-                ? LambdaSerializer.Deserialize<TState>(request.Robot.State)
+            State = !string.IsNullOrEmpty(request.Robot?.InternalState)
+                ? LambdaSerializer.Deserialize<TState>(request.Robot.InternalState)
                 : new TState();
             LogInfo($"Starting State:\n{LambdaSerializer.Serialize(State)}");
 
             // dispatch to specific method based on request command
-            LambdaRobotResponse response;
+            BotResponse response;
             switch(request.Command) {
-            case LambdaRobotCommand.GetBuild:
+            case BotCommand.GetBuild:
 
                 // robot configuration request
-                response = new LambdaRobotResponse {
+                response = new BotResponse {
                     RobotBuild = await GetBuildAsync()
                 };
                 break;
-            case LambdaRobotCommand.GetAction:
+            case BotCommand.GetAction:
 
                 // robot action request
                 try {
@@ -132,22 +139,22 @@ namespace LambdaRobots {
                     // capture request fields for easy access
                     Game = request.Game;
                     Robot = request.Robot;
-                    LambdaRobotsApi = new LambdaRobotsGameClient(Game.ApiUrl, Robot.Id, HttpClient);
+                    GameClient = new LambdaRobotsGameClient(Game.ApiUrl, Robot.Id, HttpClient);
 
                     // initialize a default empty action
-                    _action = new LambdaRobotAction();
+                    _action = new GetActionResponse();
 
                     // get robot action
                     await GetActionAsync();
 
                     // generate response
                     _action.RobotState = LambdaSerializer.Serialize(State);
-                    response = new LambdaRobotResponse {
+                    response = new BotResponse {
                         RobotAction = _action,
                     };
                 } finally {
                     Robot = null;
-                    LambdaRobotsApi = null;
+                    GameClient = null;
                 }
                 break;
             default:
@@ -167,7 +174,7 @@ namespace LambdaRobots {
         /// </summary>
         /// <param name="heading">Heading in degrees where to fire the missile to</param>
         /// <param name="distance">Distance at which the missile impacts</param>
-        public void FireMissile(double heading, double distance) {
+        public void FireMissile(float heading, float distance) {
             LogInfo($"Fire Missile: Heading = {NormalizeAngle(heading):N2}, Distance = {distance:N2}");
             _action.FireMissileHeading = heading;
             _action.FireMissileDistance = distance;
@@ -179,7 +186,7 @@ namespace LambdaRobots {
         /// </summary>
         /// <param name="x">Target horizontal coordinate</param>
         /// <param name="y">Target vertical coordinate</param>
-        public void FireMissileToXY(double x, double y) {
+        public void FireMissileToXY(float x, float y) {
             var heading = AngleToXY(x, y);
             var distance = DistanceToXY(x, y);
             FireMissile(heading, distance);
@@ -190,7 +197,7 @@ namespace LambdaRobots {
         /// to avoid a sudden stop.
         /// </summary>
         /// <param name="heading">Target robot heading in degrees</param>
-        public void SetHeading(double heading) {
+        public void SetHeading(float heading) {
             LogInfo($"Set Heading = {NormalizeAngle(heading):N0}");
             _action.Heading = heading;
         }
@@ -200,7 +207,7 @@ namespace LambdaRobots {
         /// and `Robot.Deceleration` characteristics.
         /// </summary>
         /// <param name="speed">Target robot speed</param>
-        public void SetSpeed(double speed) {
+        public void SetSpeed(float speed) {
             LogInfo($"Set Speed = {speed:N2}");
             _action.Speed = speed;
         }
@@ -213,12 +220,12 @@ namespace LambdaRobots {
         /// <param name="heading">Scan heading in degrees</param>
         /// <param name="resolution">Scan +/- arc in degrees</param>
         /// <returns>Distance to nearest target or `null` if no target found</returns>
-        public async Task<double?> ScanAsync(double heading, double resolution) {
-            var response = await LambdaRobotsApi.ScanAsync(heading, resolution);
-            var result = (response.Success && response.Found)
-                ? (double?)response.Distance
+        public async Task<float?> ScanAsync(float heading, float resolution) {
+            var response = await GameClient.ScanAsync(heading, resolution);
+            var result = (response?.Found ?? false)
+                ? (float?)response.Distance
                 : null;
-            LogInfo($"Scan: Heading = {heading:N2}, Resolution = {resolution:N2}, Found = {result?.ToString("N2") ?? "(null)"} [Success = {response.Success}]");
+            LogInfo($"Scan: Heading = {heading:N2}, Resolution = {resolution:N2}, Found = {result?.ToString("N2") ?? "(null)"} [Success = {response != null}]");
             return result;
         }
 
@@ -229,7 +236,7 @@ namespace LambdaRobots {
         /// <param name="x">Target horizontal coordinate</param>
         /// <param name="y">Target vertical coordinate</param>
         /// <returns>Angle in degrees</returns>
-        public double AngleToXY(double x, double y) => NormalizeAngle(Math.Atan2(x - X, y - Y) * 180.0 / Math.PI);
+        public float AngleToXY(float x, float y) => NormalizeAngle(MathF.Atan2(x - X, y - Y) * 180.0f / MathF.PI);
 
         /// <summary>
         /// Determine distance relative to current robot position.
@@ -237,10 +244,10 @@ namespace LambdaRobots {
         /// <param name="x">Target horizontal coordinate</param>
         /// <param name="y">Target vertical coordinate</param>
         /// <returns>Distance to target</returns>
-        public double DistanceToXY(double x, double y) {
+        public float DistanceToXY(float x, float y) {
             var deltaX = x - X;
             var deltaY = y - Y;
-            return Math.Sqrt(deltaX * deltaX + deltaY * deltaY);
+            return MathF.Sqrt(deltaX * deltaX + deltaY * deltaY);
         }
 
         /// <summary>
@@ -248,10 +255,10 @@ namespace LambdaRobots {
         /// </summary>
         /// <param name="angle">Angle in degrees to normalize</param>
         /// <returns>Angle in degrees</returns>
-        public double NormalizeAngle(double angle) {
-            var result = angle % 360.0;
-            return (result < -180.0)
-                ? (result + 360.0)
+        public float NormalizeAngle(float angle) {
+            var result = angle % 360;
+            return (result < -180.0f)
+                ? (result + 360.0f)
                 : result;
         }
 
@@ -262,7 +269,7 @@ namespace LambdaRobots {
         /// <param name="x">Target horizontal coordinate</param>
         /// <param name="y">Target vertical coordinate</param>
         /// <returns>Returns `true` if arrived at target location</returns>
-        public bool MoveToXY(double x, double y) {
+        public bool MoveToXY(float x, float y) {
             var heading = AngleToXY(x, y);
             var distance = DistanceToXY(x, y);
             LogInfo($"Move To: X = {x:N2}, Y = {y:N2}, Heading = {heading:N2}, Distance = {distance:N2}");
@@ -271,17 +278,17 @@ namespace LambdaRobots {
             if(distance <= Game.CollisionRange) {
 
                 // close enough; stop moving
-                SetSpeed(0.0);
+                SetSpeed(0.0f);
                 return true;
             }
 
             // NOTE: the distance required to stop the robot from moving is obtained with the following formula:
             //      Distance = Speed^2 / 2*Deceleration
             //  solving for Speed, gives us the maximum travel speed to avoid overshooting our target
-            var speed = Math.Sqrt(distance * 2.0 * Robot.Deceleration) * Game.SecondsPerTurn;
+            var speed = MathF.Sqrt(distance * 2.0f * Robot.Deceleration) * Game.SecondsPerTurn;
 
-            // check if angle needs to be adjusted
-            if(Math.Abs(NormalizeAngle(Heading - heading)) > 0.1) {
+            // check if heading needs to be adjusted
+            if(MathF.Abs(NormalizeAngle(Heading - heading)) > 0.1) {
 
                 // check if robot is moving slow enough to turn
                 if(Speed <= Robot.MaxTurnSpeed) {
@@ -291,7 +298,7 @@ namespace LambdaRobots {
                 }
 
                 // adjust speed to either max-turn-speed or max-travel-speed, whichever is lower
-                SetSpeed(Math.Min(Robot.MaxTurnSpeed, speed));
+                SetSpeed(MathF.Min(Robot.MaxTurnSpeed, speed));
             } else {
 
                 // adjust speed to max-travel-speed

@@ -23,63 +23,64 @@
  */
 
 using System.Threading.Tasks;
-using LambdaRobots.Protocol;
+using LambdaRobots.Bot.Model;
+using LambdaRobots.Function;
 
 namespace LambdaRobots.YosemiteSamRobot.RobotFunction {
 
-    public class LambdaRobotState {
+    public sealed class BotState {
 
-        // NOTE: Yosemite Sam robot has no state
+        // NOTE: Yosemite Sam robot has no internal state
     }
 
-    public class Function : ALambdaRobotFunction<LambdaRobotState> {
+    public sealed class Function : ABotFunction<BotState> {
 
         //--- Methods ---
-        public override async Task<LambdaRobotBuild> GetBuildAsync() {
+        public override async Task<GetBuildResponse> GetBuildAsync() {
 
             // TODO: this method is always invoked at the beginning of a match
-            return new LambdaRobotBuild {
+            return new GetBuildResponse {
                 Name = "Yosemite Sam",
-                Engine = LambdaRobotEngineType.ExtraLarge,
-                Missile = LambdaRobotMissileType.Dart
+                Engine = BotEngineType.ExtraLarge,
+                Missile = BotMissileType.Dart
             };
         }
 
         public override async Task GetActionAsync() {
 
             // check if robot needs to accelerate
-            if(Speed == 0.0) {
+            if(Speed == 0.0f) {
                 SetSpeed(Robot.MaxTurnSpeed);
-                SetHeading(Random.NextDouble() * 360.0);
+                SetHeading(RandomFloat() * 360.0f);
             }
 
             // check if robot needs to turn
-            if(X < 100.0) {
+            if(X < 100.0f) {
 
                 // too close to left wall, go right
-                SetHeading(45.0 + Random.NextDouble() * 90.0);
-            } else if(X > (Game.BoardWidth - 100.0)) {
+                SetHeading(45.0f + RandomFloat() * 90.0f);
+            } else if(X > (Game.BoardWidth - 100.0f)) {
 
                 // too close to right wall, go left
-                SetHeading(-45.0 - Random.NextDouble() * 90.0);
+                SetHeading(-45.0f - RandomFloat() * 90.0f);
             }
-            if(Y < 100.0) {
+            if(Y < 100.0f) {
 
                 // too close to bottom wall, go up
-                SetHeading(-45.0 + Random.NextDouble() * 90.0);
-            } else if(Y > (Game.BoardHeight - 100.0)) {
+                SetHeading(-45.0f + RandomFloat() * 90.0f);
+            } else if(Y > (Game.BoardHeight - 100.0f)) {
 
                 // too close to top wall, go down
-                SetHeading(135.0 + Random.NextDouble() * 90.0);
+                SetHeading(135.0f + RandomFloat() * 90.0f);
             }
 
             // check if robot can fire a missile
-            if(ReloadCoolDown == 0.0) {
+            if(ReloadCoolDown == 0.0f) {
 
                 // fire in a random direction
                 FireMissile(
-                    heading: Random.NextDouble() * 360.0,
-                    distance: 50.0 + Random.NextDouble() * (Robot.MissileRange - 50.0)
+                    heading: RandomFloat() * 360.0f,
+                    distance: 50.0f + RandomFloat() * (Robot.MissileRange - 50.0f)
                 );
             }
         }

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * MIT License
  *
  * Copyright (c) 2019-2021 LambdaSharp
@@ -22,12 +22,36 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Api.Model {
+using System.Text.Json.Serialization;
 
-    public class ScanEnemiesResponse {
+namespace LambdaRobots {
 
-        //--- Properties ---
-        public bool Found { get; set; }
-        public double Distance { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum BotMissileType {
+
+        /// <summary>
+        /// 1,200 meters range, 250 m/s velocity, 0 direct hit bonus, 0 near hit bonus, 0 far hit bonus, 0 sec. reload (0 pts)
+        /// </summary>
+        Dart,
+
+        /// <summary>
+        /// 900 meters range, 200 m/s velocity, 1 direct hit bonus, 1 near hit bonus, 0 far hit bonus, 1 sec. reload (1 pt)
+        /// </summary>
+        Arrow,
+
+        /// <summary>
+        /// 700 meters range, 150 m/s velocity, 3 direct hit bonus, 2 near hit bonus, 1 far hit bonus, 2 sec. reload (2 pts)
+        /// </summary>
+        Javelin,
+
+        /// <summary>
+        /// 500 meters range, 100 m/s velocity, 6 direct hit bonus, 4 near hit bonus, 2 far hit bonus, 3 sec. reload (3 pts)
+        /// </summary>
+        Cannon,
+
+        /// <summary>
+        /// 350 meters range, 75 m/s velocity, 12 direct hit bonus, 8 near hit bonus, 4 far hit bonus, 5 sec. reload (4 pts)
+        /// </summary>
+        BFG
     }
 }

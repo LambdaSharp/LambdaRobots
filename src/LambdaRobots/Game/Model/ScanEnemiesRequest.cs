@@ -1,4 +1,4 @@
-/*
+﻿/*
  * MIT License
  *
  * Copyright (c) 2019-2021 LambdaSharp
@@ -22,17 +22,13 @@
  * SOFTWARE.
  */
 
-using System.Collections.Generic;
+namespace LambdaRobots.Game.Model {
 
-namespace LambdaRobots.Server.DataAccess.Records {
-
-    public class GameRecord {
+    public sealed class ScanEnemiesRequest {
 
         //--- Properties ---
-        public string GameId { get; set; }
-        public Game Game { get; set; }
-        public List<string> LambdaRobotArns { get; set; }
-        public string ConnectionId { get; set; }
-        public long Expire { get; set; }
+        public string RobotId { get; set; }
+        public float Heading { get; set; }
+        public float Resolution { get; set; }
     }
 }

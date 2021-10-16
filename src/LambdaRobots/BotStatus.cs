@@ -22,17 +22,26 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Server.ServerFunction.Model {
+using System.Text.Json.Serialization;
 
-    public class JoinGameRequest {
+namespace LambdaRobots {
 
-        //--- Properties ---
-        public string GameId { get; set; }
-    }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum BotStatus {
 
-    public class JoinGameResponse {
+        /// <summary>
+        /// Status has not been initialized.
+        /// </summary>
+        Undefined,
 
-        //--- Properties ---
-        public Game Game { get; set; }
+        /// <summary>
+        /// Robot is alive.
+        /// </summary>
+        Alive,
+
+        /// <summary>
+        /// Robot is dead.
+        /// </summary>
+        Dead
     }
 }

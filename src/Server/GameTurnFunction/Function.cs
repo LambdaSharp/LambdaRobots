@@ -31,9 +31,8 @@ using Amazon.ApiGatewayManagementApi;
 using Amazon.ApiGatewayManagementApi.Model;
 using Amazon.Lambda;
 using Amazon.Runtime;
-using LambdaRobots.Api;
-using LambdaRobots.Api.Model;
-using LambdaRobots.Protocol;
+using LambdaRobots.Bot;
+using LambdaRobots.Bot.Model;
 using LambdaRobots.Server.DataAccess;
 using LambdaRobots.Server.DataAccess.Records;
 using LambdaSharp;
@@ -122,22 +121,22 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     var logic = new GameLogic(this.Game, this);
 
                     // initialize robots
-                    LogInfo($"Start game: initializing {Game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots (total: {Game.Robots.Count})");
-                    await logic.StartAsync(GameRecord.LambdaRobotArns.Count);
+                    LogInfo($"Start game: initializing {Game.Robots.Count(robot => robot.Status == BotStatus.Alive)} robots (total: {Game.Robots.Count})");
+                    await logic.StartAsync(GameRecord.BotArns.Count);
                     Game.Status = GameStatus.NextTurn;
-                    LogInfo($"Robots initialized: {Game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots ready");
+                    LogInfo($"Robots initialized: {Game.Robots.Count(robot => robot.Status == BotStatus.Alive)} robots ready");
 
                     // loop until we're done
                     var messageCount = Game.Messages.Count;
                     while(Game.Status == GameStatus.NextTurn) {
 
                         // next turn
-                        LogInfo($"Start turn {Game.CurrentGameTurn} (max: {Game.MaxTurns}): invoking {Game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots (total: {Game.Robots.Count})");
+                        LogInfo($"Start turn {Game.CurrentGameTurn} (max: {Game.MaxTurns}): invoking {Game.Robots.Count(robot => robot.Status == BotStatus.Alive)} robots (total: {Game.Robots.Count})");
                         await logic.NextTurnAsync();
                         for(var i = messageCount; i < Game.Messages.Count; ++i) {
                             LogInfo($"Game message {i + 1}: {Game.Messages[i].Text}");
                         }
-                        LogInfo($"End turn: {Game.Robots.Count(robot => robot.Status == LambdaRobotStatus.Alive)} robots alive");
+                        LogInfo($"End turn: {Game.Robots.Count(robot => robot.Status == BotStatus.Alive)} robots alive");
 
                         // attempt to update the game record
                         LogInfo($"Storing game: ID = {gameId}");
@@ -193,11 +192,12 @@ namespace LambdaRobots.Server.GameTurnFunction {
         }
 
         //--- IGameDependencyProvider Members ---
-        double IGameDependencyProvider.NextRandomDouble() => _random.NextDouble();
+        DateTimeOffset IGameDependencyProvider.UtcNow => DateTimeOffset.UtcNow;
+        float IGameDependencyProvider.NextRandomFloat() => (float)_random.NextDouble();
 
-        Task<LambdaRobotBuild> IGameDependencyProvider.GetRobotBuild(LambdaRobot robot) {
+        Task<GetBuildResponse> IGameDependencyProvider.GetRobotBuild(BotInfo robot) {
             try {
-                var client = new LambdaRobotClient(robot.Id, GameRecord.LambdaRobotArns[robot.Index], TimeSpan.FromSeconds(Game.RobotTimeoutSeconds), _lambdaClient, this);
+                var client = new LambdaRobotsBotClient(robot.Id, GameRecord.BotArns[robot.Index], TimeSpan.FromSeconds(Game.RobotTimeoutSeconds), _lambdaClient, this);
                 return client.GetBuild(new GetBuildRequest {
                     GameInfo = new GameInfo {
                         Id = Game.Id,
@@ -210,7 +210,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                         CurrentGameTurn = Game.CurrentGameTurn,
                         MaxGameTurns = Game.MaxTurns,
                         MaxBuildPoints = Game.MaxBuildPoints,
-                        SecondsPerTurn = Game.SecondsPerTurn
+                        SecondsPerTurn = (float)GameInfo.MinimumTurnTimespan.TotalSeconds
                     },
                     Robot = robot
                 });
@@ -220,10 +220,9 @@ namespace LambdaRobots.Server.GameTurnFunction {
             }
         }
 
-        Task<LambdaRobotAction> IGameDependencyProvider.GetRobotAction(LambdaRobot robot) {
-            var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        Task<GetActionResponse> IGameDependencyProvider.GetRobotAction(BotInfo robot) {
             try {
-                var client = new LambdaRobotClient(robot.Id, GameRecord.LambdaRobotArns[robot.Index], TimeSpan.FromSeconds(Game.RobotTimeoutSeconds), _lambdaClient, this);
+                var client = new LambdaRobotsBotClient(robot.Id, GameRecord.BotArns[robot.Index], TimeSpan.FromSeconds(Game.RobotTimeoutSeconds), _lambdaClient, this);
                 return client.GetAction(new GetActionRequest {
                     GameInfo = new GameInfo {
                         Id = Game.Id,
@@ -236,7 +235,10 @@ namespace LambdaRobots.Server.GameTurnFunction {
                         CurrentGameTurn = Game.CurrentGameTurn,
                         MaxGameTurns = Game.MaxTurns,
                         MaxBuildPoints = Game.MaxBuildPoints,
-                        SecondsPerTurn = Game.SecondsPerTurn,
+
+                        // TODO: must be read from _provider
+                        SecondsPerTurn = (float)(Game.LastStatusUpdate - robot.LastStatusUpdate).TotalSeconds,
+
                         ApiUrl = _gameApiUrl + $"/{Game.Id}"
                     },
                     Robot = robot

@@ -27,7 +27,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using LambdaRobots;
-using LambdaRobots.Protocol;
+using LambdaRobots.Bot.Model;
 using LambdaRobots.Server;
 
 namespace Test.LambdaRobots.Server {
@@ -36,64 +36,65 @@ namespace Test.LambdaRobots.Server {
 
         //--- Fields ---
         protected IGameDependencyProvider _provider;
-        protected Dictionary<string, List<Func<LambdaRobotAction>>> _robotActions = new Dictionary<string, List<Func<LambdaRobotAction>>>();
+        protected Dictionary<string, List<Func<GetActionResponse>>> _robotActions = new Dictionary<string, List<Func<GetActionResponse>>>();
         protected readonly Random _random = new Random();
 
         //--- Methods ---
         protected Game NewGame() => new Game {
             Id = "Test",
-            BoardWidth = 1000.0,
-            BoardHeight = 1000.0,
-            SecondsPerTurn = 1.0,
-            DirectHitRange = 5.0,
-            NearHitRange = 20.0,
-            FarHitRange = 40.0,
-            CollisionRange = 5.0,
-            MinRobotStartDistance = 100.0,
-            RobotTimeoutSeconds = 10.0,
+            BoardWidth = 1000.0f,
+            BoardHeight = 1000.0f,
+            SecondsPerTurn = 1.0f,
+            DirectHitRange = 5.0f,
+            NearHitRange = 20.0f,
+            FarHitRange = 40.0f,
+            CollisionRange = 5.0f,
+            MinRobotStartDistance = 100.0f,
+            RobotTimeoutSeconds = 10.0f,
             CurrentGameTurn = 0,
-            MaxTurns = 300,
-            MaxBuildPoints = 8
+            MaxTurns = 1000,
+            MaxBuildPoints = 8,
+            LastStatusUpdate = DateTimeOffset.UtcNow
         };
 
-        protected LambdaRobot NewRobot(string id, double x, double y) => new LambdaRobot {
+        protected BotInfo NewRobot(string id, float x, float y) => new BotInfo {
 
             // robot state
             Id = id,
             Name = id,
-            Status = LambdaRobotStatus.Alive,
+            Status = BotStatus.Alive,
             X = x,
             Y = y,
-            Speed = 0.0,
-            Heading = 0.0,
-            TotalTravelDistance = 0.0,
-            Damage = 0.0,
-            ReloadCoolDown = 0.0,
+            Speed = 0.0f,
+            Heading = 0.0f,
+            TotalTravelDistance = 0.0f,
+            Damage = 0.0f,
+            ReloadCoolDown = 0.0f,
             TotalMissileFiredCount = 0,
 
             // robot characteristics
-            MaxSpeed = 100.0,
-            Acceleration = 10.0,
-            Deceleration = 20.0,
-            MaxTurnSpeed = 50.0,
-            RadarRange = 600.0,
-            RadarMaxResolution = 10.0,
-            MaxDamage = 100.0,
-            CollisionDamage = 2.0,
-            DirectHitDamage = 8.0,
-            NearHitDamage = 4.0,
-            FarHitDamage = 2.0,
+            MaxSpeed = 100.0f,
+            Acceleration = 10.0f,
+            Deceleration = 20.0f,
+            MaxTurnSpeed = 50.0f,
+            RadarRange = 600.0f,
+            RadarMaxResolution = 10.0f,
+            MaxDamage = 100.0f,
+            CollisionDamage = 2.0f,
+            DirectHitDamage = 8.0f,
+            NearHitDamage = 4.0f,
+            FarHitDamage = 2.0f,
 
             // missile characteristics
-            MissileReloadCooldown = 5.0,
-            MissileVelocity = 50.0,
-            MissileRange = 700.0,
-            MissileDirectHitDamageBonus = 3.0,
-            MissileNearHitDamageBonus = 2.1,
-            MissileFarHitDamageBonus = 1.0
+            MissileReloadCooldown = 5.0f,
+            MissileVelocity = 50.0f,
+            MissileRange = 700.0f,
+            MissileDirectHitDamageBonus = 3.0f,
+            MissileNearHitDamageBonus = 2.1f,
+            MissileFarHitDamageBonus = 1.0f
         };
 
-        protected GameLogic NewLogic(params LambdaRobot[] robots) {
+        protected GameLogic NewLogic(params BotInfo[] robots) {
             var game = NewGame();
             game.Robots.AddRange(robots);
             for(var i = 0; i < game.Robots.Count; ++i) {
@@ -104,13 +105,14 @@ namespace Test.LambdaRobots.Server {
         }
 
         //--- IGameDependencyProvider Members ---
-        double IGameDependencyProvider.NextRandomDouble() => _random.NextDouble();
+        DateTimeOffset IGameDependencyProvider.UtcNow => DateTimeOffset.UtcNow;
+        float IGameDependencyProvider.NextRandomFloat() => (float)_random.NextDouble();
 
-        async Task<LambdaRobotBuild> IGameDependencyProvider.GetRobotBuild(LambdaRobot robot) => new LambdaRobotBuild {
+        async Task<GetBuildResponse> IGameDependencyProvider.GetRobotBuild(BotInfo robot) => new GetBuildResponse {
             Name = robot.Id
         };
 
-        async Task<LambdaRobotAction> IGameDependencyProvider.GetRobotAction(LambdaRobot robot) {
+        async Task<GetActionResponse> IGameDependencyProvider.GetRobotAction(BotInfo robot) {
 
             // destructively fetch next action from dictionary or null if none exist
             if(_robotActions.TryGetValue(robot.Id, out var actions) && (actions?.Any() ?? false)) {
@@ -118,7 +120,7 @@ namespace Test.LambdaRobots.Server {
                 actions.RemoveAt(0);
                 return action();
             }
-            return new LambdaRobotAction();
+            return new GetActionResponse();
         }
     }
 }

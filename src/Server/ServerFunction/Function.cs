@@ -28,8 +28,8 @@ using System.Threading.Tasks;
 using Amazon.Lambda;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Model;
-using LambdaRobots.Api.Model;
-using LambdaRobots.Protocol;
+using LambdaRobots.Bot.Model;
+using LambdaRobots.Game.Model;
 using LambdaRobots.Server.DataAccess;
 using LambdaRobots.Server.DataAccess.Records;
 using LambdaRobots.Server.ServerFunction.Model;
@@ -73,22 +73,22 @@ namespace LambdaRobots.Server.ServerFunction {
             var game = new Game {
                 Id = Guid.NewGuid().ToString("N"),
                 Status = GameStatus.Start,
-                BoardWidth = request.BoardWidth ?? 1000.0,
-                BoardHeight = request.BoardHeight ?? 1000.0,
-                SecondsPerTurn = request.SecondsPerTurn ?? 0.5,
-                MaxTurns = request.MaxTurns ?? 300,
+                BoardWidth = request.BoardWidth ?? 1000.0f,
+                BoardHeight = request.BoardHeight ?? 1000.0f,
+                SecondsPerTurn = request.SecondsPerTurn ?? 0.5f,
+                MaxTurns = request.MaxTurns ?? 1500,
                 MaxBuildPoints = request.MaxBuildPoints ?? 8,
-                DirectHitRange = request.DirectHitRange ?? 5.0,
-                NearHitRange = request.NearHitRange ?? 20.0,
-                FarHitRange = request.FarHitRange ?? 40.0,
-                CollisionRange = request.CollisionRange ?? 8.0,
-                MinRobotStartDistance = request.MinRobotStartDistance ?? 50.0,
-                RobotTimeoutSeconds = request.RobotTimeoutSeconds ?? 15.0
+                DirectHitRange = request.DirectHitRange ?? 5.0f,
+                NearHitRange = request.NearHitRange ?? 20.0f,
+                FarHitRange = request.FarHitRange ?? 40.0f,
+                CollisionRange = request.CollisionRange ?? 8.0f,
+                MinRobotStartDistance = request.MinRobotStartDistance ?? 50.0f,
+                RobotTimeoutSeconds = request.RobotTimeoutSeconds ?? 15.0f
             };
             var gameRecord = new GameRecord {
                 GameId = game.Id,
                 Game = game,
-                LambdaRobotArns = request.RobotArns,
+                BotArns = request.RobotArns,
                 ConnectionId = CurrentRequest.RequestContext.ConnectionId,
                 Expire = DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeSeconds()
             };
@@ -118,7 +118,7 @@ namespace LambdaRobots.Server.ServerFunction {
 
             // fetch game record from table
             var gameRecord = await _dataClient.GetGameRecordAsync(request.GameId);
-            if(gameRecord == null) {
+            if(gameRecord is null) {
                 LogInfo("No game found to stop");
 
                 // game is already stopped, nothing further to do
@@ -143,18 +143,18 @@ namespace LambdaRobots.Server.ServerFunction {
             };
         }
 
-        public async Task<ScanEnemiesResponse> ScanEnemiesAsync(string gameId, ScanEnemiesRequest request) {
+        public async Task<ScanResponse> ScanEnemiesAsync(string gameId, ScanEnemiesRequest request) {
 
             // fetch game record from table
             var gameRecord = await _dataClient.GetGameRecordAsync(gameId);
-            if(gameRecord == null) {
+            if(gameRecord is null) {
                 throw AbortNotFound($"could not find a game session: ID = {gameId ?? "<NULL>"}");
             }
             var gameLogic = new GameLogic(gameRecord.Game, this);
 
             // identify scanning robot
             var robot = gameRecord.Game.Robots.FirstOrDefault(r => r.Id == request.RobotId);
-            if(robot == null) {
+            if(robot is null) {
                 throw AbortNotFound($"could not find a robot: ID = {request.RobotId}");
             }
 
@@ -162,24 +162,25 @@ namespace LambdaRobots.Server.ServerFunction {
             var found = gameLogic.ScanRobots(robot, request.Heading, request.Resolution);
             if(found != null) {
                 var distance = GameMath.Distance(robot.X, robot.Y, found.X, found.Y);
-                var angle = GameMath.NormalizeAngle(Math.Atan2(found.X - robot.X, found.Y - robot.Y) * 180.0 / Math.PI);
+                var angle = GameMath.NormalizeAngle(MathF.Atan2(found.X - robot.X, found.Y - robot.Y) * 180.0f / MathF.PI);
                 LogInfo($"Scanning: Heading = {GameMath.NormalizeAngle(request.Heading):N2}, Resolution = {request.Resolution:N2}, Found = R{found.Index}, Distance = {distance:N2}, Angle = {angle:N2}");
-                return new ScanEnemiesResponse {
+                return new ScanResponse {
                     Found = true,
                     Distance = distance
                 };
             } else {
                LogInfo($"Scanning: Heading = {GameMath.NormalizeAngle(request.Heading):N2}, Resolution = {request.Resolution:N2}, Found = nothing");
-                return new ScanEnemiesResponse {
+                return new ScanResponse {
                     Found = false,
-                    Distance = 0.0
+                    Distance = 0.0f
                 };
             }
         }
 
         //--- IGameDependencyProvider Members ---
-        double IGameDependencyProvider.NextRandomDouble() => _random.NextDouble();
-        Task<LambdaRobotBuild> IGameDependencyProvider.GetRobotBuild(LambdaRobot robot) => throw new NotImplementedException();
-        Task<LambdaRobotAction> IGameDependencyProvider.GetRobotAction(LambdaRobot robot) => throw new NotImplementedException();
+        DateTimeOffset IGameDependencyProvider.UtcNow => DateTimeOffset.UtcNow;
+        float IGameDependencyProvider.NextRandomFloat() => (float)_random.NextDouble();
+        Task<GetBuildResponse> IGameDependencyProvider.GetRobotBuild(BotInfo robot) => throw new NotImplementedException();
+        Task<GetActionResponse> IGameDependencyProvider.GetRobotAction(BotInfo robot) => throw new NotImplementedException();
     }
 }

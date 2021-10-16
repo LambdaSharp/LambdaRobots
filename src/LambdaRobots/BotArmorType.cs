@@ -1,4 +1,4 @@
-﻿/*
+/*
  * MIT License
  *
  * Copyright (c) 2019-2021 LambdaSharp
@@ -22,13 +22,36 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Api.Model {
+using System.Text.Json.Serialization;
 
-    public sealed class ScanEnemiesRequest {
+namespace LambdaRobots {
 
-        //--- Properties ---
-        public string RobotId { get; set; }
-        public double Heading { get; set; }
-        public double Resolution { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum BotArmorType {
+
+        /// <summary>
+        /// 50 direct hit, 25 near hit, 12 far hit, 10 collision, +35 m/s max. speed, 30 m/s^2 deceleration (0 pts)
+        /// </summary>
+        UltraLight,
+
+        /// <summary>
+        /// 16 direct hit, 8 near hit, 4 far hit, 3 collision, +25 m/s max. speed, 25 m/s^2 deceleration (1 pt)
+        /// </summary>
+        Light,
+
+        /// <summary>
+        /// 8 direct hit, 4 near hit, 2 far hit, 2 collision, +0 m/s max. speed, 20 m/s^2 deceleration (2 pts)
+        /// </summary>
+        Medium,
+
+        /// <summary>
+        /// 4 direct hit, 2 near hit, 1 far hit, 1 collision, -25 m/s max. speed, 15 m/s^2 deceleration (3 pts)
+        /// </summary>
+        Heavy,
+
+        /// <summary>
+        /// 2 direct hit, 1 near hit, 0 far hit, 1 collision, -45 m/s max. speed, 10 m/s^2 deceleration (4 pts)
+        /// </summary>
+        UltraHeavy
     }
 }

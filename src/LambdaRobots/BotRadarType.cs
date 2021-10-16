@@ -24,32 +24,34 @@
 
 using System.Text.Json.Serialization;
 
-namespace LambdaRobots.Protocol {
+namespace LambdaRobots {
 
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum LambdaRobotCommand {
-        Undefined,
-        GetBuild,
-        GetAction
-    }
-
-    public class LambdaRobotRequest {
-
-        //--- Properties ---
+    public enum BotRadarType {
 
         /// <summary>
-        /// Command for the request.
+        /// 200 meters range, 45 degrees resolution (0 pts)
         /// </summary>
-        public LambdaRobotCommand Command { get; set; }
+        UltraShortRange,
 
         /// <summary>
-        /// Current robot state. Used only by `GetAction` command
+        /// 400 meters range, 20 degrees resolution (1 pt)
         /// </summary>
-        public LambdaRobot Robot { get; set; }
+        ShortRange,
 
         /// <summary>
-        /// Current game state. Used only by `GetAction` command
+        /// 600 meters range, 10 degrees resolution (2 pts)
         /// </summary>
-        public GameInfo Game { get; set; }
+        MidRange,
+
+        /// <summary>
+        /// 800 meters range, 8 degrees resolution (3 pts)
+        /// </summary>
+        LongRange,
+
+        /// <summary>
+        /// 1,000 meters range, 5 degrees resolution (4 pts)
+        /// </summary>
+        UltraLongRange
     }
 }

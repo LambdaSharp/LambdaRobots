@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../LambdaRobots/LambdaRobots.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp.DynamoDB.Native" Version="0.8.3.*"/>
+    <ProjectReference Condition="'$(LAMBDASHARP)'!=''" Include="$(LAMBDASHARP)/src/LambdaSharp.DynamoDB.Native/LambdaSharp.DynamoDB.Native.csproj"/>
+  </ItemGroup>
+</Project>

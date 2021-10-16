@@ -22,17 +22,34 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Server.ServerFunction.Model {
+using System.Text.Json.Serialization;
 
-    public class JoinGameRequest {
+namespace LambdaRobots.Function {
 
-        //--- Properties ---
-        public string GameId { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum BotCommand {
+        Undefined,
+        GetBuild,
+        GetAction
     }
 
-    public class JoinGameResponse {
+    public class BotRequest {
 
         //--- Properties ---
-        public Game Game { get; set; }
+
+        /// <summary>
+        /// Command for the request.
+        /// </summary>
+        public BotCommand Command { get; set; }
+
+        /// <summary>
+        /// Current robot state. Used only by `GetAction` command
+        /// </summary>
+        public BotInfo Robot { get; set; }
+
+        /// <summary>
+        /// Current game state. Used only by `GetAction` command
+        /// </summary>
+        public GameInfo Game { get; set; }
     }
 }

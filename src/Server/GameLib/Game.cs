@@ -22,8 +22,8 @@
  * SOFTWARE.
  */
 
+using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using System.Text.Json.Serialization;
 
 namespace LambdaRobots.Server {
@@ -44,21 +44,22 @@ namespace LambdaRobots.Server {
 
         // current state
         public GameStatus Status { get; set; }
+        public DateTimeOffset LastStatusUpdate { get; set; }
         public int CurrentGameTurn { get; set; }
-        public List<LambdaRobotMissile> Missiles { get; set; } = new List<LambdaRobotMissile>();
-        public List<LambdaRobot> Robots { get; set; } = new List<LambdaRobot>();
+        public List<MissileInfo> Missiles { get; set; } = new List<MissileInfo>();
+        public List<BotInfo> Robots { get; set; } = new List<BotInfo>();
         public List<Message> Messages { get; set; } = new List<Message>();
 
         // game characteristics
-        public double BoardWidth { get; set; }
-        public double BoardHeight { get; set; }
-        public double SecondsPerTurn { get; set; }
-        public double DirectHitRange { get; set; }
-        public double NearHitRange { get; set; }
-        public double FarHitRange { get; set; }
-        public double CollisionRange { get; set; }
-        public double MinRobotStartDistance { get; set; }
-        public double RobotTimeoutSeconds { get; set; }
+        public float BoardWidth { get; set; }
+        public float BoardHeight { get; set; }
+        public float SecondsPerTurn { get; set; }
+        public float DirectHitRange { get; set; }
+        public float NearHitRange { get; set; }
+        public float FarHitRange { get; set; }
+        public float CollisionRange { get; set; }
+        public float MinRobotStartDistance { get; set; }
+        public float RobotTimeoutSeconds { get; set; }
         public int MaxTurns { get; set; }
         public int MaxBuildPoints { get; set; }
     }
@@ -78,50 +79,5 @@ namespace LambdaRobots.Server {
         ExplodingNear,
         ExplodingFar,
         Destroyed
-    }
-
-    public class LambdaRobotMissile {
-
-        //--- Fields ---
-
-        [DataMember(IsRequired = true)]
-        public string Id { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public string RobotId { get; set; }
-
-        // current state
-
-        [DataMember(IsRequired = true)]
-        public MissileStatus Status { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public double X { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public double Y { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public double Distance { get; set; }
-
-        // missile characteristics
-
-        [DataMember(IsRequired = true)]
-        public double Speed { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public double Heading { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public double Range { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public double DirectHitDamageBonus { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public double NearHitDamageBonus { get; set; }
-
-        [DataMember(IsRequired = true)]
-        public double FarHitDamageBonus { get; set; }
     }
 }

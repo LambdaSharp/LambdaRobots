@@ -22,30 +22,11 @@
  * SOFTWARE.
  */
 
-using System.Text.Json.Serialization;
+using System;
 
 namespace LambdaRobots {
 
-    [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum LambdaRobotStatus {
-
-        /// <summary>
-        /// Status has not been initialized.
-        /// </summary>
-        Undefined,
-
-        /// <summary>
-        /// Robot is alive.
-        /// </summary>
-        Alive,
-
-        /// <summary>
-        /// Robot is dead.
-        /// </summary>
-        Dead
-    }
-
-    public class LambdaRobot {
+    public class BotInfo {
 
         //--- Properties ---
 
@@ -69,56 +50,61 @@ namespace LambdaRobots {
         /// <summary>
         /// Robot status. Either `Alive` or `Dead`.
         /// </summary>
-        public LambdaRobotStatus Status { get; set; }
+        public BotStatus Status { get; set; }
+
+        /// <summary>
+        /// Timestamp of when the robot status was last updated.
+        /// </summary>
+        public DateTimeOffset LastStatusUpdate { get; set; }
 
         /// <summary>
         /// Robot horizontal position.
         /// </summary>
-        public double X { get; set; }
+        public float X { get; set; }
 
         /// <summary>
         /// Robot vertical position.
         /// </summary>
-        public double Y { get; set; }
+        public float Y { get; set; }
 
         /// <summary>
         /// Robot speed. Between `0` and `MaxSpeed`. (m/s)
         /// </summary>
-        public double Speed { get; set; }
+        public float Speed { get; set; }
 
         /// <summary>
         /// Robot heading. Between `0` and `360`. (degrees)
         /// </summary>
-        public double Heading { get; set; }
+        public float Heading { get; set; }
 
         /// <summary>
         /// Accumulated robot damage. Between `0` and `MaxDamage`.
         /// </summary>
-        public double Damage { get; set; }
+        public float Damage { get; set; }
 
         /// <summary>
         /// Number of seconds before the robot can fire another missile. (s)
         /// </summary>
-        public double ReloadCoolDown { get; set; }
+        public float ReloadCoolDown { get; set; }
 
         // target state
 
         /// <summary>
         /// Desired speed for robot. The current speed will be adjusted accordingly every turn. (m/s)
         /// </summary>
-        public double TargetSpeed { get; set; }
+        public float TargetSpeed { get; set; }
 
         /// <summary>
         /// Desired heading for robot. The heading will be adjusted accordingly every turn. (degrees)
         /// </summary>
-        public double TargetHeading { get; set; }
+        public float TargetHeading { get; set; }
 
         // robot stats
 
         /// <summary>
         /// Total distance traveled by robot during the match. (m)
         /// </summary>
-        public double TotalTravelDistance { get; set; }
+        public float TotalTravelDistance { get; set; }
 
         /// <summary>
         /// Number of missiles fired by robot during match.
@@ -138,7 +124,7 @@ namespace LambdaRobots {
         /// <summary>
         /// Damage dealt by missiles during match.
         /// </summary>
-        public double TotalDamageDealt { get; set; }
+        public float TotalDamageDealt { get; set; }
 
         /// <summary>
         /// Number of collisions with walls or other robots during match.
@@ -155,93 +141,93 @@ namespace LambdaRobots {
         /// <summary>
         /// Maximum speed for robot. (m/s)
         /// </summary>
-        public double MaxSpeed { get; set; }
+        public float MaxSpeed { get; set; }
 
         /// <summary>
         /// Acceleration when speeding up. (m/s^2)
         /// </summary>
-        public double Acceleration { get; set; }
+        public float Acceleration { get; set; }
 
         /// <summary>
         /// Deceleration when speeding up. (m/s^2)
         /// </summary>
-        public double Deceleration { get; set; }
+        public float Deceleration { get; set; }
 
         /// <summary>
         /// Maximum speed at which the robot can change heading without a sudden stop. (m/s)
         /// </summary>
-        public double MaxTurnSpeed { get; set; }
+        public float MaxTurnSpeed { get; set; }
 
         /// <summary>
         /// Maximum range at which the radar can detect an opponent. (m)
         /// </summary>
-        public double RadarRange { get; set; }
+        public float RadarRange { get; set; }
 
         /// <summary>
         /// Maximum degrees the radar can scan beyond the selected heading. (degrees)
         /// </summary>
-        public double RadarMaxResolution { get; set; }
+        public float RadarMaxResolution { get; set; }
 
         /// <summary>
         /// Maximum damage before the robot is destroyed.
         /// </summary>
-        public double MaxDamage { get; set; }
+        public float MaxDamage { get; set; }
 
         /// <summary>
         /// Amount of damage the robot receives from a collision.
         /// </summary>
-        public double CollisionDamage { get; set; }
+        public float CollisionDamage { get; set; }
 
         /// <summary>
         /// Amount of damage the robot receives from a direct hit.
         /// </summary>
-        public double DirectHitDamage { get; set; }
+        public float DirectHitDamage { get; set; }
 
         /// <summary>
         /// Amount of damage the robot receives from a near hit.
         /// </summary>
-        public double NearHitDamage { get; set; }
+        public float NearHitDamage { get; set; }
 
         /// <summary>
         /// Amount of damage the robot receives from a far hit.
         /// </summary>
-        public double FarHitDamage { get; set; }
+        public float FarHitDamage { get; set; }
 
         // missile characteristics
 
         /// <summary>
         /// Number of seconds between each missile launch. (s)
         /// </summary>
-        public double MissileReloadCooldown { get; set; }
+        public float MissileReloadCooldown { get; set; }
 
         /// <summary>
         /// Travel velocity for missile. (m/s)
         /// </summary>
-        public double MissileVelocity { get; set; }
+        public float MissileVelocity { get; set; }
 
         /// <summary>
         /// Maximum range for missile. (m)
         /// </summary>
-        public double MissileRange { get; set; }
+        public float MissileRange { get; set; }
 
         /// <summary>
         /// Bonus damage on target for a direct hit.
         /// </summary>
-        public double MissileDirectHitDamageBonus { get; set; }
+        public float MissileDirectHitDamageBonus { get; set; }
 
         /// <summary>
         /// Bonus damage on target for a near hit.
         /// </summary>
-        public double MissileNearHitDamageBonus { get; set; }
+        public float MissileNearHitDamageBonus { get; set; }
 
         /// <summary>
         /// Bonus damage on target for a far hit.
         /// </summary>
-        public double MissileFarHitDamageBonus { get; set; }
+        public float MissileFarHitDamageBonus { get; set; }
 
         /// <summary>
         /// Internal robot state.
         /// </summary>
-        public string State { get; set; }
+        public string InternalState { get; set; }
     }
 }

@@ -22,35 +22,36 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Api.Model {
+using System.Text.Json.Serialization;
 
-    public sealed class GetBuildRequest {
+namespace LambdaRobots {
 
-        //--- Properties ---
-
-        /// <summary>
-        /// Current game state. Used only by `GetAction` command
-        /// </summary>
-        public GameInfo GameInfo { get; set; }
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum BotEngineType {
 
         /// <summary>
-        /// Current robot state. Used only by `GetAction` command
+        /// 60 m/s max. speed, 7 m/s^2 acceleration (0 pts)
         /// </summary>
-        public LambdaRobot Robot { get; set; }
-    }
-
-    public sealed class GetActionRequest {
-
-        //--- Properties ---
+        Economy,
 
         /// <summary>
-        /// Current game state. Used only by `GetAction` command
+        ///  80 m/s max. speed, 8 m/s^2 acceleration (1 pt)
         /// </summary>
-        public GameInfo GameInfo { get; set; }
+        Compact,
 
         /// <summary>
-        /// Current robot state. Used only by `GetAction` command
+        /// 100 m/s max. speed, 10 m/s^2 acceleration (2 pts)
         /// </summary>
-        public LambdaRobot Robot { get; set; }
+        Standard,
+
+        /// <summary>
+        /// 120 m/s max. speed, 12 m/s^2 acceleration (3 pts)
+        /// </summary>
+        Large,
+
+        /// <summary>
+        /// 140 m/s max. speed, 13 m/s^2 acceleration (4 pts)
+        /// </summary>
+        ExtraLarge
     }
 }

@@ -24,36 +24,37 @@
 
 using System;
 using System.Threading.Tasks;
-using LambdaRobots.Protocol;
+using LambdaRobots.Bot.Model;
+using LambdaRobots.Function;
 
 namespace LambdaRobots.HotShotRobot.RobotFunction {
 
-    public class LambdaRobotState {
+    public sealed class BotState {
 
         //--- Properties ---
         public bool Initialized { get; set; }
-        public double ScanHeading { get; set; }
-        public double LastDamage { get; set; }
-        public double? TargetRange { get; set; }
-        public double NoHitSweep { get; set; }
-        public double ScanResolution { get; set; }
-        public double? GotoX { get; set; }
-        public double? GotoY { get; set; }
+        public float ScanHeading { get; set; }
+        public float LastDamage { get; set; }
+        public float? TargetRange { get; set; }
+        public float NoHitSweep { get; set; }
+        public float ScanResolution { get; set; }
+        public float? GotoX { get; set; }
+        public float? GotoY { get; set; }
     }
 
-    public class Function : ALambdaRobotFunction<LambdaRobotState> {
+    public sealed class Function : ABotFunction<BotState> {
 
         //--- Properties ---
         private bool WasHurt => Damage > State.LastDamage;
 
         //--- Methods ---
-        public override async Task<LambdaRobotBuild> GetBuildAsync() {
-            return new LambdaRobotBuild {
+        public override async Task<GetBuildResponse> GetBuildAsync() {
+            return new GetBuildResponse {
                 Name = "HotShot",
-                Radar = LambdaRobotRadarType.LongRange,
-                Armor = LambdaRobotArmorType.Medium,
-                Engine = LambdaRobotEngineType.Compact,
-                Missile = LambdaRobotMissileType.Javelin
+                Radar = BotRadarType.LongRange,
+                Armor = BotArmorType.Medium,
+                Engine = BotEngineType.Compact,
+                Missile = BotMissileType.Javelin
             };
         }
 
@@ -64,7 +65,7 @@ namespace LambdaRobots.HotShotRobot.RobotFunction {
                 State.Initialized = true;
 
                 // initialize state
-                State.NoHitSweep = 0.0;
+                State.NoHitSweep = 0.0f;
                 State.ScanResolution = Robot.RadarMaxResolution;
 
                 // initialize aim to point to middle of the game board
@@ -76,38 +77,41 @@ namespace LambdaRobots.HotShotRobot.RobotFunction {
             //  each turn, similar to binary search.
 
             // check if target is found in left scan area
-            State.TargetRange = await ScanAsync(State.ScanHeading - State.ScanResolution, State.ScanResolution);
+            float scanHeading = State.ScanHeading - State.ScanResolution;
+            State.TargetRange = await ScanAsync(scanHeading, State.ScanResolution);
             if((State.TargetRange != null) && (State.TargetRange > Game.FarHitRange) && (State.TargetRange <= Robot.MissileRange)) {
-                LogInfo($"Target found: ScanHeading = {State.ScanHeading:N2}, Range = {State.TargetRange:N2}");
+                LogInfo($"Target found: ScanHeading = {scanHeading:N2}, Range = {State.TargetRange:N2}");
 
                 // update scan heading
-                State.ScanHeading -= State.ScanResolution;
+                State.ScanHeading = scanHeading;
 
                 // narrow scan resolution
-                State.ScanResolution = Math.Max(0.1, State.ScanResolution / 2.0);
+                State.ScanResolution = MathF.Max(0.1f, State.ScanResolution / 2.0f);
             } else {
 
                 // check if target is found in right scan area
-                State.TargetRange = await ScanAsync(State.ScanHeading + State.ScanResolution, State.ScanResolution);
+                scanHeading = State.ScanHeading + State.ScanResolution;
+                State.TargetRange = await ScanAsync(scanHeading, State.ScanResolution);
                 if((State.TargetRange != null) && (State.TargetRange > Game.FarHitRange) && (State.TargetRange <= Robot.MissileRange)) {
-                    LogInfo($"Target found: ScanHeading = {State.ScanHeading:N2}, Range = {State.TargetRange:N2}");
+                    LogInfo($"Target found: ScanHeading = {scanHeading:N2}, Range = {State.TargetRange:N2}");
 
                     // update scan heading
-                    State.ScanHeading += State.ScanResolution;
+                    State.ScanHeading = scanHeading;
 
                     // narrow scan resolution
-                    State.ScanResolution = Math.Max(0.1, State.ScanResolution / 2.0);
+                    State.ScanResolution = MathF.Max(0.1f, State.ScanResolution / 2.0f);
                 } else {
-                    LogInfo($"No target found: ScanHeading = {State.ScanHeading:N2}");
+                    State.TargetRange = null;
+                    LogInfo($"No target found: ScanHeading = {State.ScanHeading:N2} +/- {State.ScanResolution:N2}");
 
                     // look in adjacent area
-                    State.ScanHeading += 3.0 * Robot.RadarMaxResolution;
+                    State.ScanHeading += 3.0f * Robot.RadarMaxResolution;
 
                     // reset resolution to max resolution
                     State.ScanResolution = Robot.RadarMaxResolution;
 
                     // increase our no-hit sweep tracker so we know when to move
-                    State.NoHitSweep += 2.0 * Robot.RadarMaxResolution;
+                    State.NoHitSweep += 2.0f * Robot.RadarMaxResolution;
                 }
             }
             State.ScanHeading = NormalizeAngle(State.ScanHeading);
@@ -119,25 +123,25 @@ namespace LambdaRobots.HotShotRobot.RobotFunction {
                 FireMissile(State.ScanHeading, State.TargetRange.Value);
 
                 // reset sweep tracker to indicate we found something
-                State.NoHitSweep = 0.0;
+                State.NoHitSweep = 0.0f;
             }
 
             // check if we're not moving
-            if((State.GotoX == null) || (State.GotoY == null)) {
+            if((State.GotoX is null) || (State.GotoY is null)) {
 
                 // check if we were hurt or having found a target after a full sweep
                 if(WasHurt) {
                     LogInfo("Damage detected. Taking evasive action.");
 
                     // take evasive action!
-                    State.GotoX = Game.CollisionRange + Random.NextDouble() * (Game.BoardWidth - 2.0 * Game.CollisionRange);
-                    State.GotoY = Game.CollisionRange + Random.NextDouble() * (Game.BoardHeight - 2.0 * Game.CollisionRange);
-                } else if((State.NoHitSweep >= 360.0) && ((State.GotoX == null) || (State.GotoY == null))) {
+                    State.GotoX = Game.CollisionRange + RandomFloat() * (Game.BoardWidth - 2.0f * Game.CollisionRange);
+                    State.GotoY = Game.CollisionRange + RandomFloat() * (Game.BoardHeight - 2.0f * Game.CollisionRange);
+                } else if((State.NoHitSweep >= 360.0) && ((State.GotoX is null) || (State.GotoY is null))) {
                     LogInfo("Nothing found in immediate surroundings. Moving to new location.");
 
                     // time to move to a new random location on the board
-                    State.GotoX = Game.CollisionRange + Random.NextDouble() * (Game.BoardWidth - 2.0 * Game.CollisionRange);
-                    State.GotoY = Game.CollisionRange + Random.NextDouble() * (Game.BoardHeight - 2.0 * Game.CollisionRange);
+                    State.GotoX = Game.CollisionRange + RandomFloat() * (Game.BoardWidth - 2.0f * Game.CollisionRange);
+                    State.GotoY = Game.CollisionRange + RandomFloat() * (Game.BoardHeight - 2.0f * Game.CollisionRange);
                 }
             }
 
@@ -145,7 +149,7 @@ namespace LambdaRobots.HotShotRobot.RobotFunction {
             if((State.GotoX != null) && (State.GotoY != null)) {
 
                 // reset sweep tracker while moving
-                State.NoHitSweep = 0.0;
+                State.NoHitSweep = 0.0f;
 
                 // stop moving once we have reached our destination
                 if(MoveToXY(State.GotoX.Value, State.GotoY.Value)) {

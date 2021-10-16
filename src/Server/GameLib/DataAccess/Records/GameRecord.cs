@@ -22,26 +22,17 @@
  * SOFTWARE.
  */
 
-using System;
+using System.Collections.Generic;
 
-namespace LambdaRobots.Server {
+namespace LambdaRobots.Server.DataAccess.Records {
 
-    public static class GameMath {
+    public class GameRecord {
 
-        //--- Class Methods ---
-        public static double Distance(double x1, double y1, double x2, double y2)
-            => Math.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
-
-        public static double MinMax(double min, double value, double max)
-            => Math.Max(min, Math.Min(max, value));
-
-        public static double NormalizeAngle(double angle) {
-            var result = angle % 360;
-            return (result <= -180.0)
-                ? (result + 360.0)
-                : (result > 180.0)
-                ? (result - 360.0)
-                : result;
-        }
+        //--- Properties ---
+        public string GameId { get; set; }
+        public Game Game { get; set; }
+        public List<string> BotArns { get; set; }
+        public string ConnectionId { get; set; }
+        public long Expire { get; set; }
     }
 }

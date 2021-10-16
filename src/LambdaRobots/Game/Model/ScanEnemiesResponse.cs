@@ -22,17 +22,12 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Server.ServerFunction.Model {
+namespace LambdaRobots.Game.Model {
 
-    public class JoinGameRequest {
-
-        //--- Properties ---
-        public string GameId { get; set; }
-    }
-
-    public class JoinGameResponse {
+    public sealed class ScanResponse {
 
         //--- Properties ---
-        public Game Game { get; set; }
+        public bool Found { get; set; }
+        public float Distance { get; set; }
     }
 }

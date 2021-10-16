@@ -22,9 +22,14 @@
  * SOFTWARE.
  */
 
+using System;
+
 namespace LambdaRobots {
 
     public class GameInfo {
+
+        //--- Constants ---
+        public static readonly TimeSpan MinimumTurnTimespan = TimeSpan.FromMilliseconds(33);
 
         //--- Properties ---
 
@@ -36,39 +41,39 @@ namespace LambdaRobots {
         /// <summary>
         /// Width of the game board.
         /// </summary>
-        public double BoardWidth { get; set; }
+        public float BoardWidth { get; set; }
 
         /// <summary>
         /// Height of the game board.
         /// </summary>
-        public double BoardHeight { get; set; }
+        public float BoardHeight { get; set; }
 
         /// <summary>
         /// Number of seconds elapsed per game turn.
         /// </summary>
         ///
         // TODO: is still useful when using real-time?
-        public double SecondsPerTurn { get; set; }
+        public float SecondsPerTurn { get; set; }
 
         /// <summary>
         /// Distance for missile impact to count as direct hit.
         /// </summary>
-        public double DirectHitRange;
+        public float DirectHitRange { get; set; }
 
         /// <summary>
         /// Distance for missile impact to count as near hit.
         /// </summary>
-        public double NearHitRange;
+        public float NearHitRange { get; set; }
 
         /// <summary>
         /// Distance for missile impact to count as far hit.
         /// </summary>
-        public double FarHitRange;
+        public float FarHitRange { get; set; }
 
         /// <summary>
         /// Distance between robots to count as a collision.
         /// </summary>
-        public double CollisionRange;
+        public float CollisionRange { get; set; }
 
         /// <summary>
         /// Current game turn. Starts at `1`.

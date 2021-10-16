@@ -31,9 +31,15 @@ Items:
 
   - Function: ServerFunction
     Description: Function for handling REST API and WebSocket interactions
-    Memory: 256
+    Memory: 1769
     Timeout: 30
     Sources:
+
+      # REST API
+      - Api: POST:/{gameId}/scan
+        Invoke: ScanEnemies
+
+      # WebSocket API
       - WebSocket: $connect
         Invoke: OpenConnection
       - WebSocket: $disconnect
@@ -42,13 +48,11 @@ Items:
         Invoke: StartGame
       - WebSocket: stop
         Invoke: StopGame
-      - Api: POST:/{gameId}/scan
-        Invoke: ScanEnemies
 
   - Function: GameTurnFunction
     Scope: ServerFunction
     Description: Function for computing the next game turn
-    Memory: 256
+    Memory: 1769
     Timeout: 900
 
   - Resource: InvokeLambdasPermission
@@ -80,7 +84,7 @@ Items:
 
   - Package: WebsiteFiles
     Description: Website files to deploy
-    Files: Packages/wwwroot
+    Files: Website
 
   - Resource: DeployWebsiteFiles
     Type: LambdaSharp::S3::Unzip

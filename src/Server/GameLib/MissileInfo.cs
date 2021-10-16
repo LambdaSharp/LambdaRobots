@@ -22,17 +22,26 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Server.ServerFunction.Model {
+namespace LambdaRobots.Server {
 
-    public class JoinGameRequest {
+    public class MissileInfo {
 
-        //--- Properties ---
-        public string GameId { get; set; }
-    }
+        //--- Fields ---
+        public string Id { get; set; }
+        public string RobotId { get; set; }
 
-    public class JoinGameResponse {
+        // current state
+        public MissileStatus Status { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Distance { get; set; }
 
-        //--- Properties ---
-        public Game Game { get; set; }
+        // missile characteristics
+        public float Speed { get; set; }
+        public float Heading { get; set; }
+        public float Range { get; set; }
+        public float DirectHitDamageBonus { get; set; }
+        public float NearHitDamageBonus { get; set; }
+        public float FarHitDamageBonus { get; set; }
     }
 }
