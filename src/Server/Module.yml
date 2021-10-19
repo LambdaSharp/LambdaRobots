@@ -3,10 +3,8 @@ Description: Lambda-Robots is based on the 90s game P-Robots by David Malmberg
 Pragmas:
   - Overrides:
       Module::WebSocket.RouteSelectionExpression: $request.body.Action
-
 Using:
   - Module: LambdaSharp.S3.IO@lambdasharp
-
 Items:
 
   # Game Connection
@@ -24,17 +22,17 @@ Items:
       - WebSocket: stop
         Invoke: StopGame
 
-  - Resource: InvokeLambdasPermission
-    Description: Allow GameTurnFunction to be invoked
-    Allow: lambda:InvokeFunction
-    Value: "*"
-
   # Game Loop
   - Function: GameTurnFunction
     Scope: ServerFunction
     Description: Function for computing the next game turn
     Memory: 1769
     Timeout: 900
+    Sources:
+      - EventBus: default
+        Pattern:
+          DetailType:
+            - LambdaRobots.Server.GameKickOffEvent
 
   - Variable: RestApiUrl
     Description: URL for REST API
@@ -118,7 +116,7 @@ Items:
         Enabled: true
 
   # Output Variables
-  - Variable: LambdaRobotsServerUrl
-    Description: URL for the Lambda-Robots web-server
+  - Variable: LambdaRobotsSiteUrl
+    Description: URL for the Lambda-Robots website
     Scope: public
     Value: !GetAtt WebsiteBucket.WebsiteURL

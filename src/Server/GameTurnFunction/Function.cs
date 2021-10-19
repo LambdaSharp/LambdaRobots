@@ -36,24 +36,11 @@ using LambdaRobots.Bot.Model;
 using LambdaRobots.Server.DataAccess;
 using LambdaRobots.Server.DataAccess.Records;
 using LambdaSharp;
+using LambdaSharp.EventBridge;
 
 namespace LambdaRobots.Server.GameTurnFunction {
 
-    public class FunctionRequest {
-
-        //--- Properties ---
-        public string GameId { get; set; }
-        public GameStatus Status { get; set; }
-    }
-
-    public class FunctionResponse {
-
-        //--- Properties ---
-        public string GameId { get; set; }
-        public GameStatus Status { get; set; }
-    }
-
-    public class Function : ALambdaFunction<FunctionRequest, FunctionResponse>, IGameDependencyProvider {
+    public class Function : ALambdaEventFunction<GameKickOffEvent>, IGameDependencyProvider {
 
         //--- Class Fields ---
         private readonly static Random _random = new Random();
@@ -88,29 +75,15 @@ namespace LambdaRobots.Server.GameTurnFunction {
             _gameApiUrl = config.ReadText("RestApiUrl");
         }
 
-        public override async Task<FunctionResponse> ProcessMessageAsync(FunctionRequest request) {
-            try {
-                await GameLoopAsync(request.GameId);
-            } catch(Exception) {
-                return new FunctionResponse {
-                    GameId = request.GameId,
-                    Status = GameStatus.Error
-                };
-            }
-            return new FunctionResponse {
-                GameId = request.GameId,
-                Status = GameStatus.Finished
-            };
-        }
-
-        public async Task GameLoopAsync(string gameId) {
+        public override async Task ProcessEventAsync(GameKickOffEvent message) {
+            var gameId = message.GameId;
 
             // get game state from DynamoDB table
             LogInfo($"Loading game state: ID = {gameId}");
             GameRecord = await _dataClient.GetGameRecordAsync(gameId);
             try {
                 if(GameRecord?.Game?.Status != GameStatus.Start) {
-                    LogWarn($"Game state is invalid (gameId: {gameId})");
+                    LogWarn($"Game state is invalid: ID = {gameId}");
                     return;
                 }
                 try {
@@ -153,7 +126,6 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     // notify frontend that the game is over
                     Game.Status = GameStatus.Error;
                     await TryPostGameUpdateAsync(GameRecord.ConnectionId, Game);
-                    throw;
                 } finally {
 
                     // delete game from table

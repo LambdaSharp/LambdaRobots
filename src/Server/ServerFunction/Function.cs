@@ -42,7 +42,6 @@ namespace LambdaRobots.Server.ServerFunction {
 
         //--- Fields ---
         private DataAccessClient _dataClient;
-        private IAmazonLambda _lambdaClient;
         private string _gameTurnFunctionArn;
 
         //--- Constructors ---
@@ -51,7 +50,6 @@ namespace LambdaRobots.Server.ServerFunction {
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
             _dataClient = new DataAccessClient(config.ReadDynamoDBTableName("GameTable"));
-            _lambdaClient = new AmazonLambdaClient();
             _gameTurnFunctionArn = config.ReadText("GameTurnFunction");
         }
 
@@ -94,14 +92,10 @@ namespace LambdaRobots.Server.ServerFunction {
             await _dataClient.CreateGameRecordAsync(gameRecord);
 
             // dispatch game loop
-            LogInfo($"Kicking off Game Turn lambda: Name = {_gameTurnFunctionArn}");
-            await _lambdaClient.InvokeAsync(new InvokeRequest {
-                Payload = LambdaSerializer.Serialize(new {
-                    GameId = game.Id,
-                    Status = game.Status
-                }),
-                FunctionName = _gameTurnFunctionArn,
-                InvocationType = InvocationType.Event
+            LogInfo($"Kicking off game: ID = {game.Id}");
+            LogEvent(new GameKickOffEvent {
+                GameId = game.Id,
+                Status = game.Status
             });
 
             // return with kicked off game
