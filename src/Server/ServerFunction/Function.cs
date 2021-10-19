@@ -23,13 +23,10 @@
  */
 
 using System;
-using System.Linq;
 using System.Threading.Tasks;
 using Amazon.Lambda;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Model;
-using LambdaRobots.Bot.Model;
-using LambdaRobots.Game.Model;
 using LambdaRobots.Server.DataAccess;
 using LambdaRobots.Server.DataAccess.Records;
 using LambdaRobots.Server.ServerFunction.Model;
@@ -38,7 +35,7 @@ using LambdaSharp.ApiGateway;
 
 namespace LambdaRobots.Server.ServerFunction {
 
-    public class Function : ALambdaApiGatewayFunction, IGameDependencyProvider {
+    public class Function : ALambdaApiGatewayFunction {
 
         //--- Class Fields ---
         private readonly static Random _random = new Random();
@@ -142,45 +139,5 @@ namespace LambdaRobots.Server.ServerFunction {
                 Game = gameRecord.Game
             };
         }
-
-        public async Task<ScanResponse> ScanEnemiesAsync(string gameId, ScanEnemiesRequest request) {
-
-            // fetch game record from table
-            var gameRecord = await _dataClient.GetGameRecordAsync(gameId);
-            if(gameRecord is null) {
-                throw AbortNotFound($"could not find a game session: ID = {gameId ?? "<NULL>"}");
-            }
-            var gameLogic = new GameLogic(gameRecord.Game, this);
-
-            // identify scanning robot
-            var robot = gameRecord.Game.Robots.FirstOrDefault(r => r.Id == request.RobotId);
-            if(robot is null) {
-                throw AbortNotFound($"could not find a robot: ID = {request.RobotId}");
-            }
-
-            // find nearest enemy within scan resolution
-            var found = gameLogic.ScanRobots(robot, request.Heading, request.Resolution);
-            if(found != null) {
-                var distance = GameMath.Distance(robot.X, robot.Y, found.X, found.Y);
-                var angle = GameMath.NormalizeAngle(MathF.Atan2(found.X - robot.X, found.Y - robot.Y) * 180.0f / MathF.PI);
-                LogInfo($"Scanning: Heading = {GameMath.NormalizeAngle(request.Heading):N2}, Resolution = {request.Resolution:N2}, Found = R{found.Index}, Distance = {distance:N2}, Angle = {angle:N2}");
-                return new ScanResponse {
-                    Found = true,
-                    Distance = distance
-                };
-            } else {
-               LogInfo($"Scanning: Heading = {GameMath.NormalizeAngle(request.Heading):N2}, Resolution = {request.Resolution:N2}, Found = nothing");
-                return new ScanResponse {
-                    Found = false,
-                    Distance = 0.0f
-                };
-            }
-        }
-
-        //--- IGameDependencyProvider Members ---
-        DateTimeOffset IGameDependencyProvider.UtcNow => DateTimeOffset.UtcNow;
-        float IGameDependencyProvider.NextRandomFloat() => (float)_random.NextDouble();
-        Task<GetBuildResponse> IGameDependencyProvider.GetRobotBuild(BotInfo robot) => throw new NotImplementedException();
-        Task<GetActionResponse> IGameDependencyProvider.GetRobotAction(BotInfo robot) => throw new NotImplementedException();
     }
 }

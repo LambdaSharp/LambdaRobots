@@ -110,9 +110,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
             GameRecord = await _dataClient.GetGameRecordAsync(gameId);
             try {
                 if(GameRecord?.Game?.Status != GameStatus.Start) {
-
-                    // TODO: better log diagnostics
-                    LogWarn($"Game state is invalid");
+                    LogWarn($"Game state is invalid (gameId: {gameId})");
                     return;
                 }
                 try {
@@ -141,9 +139,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                         // attempt to update the game record
                         LogInfo($"Storing game: ID = {gameId}");
                         if(!await _dataClient.UpdateGameRecordAsync(gameId, Game)) {
-
-                            // TODO: better exception
-                            throw new Exception("unable to update record");
+                            throw new ApplicationException("unable to update game record");
                         }
 
                         // notify WebSocket of new game state
@@ -235,10 +231,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                         CurrentGameTurn = Game.CurrentGameTurn,
                         MaxGameTurns = Game.MaxTurns,
                         MaxBuildPoints = Game.MaxBuildPoints,
-
-                        // TODO: must be read from _provider
                         SecondsPerTurn = (float)(Game.LastStatusUpdate - robot.LastStatusUpdate).TotalSeconds,
-
                         ApiUrl = _gameApiUrl + $"/{Game.Id}"
                     },
                     Robot = robot
