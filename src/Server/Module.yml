@@ -8,7 +8,7 @@ Using:
 Items:
 
   # Game Connection
-  - Function: ServerFunction
+  - Function: GameConnectionFunction
     Description: Function for UI websocket interactions
     Memory: 1769
     Timeout: 30
@@ -24,7 +24,7 @@ Items:
 
   # Game Loop
   - Function: GameTurnFunction
-    Scope: ServerFunction
+    Scope: GameConnectionFunction
     Description: Function for computing the next game turn
     Memory: 1769
     Timeout: 900

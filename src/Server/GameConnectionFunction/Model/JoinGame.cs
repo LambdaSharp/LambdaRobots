@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Server.ServerFunction.Model {
+namespace LambdaRobots.Server.GameConnectionFunction.Model {
 
     public class JoinGameRequest {
 

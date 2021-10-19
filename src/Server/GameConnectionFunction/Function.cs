@@ -24,16 +24,14 @@
 
 using System;
 using System.Threading.Tasks;
-using Amazon.Lambda;
 using Amazon.Lambda.APIGatewayEvents;
-using Amazon.Lambda.Model;
 using LambdaRobots.Server.DataAccess;
 using LambdaRobots.Server.DataAccess.Records;
-using LambdaRobots.Server.ServerFunction.Model;
+using LambdaRobots.Server.GameConnectionFunction.Model;
 using LambdaSharp;
 using LambdaSharp.ApiGateway;
 
-namespace LambdaRobots.Server.ServerFunction {
+namespace LambdaRobots.Server.GameConnectionFunction {
 
     public class Function : ALambdaApiGatewayFunction {
 
