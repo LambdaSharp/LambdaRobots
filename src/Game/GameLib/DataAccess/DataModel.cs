@@ -26,7 +26,7 @@ using LambdaRobots.Game.DataAccess.Records;
 using LambdaSharp.DynamoDB.Native;
 
 namespace LambdaRobots.Game.DataAccess {
-    
+
     public static class DataModel {
 
         //--- Constants ---
@@ -35,7 +35,7 @@ namespace LambdaRobots.Game.DataAccess {
 
         //--- Extension Methods ---
         public static DynamoPrimaryKey<GameRecord> GetPrimaryKey(this GameRecord record)
-            => GetPrimaryKeyForGameRecord(record.GameId);
+            => GetPrimaryKeyForGameRecord(record.GameSession.Id);
 
         //--- Methods ---
         public static DynamoPrimaryKey<GameRecord> GetPrimaryKeyForGameRecord(string gameId)

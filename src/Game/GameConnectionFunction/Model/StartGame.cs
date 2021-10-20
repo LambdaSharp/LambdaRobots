@@ -49,6 +49,6 @@ namespace LambdaRobots.Game.GameConnectionFunction.Model {
     public sealed class StartGameResponse {
 
         //--- Properties ---
-        public GameBoard GameBoard { get; set; }
+        public GameSession GameSession { get; set; }
     }
 }

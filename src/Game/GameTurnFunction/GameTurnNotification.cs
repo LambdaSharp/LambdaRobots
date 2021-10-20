@@ -27,6 +27,6 @@ namespace LambdaRobots.Game.GameTurnFunction {
     public sealed class GameTurnNotification {
 
         //--- Properties ---
-        public GameBoard GameBoard { get; set; }
+        public GameSession GameSession { get; set; }
     }
 }

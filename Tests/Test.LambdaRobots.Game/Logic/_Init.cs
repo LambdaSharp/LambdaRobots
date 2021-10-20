@@ -40,7 +40,7 @@ namespace Test.LambdaRobots.Game {
         protected readonly Random _random = new Random();
 
         //--- Methods ---
-        protected GameBoard NewGameBoard() => new GameBoard {
+        protected GameSession NewGameSession() => new GameSession {
             Id = "Test",
             BoardWidth = 1000.0f,
             BoardHeight = 1000.0f,
@@ -94,7 +94,7 @@ namespace Test.LambdaRobots.Game {
         };
 
         protected GameLogic NewLogic(params BotInfo[] bots) {
-            var game = NewGameBoard();
+            var game = NewGameSession();
             game.Bots.AddRange(bots);
             for(var i = 0; i < game.Bots.Count; ++i) {
                 game.Bots[i].Index = i;

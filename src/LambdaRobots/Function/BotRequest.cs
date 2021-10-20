@@ -50,6 +50,6 @@ namespace LambdaRobots.Function {
         /// <summary>
         /// Current game state. Used only by `GetAction` command
         /// </summary>
-        public GameBoardInfo GameBoard { get; set; }
+        public SessionInfo Session { get; set; }
     }
 }

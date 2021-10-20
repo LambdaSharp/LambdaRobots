@@ -22,11 +22,9 @@
  * SOFTWARE.
  */
 
-using System;
-
 namespace LambdaRobots {
 
-    public sealed class GameBoardInfo {
+    public sealed class SessionInfo {
 
         //--- Properties ---
 

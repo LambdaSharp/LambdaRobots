@@ -131,9 +131,9 @@ namespace Test.LambdaRobots.Game {
             bot.Y.Should().Be(1000.0f);
             bot.Speed.Should().Be(0.0f);
             bot.Damage.Should().Be(bot.CollisionDamage);
-            logic.GameBoard.Messages.Count.Should().Be(2);
-            logic.GameBoard.Messages[0].Text.Should().Be("Bob (R0) received 2 damage by wall collision");
-            logic.GameBoard.Messages[1].Text.Should().Be("Bob is victorious! Game Over.");
+            logic.GameSession.Messages.Count.Should().Be(2);
+            logic.GameSession.Messages[0].Text.Should().Be("Bob (R0) received 2 damage by wall collision");
+            logic.GameSession.Messages[1].Text.Should().Be("Bob is victorious! Game Over.");
         }
 
         [Fact]
@@ -150,9 +150,9 @@ namespace Test.LambdaRobots.Game {
             // assert
             bob.Damage.Should().Be(bob.CollisionDamage);
             dave.Damage.Should().Be(dave.CollisionDamage);
-            logic.GameBoard.Messages.Count.Should().Be(2);
-            logic.GameBoard.Messages[0].Text.Should().Be("Bob (R0) was damaged 2 by collision with Dave (R1)");
-            logic.GameBoard.Messages[1].Text.Should().Be("Dave (R1) was damaged 2 by collision with Bob (R0)");
+            logic.GameSession.Messages.Count.Should().Be(2);
+            logic.GameSession.Messages[0].Text.Should().Be("Bob (R0) was damaged 2 by collision with Dave (R1)");
+            logic.GameSession.Messages[1].Text.Should().Be("Dave (R1) was damaged 2 by collision with Bob (R0)");
         }
         #endregion
 
