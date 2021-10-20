@@ -23,7 +23,7 @@ Items:
         Invoke: StopGame
 
   # Game Loop
-  - Function: GameTurnFunction
+  - Function: GameLoopFunction
     Scope: GameControllerFunction
     Description: Function for computing the next game turn
     Memory: 1769
@@ -36,7 +36,7 @@ Items:
 
   - Variable: RestApiUrl
     Description: URL for REST API
-    Scope: GameTurnFunction
+    Scope: GameLoopFunction
     Value: !Ref Module::RestApi::Url
 
   # Game API

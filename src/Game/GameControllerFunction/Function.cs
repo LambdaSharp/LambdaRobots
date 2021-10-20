@@ -40,7 +40,7 @@ namespace LambdaRobots.Game.GameControllerFunction {
 
         //--- Fields ---
         private DataAccessClient _dataClient;
-        private string _gameTurnFunctionArn;
+        private string _gameLoopFunctionArn;
 
         //--- Constructors ---
         public Function() : base(new LambdaSharp.Serialization.LambdaSystemTextJsonSerializer()) { }
@@ -48,7 +48,7 @@ namespace LambdaRobots.Game.GameControllerFunction {
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
             _dataClient = new DataAccessClient(config.ReadDynamoDBTableName("GameTable"));
-            _gameTurnFunctionArn = config.ReadText("GameTurnFunction");
+            _gameLoopFunctionArn = config.ReadText("GameLoopFunction");
         }
 
         public async Task OpenConnectionAsync(APIGatewayProxyRequest request, string username = null) {

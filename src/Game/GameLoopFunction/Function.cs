@@ -38,7 +38,7 @@ using LambdaRobots.Game.DataAccess.Records;
 using LambdaSharp;
 using LambdaSharp.EventBridge;
 
-namespace LambdaRobots.Game.GameTurnFunction {
+namespace LambdaRobots.Game.GameLoopFunction {
 
     public sealed class Function : ALambdaEventFunction<GameKickOffEvent>, IGameDependencyProvider {
 

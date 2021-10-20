@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Game.GameTurnFunction {
+namespace LambdaRobots.Game.GameLoopFunction {
 
     public sealed class GameTurnNotification {
 
