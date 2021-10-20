@@ -24,7 +24,7 @@
 
 namespace LambdaRobots.Bot.Model {
 
-    public class GetActionResponse {
+    public sealed class GetActionResponse {
 
         //--- Properties ---
         public float? Speed { get; set; }

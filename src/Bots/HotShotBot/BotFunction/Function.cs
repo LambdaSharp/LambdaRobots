@@ -69,7 +69,7 @@ namespace LambdaRobots.HotShotBot.BotFunction {
                 State.ScanResolution = Bot.RadarMaxResolution;
 
                 // initialize aim to point to middle of the game board
-                State.ScanHeading = AngleToXY(Game.BoardWidth / 2, Game.BoardHeight / 2);
+                State.ScanHeading = AngleToXY(GameBoard.BoardWidth / 2, GameBoard.BoardHeight / 2);
             }
 
             // NOTE: HotShot will do up to 2 scans each turn. Whichever area has a hit is then targetted and the
@@ -79,7 +79,7 @@ namespace LambdaRobots.HotShotBot.BotFunction {
             // check if target is found in left scan area
             float scanHeading = State.ScanHeading - State.ScanResolution;
             State.TargetRange = await ScanAsync(scanHeading, State.ScanResolution);
-            if((State.TargetRange != null) && (State.TargetRange > Game.FarHitRange) && (State.TargetRange <= Bot.MissileRange)) {
+            if((State.TargetRange != null) && (State.TargetRange > GameBoard.FarHitRange) && (State.TargetRange <= Bot.MissileRange)) {
                 LogInfo($"Target found: ScanHeading = {scanHeading:N2}, Range = {State.TargetRange:N2}");
 
                 // update scan heading
@@ -92,7 +92,7 @@ namespace LambdaRobots.HotShotBot.BotFunction {
                 // check if target is found in right scan area
                 scanHeading = State.ScanHeading + State.ScanResolution;
                 State.TargetRange = await ScanAsync(scanHeading, State.ScanResolution);
-                if((State.TargetRange != null) && (State.TargetRange > Game.FarHitRange) && (State.TargetRange <= Bot.MissileRange)) {
+                if((State.TargetRange != null) && (State.TargetRange > GameBoard.FarHitRange) && (State.TargetRange <= Bot.MissileRange)) {
                     LogInfo($"Target found: ScanHeading = {scanHeading:N2}, Range = {State.TargetRange:N2}");
 
                     // update scan heading
@@ -134,14 +134,14 @@ namespace LambdaRobots.HotShotBot.BotFunction {
                     LogInfo("Damage detected. Taking evasive action.");
 
                     // take evasive action!
-                    State.GotoX = Game.CollisionRange + RandomFloat() * (Game.BoardWidth - 2.0f * Game.CollisionRange);
-                    State.GotoY = Game.CollisionRange + RandomFloat() * (Game.BoardHeight - 2.0f * Game.CollisionRange);
+                    State.GotoX = GameBoard.CollisionRange + RandomFloat() * (GameBoard.BoardWidth - 2.0f * GameBoard.CollisionRange);
+                    State.GotoY = GameBoard.CollisionRange + RandomFloat() * (GameBoard.BoardHeight - 2.0f * GameBoard.CollisionRange);
                 } else if((State.NoHitSweep >= 360.0) && ((State.GotoX is null) || (State.GotoY is null))) {
                     LogInfo("Nothing found in immediate surroundings. Moving to new location.");
 
                     // time to move to a new random location on the board
-                    State.GotoX = Game.CollisionRange + RandomFloat() * (Game.BoardWidth - 2.0f * Game.CollisionRange);
-                    State.GotoY = Game.CollisionRange + RandomFloat() * (Game.BoardHeight - 2.0f * Game.CollisionRange);
+                    State.GotoX = GameBoard.CollisionRange + RandomFloat() * (GameBoard.BoardWidth - 2.0f * GameBoard.CollisionRange);
+                    State.GotoY = GameBoard.CollisionRange + RandomFloat() * (GameBoard.BoardHeight - 2.0f * GameBoard.CollisionRange);
                 }
             }
 

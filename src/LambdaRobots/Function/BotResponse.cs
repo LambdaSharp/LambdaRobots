@@ -26,7 +26,7 @@ using LambdaRobots.Bot.Model;
 
 namespace LambdaRobots.Function {
 
-    public class BotResponse {
+    public sealed class BotResponse {
 
         //--- Properties ---
         public GetBuildResponse BotBuild { get; set; }

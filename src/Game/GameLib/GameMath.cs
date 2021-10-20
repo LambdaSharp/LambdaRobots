@@ -22,20 +22,26 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Bot.Model {
+using System;
 
-    public sealed class GetBuildRequest {
+namespace LambdaRobots.Game {
 
-        //--- Properties ---
+    public static class GameMath {
 
-        /// <summary>
-        /// Current game state.
-        /// </summary>
-        public GameBoardInfo GameBoard { get; set; }
+        //--- Class Methods ---
+        public static float Distance(float x1, float y1, float x2, float y2)
+            => MathF.Sqrt((x1 - x2) * (x1 - x2) + (y1 - y2) * (y1 - y2));
 
-        /// <summary>
-        /// Current bot state.
-        /// </summary>
-        public BotInfo Bot { get; set; }
+        public static float MinMax(float min, float value, float max)
+            => MathF.Max(min, MathF.Min(max, value));
+
+        public static float NormalizeAngle(float angle) {
+            var result = angle % 360;
+            return (result <= -180.0f)
+                ? (result + 360.0f)
+                : (result > 180.0f)
+                ? (result - 360.0f)
+                : result;
+        }
     }
 }

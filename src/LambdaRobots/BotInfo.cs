@@ -26,7 +26,7 @@ using System;
 
 namespace LambdaRobots {
 
-    public class BotInfo {
+    public sealed class BotInfo {
 
         //--- Properties ---
 

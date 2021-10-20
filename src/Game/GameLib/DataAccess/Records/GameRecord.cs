@@ -22,20 +22,17 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Bot.Model {
+using System.Collections.Generic;
 
-    public sealed class GetBuildRequest {
+namespace LambdaRobots.Game.DataAccess.Records {
+
+    public sealed class GameRecord {
 
         //--- Properties ---
-
-        /// <summary>
-        /// Current game state.
-        /// </summary>
-        public GameBoardInfo GameBoard { get; set; }
-
-        /// <summary>
-        /// Current bot state.
-        /// </summary>
-        public BotInfo Bot { get; set; }
+        public string GameId { get; set; }
+        public GameBoard GameBoard { get; set; }
+        public List<string> BotArns { get; set; }
+        public string ConnectionId { get; set; }
+        public long Expire { get; set; }
     }
 }

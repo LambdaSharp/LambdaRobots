@@ -66,7 +66,7 @@ namespace LambdaRobots.Bot {
                 var getBuildTask = _lambdaClient.InvokeAsync(new InvokeRequest {
                     Payload = JsonSerializer.Serialize(new BotRequest {
                         Command = BotCommand.GetBuild,
-                        Game = request.GameInfo,
+                        GameBoard = request.GameBoard,
                         Bot = request.Bot
                     }),
                     FunctionName = _lambdaArn,
@@ -94,7 +94,7 @@ namespace LambdaRobots.Bot {
                 var getActionTask = _lambdaClient.InvokeAsync(new InvokeRequest {
                     Payload = JsonSerializer.Serialize(new BotRequest {
                         Command = BotCommand.GetAction,
-                        Game = request.GameInfo,
+                        GameBoard = request.GameBoard,
                         Bot = request.Bot
                     }),
                     FunctionName = _lambdaArn,

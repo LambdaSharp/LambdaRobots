@@ -8,7 +8,7 @@ lash publish \
     --tier Release \
     --force-build \
     --module-version $LAMBDAROBOTS_VERSION \
-    $FOLDER/src/Server \
+    $FOLDER/src/Game \
     $FOLDER/src/Bots/HotShotBot/ \
     $FOLDER/src/Bots/TargetBot/ \
     $FOLDER/src/Bots/YosemiteSamBot/

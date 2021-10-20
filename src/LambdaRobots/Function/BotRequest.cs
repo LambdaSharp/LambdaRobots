@@ -33,7 +33,7 @@ namespace LambdaRobots.Function {
         GetAction
     }
 
-    public class BotRequest {
+    public sealed class BotRequest {
 
         //--- Properties ---
 
@@ -50,6 +50,6 @@ namespace LambdaRobots.Function {
         /// <summary>
         /// Current game state. Used only by `GetAction` command
         /// </summary>
-        public GameInfo Game { get; set; }
+        public GameBoardInfo GameBoard { get; set; }
     }
 }

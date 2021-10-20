@@ -22,20 +22,23 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Bot.Model {
+using LambdaRobots.Game.DataAccess.Records;
+using LambdaSharp.DynamoDB.Native;
 
-    public sealed class GetBuildRequest {
+namespace LambdaRobots.Game.DataAccess {
+    
+    public static class DataModel {
 
-        //--- Properties ---
+        //--- Constants ---
+        private const string GAME_RECORD_PK_FORMAT = "GAMES";
+        private const string GAME_RECORD_SK_FORMAT = "GAME={0}";
 
-        /// <summary>
-        /// Current game state.
-        /// </summary>
-        public GameBoardInfo GameBoard { get; set; }
+        //--- Extension Methods ---
+        public static DynamoPrimaryKey<GameRecord> GetPrimaryKey(this GameRecord record)
+            => GetPrimaryKeyForGameRecord(record.GameId);
 
-        /// <summary>
-        /// Current bot state.
-        /// </summary>
-        public BotInfo Bot { get; set; }
+        //--- Methods ---
+        public static DynamoPrimaryKey<GameRecord> GetPrimaryKeyForGameRecord(string gameId)
+            => new DynamoPrimaryKey<GameRecord>(GAME_RECORD_PK_FORMAT, GAME_RECORD_SK_FORMAT, gameId);
     }
 }

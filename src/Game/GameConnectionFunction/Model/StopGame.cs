@@ -22,20 +22,18 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Bot.Model {
+namespace LambdaRobots.Game.GameConnectionFunction.Model {
 
-    public sealed class GetBuildRequest {
+    public sealed class StopGameRequest {
 
         //--- Properties ---
+        public string Action { get; set; }
+        public string GameId { get; set; }
+    }
 
-        /// <summary>
-        /// Current game state.
-        /// </summary>
-        public GameBoardInfo GameBoard { get; set; }
+    public sealed class StopGameResponse {
 
-        /// <summary>
-        /// Current bot state.
-        /// </summary>
-        public BotInfo Bot { get; set; }
+        //--- Properties ---
+        public GameBoard GameBoard { get; set; }
     }
 }

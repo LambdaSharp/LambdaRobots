@@ -46,7 +46,7 @@ namespace LambdaRobots.Game {
         Task<ScanResponse> ScanAsync(float heading, float resolution);
     }
 
-    public class LambdaRobotsGameClient : ILambdaRobotsGame {
+    public sealed class LambdaRobotsGameClient : ILambdaRobotsGame {
 
         //--- Fields ---
         private readonly HttpClient _httpClient;

@@ -22,20 +22,11 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Bot.Model {
+namespace LambdaRobots.Game.GameTurnFunction {
 
-    public sealed class GetBuildRequest {
+    public sealed class GameTurnNotification {
 
         //--- Properties ---
-
-        /// <summary>
-        /// Current game state.
-        /// </summary>
-        public GameBoardInfo GameBoard { get; set; }
-
-        /// <summary>
-        /// Current bot state.
-        /// </summary>
-        public BotInfo Bot { get; set; }
+        public GameBoard GameBoard { get; set; }
     }
 }

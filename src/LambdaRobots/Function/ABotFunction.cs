@@ -57,20 +57,20 @@ namespace LambdaRobots.Function {
         /// <summary>
         /// Bot data structure describing the state and characteristics of the bot.
         /// </summary>
-        public LambdaRobots.BotInfo Bot { get; set; }
+        public BotInfo Bot { get; set; }
 
         /// <summary>
         /// Game data structure describing the state and characteristics of the game;
         /// </summary>
-        public LambdaRobots.GameInfo Game { get; set; }
+        public GameBoardInfo GameBoard { get; set; }
 
         /// <summary>
-        /// Horizontal position of bot. Value is between `0` and `Game.BoardWidth`.
+        /// Horizontal position of bot. Value is between `0` and `GameBoardInfo.BoardWidth`.
         /// </summary>
         public float X => Bot.X;
 
         /// <summary>
-        /// Vertical position of bot. Value is between `0` and `Game.BoardHeight`.
+        /// Vertical position of bot. Value is between `0` and `GameBoardInfo.BoardHeight`.
         /// </summary>
         public float Y => Bot.Y;
 
@@ -137,9 +137,9 @@ namespace LambdaRobots.Function {
                 try {
 
                     // capture request fields for easy access
-                    Game = request.Game;
+                    GameBoard = request.GameBoard;
                     Bot = request.Bot;
-                    GameClient = new LambdaRobotsGameClient(Game.ApiUrl, Bot.Id, HttpClient);
+                    GameClient = new LambdaRobotsGameClient(GameBoard.ApiUrl, Bot.Id, HttpClient);
 
                     // initialize a default empty action
                     _action = new GetActionResponse();
@@ -275,7 +275,7 @@ namespace LambdaRobots.Function {
             LogInfo($"Move To: X = {x:N2}, Y = {y:N2}, Heading = {heading:N2}, Distance = {distance:N2}");
 
             // check if bot is close enough to target location
-            if(distance <= Game.CollisionRange) {
+            if(distance <= GameBoard.CollisionRange) {
 
                 // close enough; stop moving
                 SetSpeed(0.0f);
@@ -285,7 +285,7 @@ namespace LambdaRobots.Function {
             // NOTE: the distance required to stop the bot from moving is obtained with the following formula:
             //      Distance = Speed^2 / 2*Deceleration
             //  solving for Speed, gives us the maximum travel speed to avoid overshooting our target
-            var speed = MathF.Sqrt(distance * 2.0f * Bot.Deceleration) * Game.SecondsSinceLastTurn;
+            var speed = MathF.Sqrt(distance * 2.0f * Bot.Deceleration) * GameBoard.SecondsSinceLastTurn;
 
             // check if heading needs to be adjusted
             if(MathF.Abs(NormalizeAngle(Heading - heading)) > 0.1) {

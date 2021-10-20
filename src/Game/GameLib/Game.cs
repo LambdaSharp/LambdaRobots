@@ -23,72 +23,61 @@
  */
 
 using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
-namespace LambdaRobots {
+namespace LambdaRobots.Game {
 
-    public sealed class GameBoardInfo {
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum GameStatus {
+        Undefined,
+        Start,
+        NextTurn,
+        Finished,
+        Error
+    }
+
+    public sealed class GameBoard {
 
         //--- Properties ---
-
-        /// <summary>
-        /// Unique Game ID.
-        /// </summary>
         public string Id { get; set; }
 
-        /// <summary>
-        /// Width of the game board.
-        /// </summary>
-        public float BoardWidth { get; set; }
-
-        /// <summary>
-        /// Height of the game board.
-        /// </summary>
-        public float BoardHeight { get; set; }
-
-        /// <summary>
-        /// Number of seconds elapsed per game turn.
-        /// </summary>
-        ///
-        public float SecondsSinceLastTurn { get; set; }
-
-        /// <summary>
-        /// Distance for missile impact to count as direct hit.
-        /// </summary>
-        public float DirectHitRange { get; set; }
-
-        /// <summary>
-        /// Distance for missile impact to count as near hit.
-        /// </summary>
-        public float NearHitRange { get; set; }
-
-        /// <summary>
-        /// Distance for missile impact to count as far hit.
-        /// </summary>
-        public float FarHitRange { get; set; }
-
-        /// <summary>
-        /// Distance between bots to count as a collision.
-        /// </summary>
-        public float CollisionRange { get; set; }
-
-        /// <summary>
-        /// Current game turn. Starts at `1`.
-        /// </summary>
+        // current state
+        public GameStatus Status { get; set; }
+        public DateTimeOffset LastStatusUpdate { get; set; }
         public int CurrentGameTurn { get; set; }
+        public List<MissileInfo> Missiles { get; set; } = new List<MissileInfo>();
+        public List<BotInfo> Bots { get; set; } = new List<BotInfo>();
+        public List<Message> Messages { get; set; } = new List<Message>();
 
-        /// <summary>
-        /// Maximum number of turns before the game ends in a draw.
-        /// </summary>
-        public int MaxGameTurns { get; set; }
-
-        /// <summary>
-        /// Maximum number of build points a bot can use.
-        /// </summary>
+        // game characteristics
+        public float BoardWidth { get; set; }
+        public float BoardHeight { get; set; }
+        public float DirectHitRange { get; set; }
+        public float NearHitRange { get; set; }
+        public float FarHitRange { get; set; }
+        public float CollisionRange { get; set; }
+        public float MinBotStartDistance { get; set; }
+        public float BotTimeoutSeconds { get; set; }
+        public int MaxTurns { get; set; }
         public int MaxBuildPoints { get; set; }
+        public float MinimumSecondsPerTurn { get; set; }
+    }
 
-        /// <summary>
-        /// URL for game server API.
-        /// </summary>
-        public string ApiUrl { get; set; }
+    public sealed class Message {
+
+        //--- Properties ---
+        public int GameTurn { get; set; }
+        public string Text { get; set; }
+    }
+
+    [JsonConverter(typeof(JsonStringEnumConverter))]
+    public enum MissileStatus {
+        Undefined,
+        Flying,
+        ExplodingDirect,
+        ExplodingNear,
+        ExplodingFar,
+        Destroyed
     }
 }

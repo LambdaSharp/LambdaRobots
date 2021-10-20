@@ -22,20 +22,26 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Bot.Model {
+namespace LambdaRobots.Game {
 
-    public sealed class GetBuildRequest {
+    public sealed class MissileInfo {
 
-        //--- Properties ---
+        //--- Fields ---
+        public string Id { get; set; }
+        public string BotId { get; set; }
 
-        /// <summary>
-        /// Current game state.
-        /// </summary>
-        public GameBoardInfo GameBoard { get; set; }
+        // current state
+        public MissileStatus Status { get; set; }
+        public float X { get; set; }
+        public float Y { get; set; }
+        public float Distance { get; set; }
 
-        /// <summary>
-        /// Current bot state.
-        /// </summary>
-        public BotInfo Bot { get; set; }
+        // missile characteristics
+        public float Speed { get; set; }
+        public float Heading { get; set; }
+        public float Range { get; set; }
+        public float DirectHitDamageBonus { get; set; }
+        public float NearHitDamageBonus { get; set; }
+        public float FarHitDamageBonus { get; set; }
     }
 }

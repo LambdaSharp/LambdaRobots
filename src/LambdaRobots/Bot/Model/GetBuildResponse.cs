@@ -24,7 +24,7 @@
 
 namespace LambdaRobots.Bot.Model {
 
-    public class GetBuildResponse  {
+    public sealed class GetBuildResponse  {
 
         //--- Properties ---
 
