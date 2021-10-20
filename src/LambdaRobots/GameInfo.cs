@@ -28,9 +28,6 @@ namespace LambdaRobots {
 
     public class GameInfo {
 
-        //--- Constants ---
-        public static readonly TimeSpan MinimumTurnTimespan = TimeSpan.FromMilliseconds(33);
-
         //--- Properties ---
 
         /// <summary>
@@ -52,7 +49,7 @@ namespace LambdaRobots {
         /// Number of seconds elapsed per game turn.
         /// </summary>
         ///
-        public float SecondsPerTurn { get; set; }
+        public float SecondsSinceLastTurn { get; set; }
 
         /// <summary>
         /// Distance for missile impact to count as direct hit.

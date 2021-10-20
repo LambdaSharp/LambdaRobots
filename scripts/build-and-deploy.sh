@@ -1,5 +1,6 @@
 #!/bin/bash
 
+# TODO: don't use this
 LAMBDAROBOTS_VERSION=2.0-DEV
 FOLDER=`pwd`
 
@@ -15,4 +16,5 @@ lash deploy \
     $FOLDER/src/Server \
     $FOLDER/src/Bots/HotShotBot/ \
     $FOLDER/src/Bots/TargetBot/ \
-    $FOLDER/src/Bots/YosemiteSamBot/
+    $FOLDER/src/Bots/YosemiteSamBot/ \
+    $FOLDER/src/Bots/BringYourOwnBot/

@@ -68,15 +68,15 @@ namespace LambdaRobots.Server.GameConnectionFunction {
                 Status = GameStatus.Start,
                 BoardWidth = request.BoardWidth ?? 1000.0f,
                 BoardHeight = request.BoardHeight ?? 1000.0f,
-                SecondsPerTurn = request.SecondsPerTurn ?? 0.5f,
-                MaxTurns = request.MaxTurns ?? 1500,
+                MaxTurns = request.MaxTurns ?? 1000,
                 MaxBuildPoints = request.MaxBuildPoints ?? 8,
                 DirectHitRange = request.DirectHitRange ?? 5.0f,
                 NearHitRange = request.NearHitRange ?? 20.0f,
                 FarHitRange = request.FarHitRange ?? 40.0f,
                 CollisionRange = request.CollisionRange ?? 8.0f,
                 MinBotStartDistance = request.MinBotStartDistance ?? 50.0f,
-                BotTimeoutSeconds = request.BotTimeoutSeconds ?? 15.0f
+                BotTimeoutSeconds = request.BotTimeoutSeconds ?? 15.0f,
+                MinimumSecondsPerTurn = request.MinimumSecondsPerTurn ?? 0.033f
             };
             var gameRecord = new GameRecord {
                 GameId = game.Id,

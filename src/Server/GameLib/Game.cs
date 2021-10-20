@@ -53,7 +53,6 @@ namespace LambdaRobots.Server {
         // game characteristics
         public float BoardWidth { get; set; }
         public float BoardHeight { get; set; }
-        public float SecondsPerTurn { get; set; }
         public float DirectHitRange { get; set; }
         public float NearHitRange { get; set; }
         public float FarHitRange { get; set; }
@@ -62,6 +61,7 @@ namespace LambdaRobots.Server {
         public float BotTimeoutSeconds { get; set; }
         public int MaxTurns { get; set; }
         public int MaxBuildPoints { get; set; }
+        public float MinimumSecondsPerTurn { get; set; }
     }
 
     public class Message {

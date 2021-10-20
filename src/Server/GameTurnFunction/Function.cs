@@ -178,7 +178,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                         CurrentGameTurn = Game.CurrentGameTurn,
                         MaxGameTurns = Game.MaxTurns,
                         MaxBuildPoints = Game.MaxBuildPoints,
-                        SecondsPerTurn = (float)GameInfo.MinimumTurnTimespan.TotalSeconds
+                        SecondsSinceLastTurn = Game.MinimumSecondsPerTurn
                     },
                     Bot = bot
                 });
@@ -203,7 +203,7 @@ namespace LambdaRobots.Server.GameTurnFunction {
                         CurrentGameTurn = Game.CurrentGameTurn,
                         MaxGameTurns = Game.MaxTurns,
                         MaxBuildPoints = Game.MaxBuildPoints,
-                        SecondsPerTurn = (float)(Game.LastStatusUpdate - bot.LastStatusUpdate).TotalSeconds,
+                        SecondsSinceLastTurn = (float)(Game.LastStatusUpdate - bot.LastStatusUpdate).TotalSeconds,
                         ApiUrl = _gameApiUrl + $"/{Game.Id}"
                     },
                     Bot = bot

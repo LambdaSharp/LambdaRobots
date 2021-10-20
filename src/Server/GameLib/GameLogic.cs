@@ -108,10 +108,13 @@ namespace LambdaRobots.Server {
 
             // make sure turns are not too fast
             var timeSinceLastTurn = Game.LastStatusUpdate - _provider.UtcNow;
-            if(timeSinceLastTurn < GameInfo.MinimumTurnTimespan) {
-                await Task.Delay(GameInfo.MinimumTurnTimespan - timeSinceLastTurn);
+            var minimumTurnTimespan = TimeSpan.FromSeconds(Game.MinimumSecondsPerTurn);
+            if(timeSinceLastTurn < minimumTurnTimespan) {
+                await Task.Delay(minimumTurnTimespan - timeSinceLastTurn);
             }
-            Game.LastStatusUpdate = _provider.UtcNow;
+            var now = _provider.UtcNow;
+            var timelapseSeconds = (float)(now - Game.LastStatusUpdate).TotalSeconds;
+            Game.LastStatusUpdate = now;
 
             // allocate array for bot action responses
             if(_pendingGetActions is null) {
@@ -150,7 +153,7 @@ namespace LambdaRobots.Server {
 
             // move bots
             foreach(var bot in Game.Bots.Where(bot => bot.Status == BotStatus.Alive)) {
-                MoveBot(bot);
+                MoveBot(bot, timelapseSeconds);
             }
 
             // update missile states
@@ -159,7 +162,7 @@ namespace LambdaRobots.Server {
                 case MissileStatus.Flying:
 
                     // move flying missiles
-                    MoveMissile(missile);
+                    MoveMissile(missile, timelapseSeconds);
                     break;
                 case MissileStatus.ExplodingDirect:
 
@@ -300,11 +303,13 @@ namespace LambdaRobots.Server {
         }
 
         private void ApplyBotAction(BotInfo bot, GetActionResponse action) {
-            bot.LastStatusUpdate = _provider.UtcNow;
+            var now = _provider.UtcNow;
+            var secondsSinceUpdate = (float)(now - bot.LastStatusUpdate).TotalSeconds;
+            bot.LastStatusUpdate = now;
 
             // reduce reload time if any is active
             if(bot.ReloadCoolDown > 0) {
-                bot.ReloadCoolDown = MathF.Max(0.0f, bot.ReloadCoolDown - Game.SecondsPerTurn);
+                bot.ReloadCoolDown = MathF.Max(0.0f, bot.ReloadCoolDown - secondsSinceUpdate);
             }
 
             // check if any actions need to be applied
@@ -349,7 +354,7 @@ namespace LambdaRobots.Server {
             }
         }
 
-        private void MoveMissile(MissileInfo missile) {
+        private void MoveMissile(MissileInfo missile, float timelapseSeconds) {
             bool collision;
             Move(
                 missile.X,
@@ -358,6 +363,7 @@ namespace LambdaRobots.Server {
                 missile.Speed,
                 missile.Heading,
                 missile.Range,
+                timelapseSeconds,
                 out var missileX,
                 out var missileY,
                 out var missileDistance,
@@ -436,7 +442,7 @@ namespace LambdaRobots.Server {
             });
         }
 
-        private void MoveBot(BotInfo bot) {
+        private void MoveBot(BotInfo bot, float timelapseSeconds) {
 
             // compute new heading
             if(bot.Heading != bot.TargetHeading) {
@@ -452,9 +458,9 @@ namespace LambdaRobots.Server {
             // compute new speed
             var oldSpeed = bot.Speed;
             if(bot.TargetSpeed > bot.Speed) {
-                bot.Speed = MathF.Min(bot.TargetSpeed, bot.Speed + bot.Acceleration * Game.SecondsPerTurn);
+                bot.Speed = MathF.Min(bot.TargetSpeed, bot.Speed + bot.Acceleration * timelapseSeconds);
             } else if(bot.TargetSpeed < bot.Speed) {
-                bot.Speed = MathF.Max(bot.TargetSpeed, bot.Speed - bot.Deceleration * Game.SecondsPerTurn);
+                bot.Speed = MathF.Max(bot.TargetSpeed, bot.Speed - bot.Deceleration * timelapseSeconds);
             }
             var effectiveSpeed = (bot.Speed + oldSpeed) / 2.0f;
 
@@ -467,6 +473,7 @@ namespace LambdaRobots.Server {
                 effectiveSpeed,
                 bot.Heading,
                 float.MaxValue,
+                timelapseSeconds,
                 out var botX,
                 out var botY,
                 out var botTotalTravelDistance,
@@ -521,6 +528,7 @@ namespace LambdaRobots.Server {
             float speed,
             float heading,
             float range,
+            float timelapseSeconds,
             out float endX,
             out float endY,
             out float endDistance,
@@ -529,7 +537,7 @@ namespace LambdaRobots.Server {
             collision = false;
 
             // ensure object cannot move beyond its max range
-            endDistance = startDistance + speed * Game.SecondsPerTurn;
+            endDistance = startDistance + speed * timelapseSeconds;
             if(endDistance > range) {
                 collision = true;
                 endDistance = range;

@@ -44,7 +44,6 @@ namespace Test.LambdaRobots.Server {
             Id = "Test",
             BoardWidth = 1000.0f,
             BoardHeight = 1000.0f,
-            SecondsPerTurn = 1.0f,
             DirectHitRange = 5.0f,
             NearHitRange = 20.0f,
             FarHitRange = 40.0f,

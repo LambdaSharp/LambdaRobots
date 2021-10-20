@@ -187,7 +187,7 @@ function getAdvanceConfig() {
   var config = {
     BoardWidth: Number(document.getElementById("BoardWidth").value),
     BoardHeight: Number(document.getElementById("BoardHeight").value),
-    SecondsPerTurn: Number(document.getElementById("SecondsPerTurn").value),
+    MinimumSecondsPerTurn: Number(document.getElementById("MinimumSecondsPerTurn").value),
     MaxTurns: Number(document.getElementById("MaxTurns").value),
     DirectHitRange: Number(document.getElementById("DirectHitRange").value),
     NearHitRange: Number(document.getElementById("NearHitRange").value),

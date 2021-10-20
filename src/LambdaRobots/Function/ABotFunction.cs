@@ -285,7 +285,7 @@ namespace LambdaRobots.Function {
             // NOTE: the distance required to stop the bot from moving is obtained with the following formula:
             //      Distance = Speed^2 / 2*Deceleration
             //  solving for Speed, gives us the maximum travel speed to avoid overshooting our target
-            var speed = MathF.Sqrt(distance * 2.0f * Bot.Deceleration) * Game.SecondsPerTurn;
+            var speed = MathF.Sqrt(distance * 2.0f * Bot.Deceleration) * Game.SecondsSinceLastTurn;
 
             // check if heading needs to be adjusted
             if(MathF.Abs(NormalizeAngle(Heading - heading)) > 0.1) {

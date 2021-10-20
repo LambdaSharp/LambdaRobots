@@ -181,21 +181,22 @@ The most commonly needed properties are readily available as properties from the
 |`Y`|`float`|Bot vertical position.|
 
 ##### `Game` Properties
-|Property           |Type    |Description |
-|-------------------|--------|------------|
-|`ApiUrl`           |`string`|URL for game server API.|
-|`BoardHeight`      |`float` |Height of the game board.|
-|`BoardWidth`       |`float` |Width of the game board.|
-|`CollisionRange`   |`float` |Distance between bots to count as a collision.|
-|`DirectHitRange`   |`float` |Distance for missile impact to count as direct hit.|
-|`FarHitRange`      |`float` |Distance for missile impact to count as far hit.|
-|`GameTurn`         |`int`   |Current game turn. Starts at `1`.|
-|`Id`               |`string`|Unique Game ID.|
-|`LastStatusUpdate` |`string`|Timestamp of when the board status was last updated.|
-|`MaxBuildPoints`   |`int`   |Maximum number of build points a bot can use.|
-|`MaxGameTurns`     |`int`   |Maximum number of turns before the game ends in a draw.|
-|`NearHitRange`     |`float` |Distance for missile impact to count as near hit.|
-|`SecondsPerTurn`   |`float` |Number of seconds elapsed per game turn.|
+|Property               |Type    |Description |
+|-----------------------|--------|------------|
+|`ApiUrl`               |`string`|URL for game server API.|
+|`BoardHeight`          |`float` |Height of the game board.|
+|`BoardWidth`           |`float` |Width of the game board.|
+|`CollisionRange`       |`float` |Distance between bots to count as a collision.|
+|`DirectHitRange`       |`float` |Distance for missile impact to count as direct hit.|
+|`FarHitRange`          |`float` |Distance for missile impact to count as far hit.|
+|`GameTurn`             |`int`   |Current game turn. Starts at `1`.|
+|`Id`                   |`string`|Unique Game ID.|
+|`LastStatusUpdate`     |`string`|Timestamp of when the board status was last updated.|
+|`MaxBuildPoints`       |`int`   |Maximum number of build points a bot can use.|
+|`MaxGameTurns`         |`int`   |Maximum number of turns before the game ends in a draw.|
+|`MinimumSecondsPerTurn`|`float` |Number of seconds elapsed between game turns.|
+|`NearHitRange`         |`float` |Distance for missile impact to count as near hit.|
+|`SecondsSinceLastTurn` |`float` |Number of seconds elapsed since the last game turn.|
 
 #### Primary Methods
 The following methods represent the core capabilities of the bot. They are used to move, fire missiles, and scan its surroundings.

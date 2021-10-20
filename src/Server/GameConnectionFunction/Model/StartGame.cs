@@ -35,7 +35,6 @@ namespace LambdaRobots.Server.GameConnectionFunction.Model {
         // optional board initialization settings
         public float? BoardWidth { get; set; }
         public float? BoardHeight { get; set; }
-        public float? SecondsPerTurn { get; set; }
         public int? MaxTurns { get; set; }
         public int? MaxBuildPoints { get; set; }
         public float? DirectHitRange { get; set; }
@@ -44,6 +43,7 @@ namespace LambdaRobots.Server.GameConnectionFunction.Model {
         public float? CollisionRange { get; set; }
         public float? MinBotStartDistance { get; set; }
         public float? BotTimeoutSeconds { get; set; }
+        public float? MinimumSecondsPerTurn { get; set; }
     }
 
     public class StartGameResponse {
