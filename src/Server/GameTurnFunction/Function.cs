@@ -100,14 +100,24 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     // loop until we're done
                     var messageCount = Game.Messages.Count;
                     while(Game.Status == GameStatus.NextTurn) {
+                        var now = ((IGameDependencyProvider)this).UtcNow;
+
+                        // make sure turns are not too fast
+                        var timeSinceLastTurn = now - Game.LastStatusUpdate;
+                        var minimumTurnTimespan = TimeSpan.FromSeconds(Game.MinimumSecondsPerTurn);
+                        if(timeSinceLastTurn < minimumTurnTimespan) {
+                            await Task.Delay(minimumTurnTimespan - timeSinceLastTurn);
+                        }
+                        var timelapseSeconds = (float)timeSinceLastTurn.TotalSeconds;
+                        Game.LastStatusUpdate = now;
 
                         // next turn
                         LogInfo($"Start turn {Game.CurrentGameTurn} (max: {Game.MaxTurns}): invoking {Game.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots (total: {Game.Bots.Count})");
-                        await logic.NextTurnAsync();
+                        logic.NextTurn(timelapseSeconds);
                         for(var i = messageCount; i < Game.Messages.Count; ++i) {
                             LogInfo($"Game message {i + 1}: {Game.Messages[i].Text}");
                         }
-                        LogInfo($"End turn: {Game.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots alive");
+                        LogInfo($"End turn {Game.CurrentGameTurn}: {Game.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots alive");
 
                         // attempt to update the game record
                         LogInfo($"Storing game: ID = {gameId}");

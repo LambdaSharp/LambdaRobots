@@ -32,13 +32,13 @@ using LambdaRobots.Bot.Model;
 
 namespace Test.LambdaRobots.Server {
 
-    public class NextTurnAsyncTests : _Init {
+    public class NextTurnTests : _Init {
 
         //--- Fields ---
         private readonly ITestOutputHelper _output;
 
         //--- Constructors ---
-        public NextTurnAsyncTests(ITestOutputHelper output) => _output = output;
+        public NextTurnTests(ITestOutputHelper output) => _output = output;
 
         //--- Methods ---
 
@@ -57,7 +57,7 @@ namespace Test.LambdaRobots.Server {
             };
 
             // act
-            logic.NextTurnAsync().Wait();
+            logic.NextTurn(1.0f);
 
             // assert
             bot.X.Should().Be(500.0f);
@@ -79,8 +79,8 @@ namespace Test.LambdaRobots.Server {
             };
 
             // act
-            logic.NextTurnAsync().Wait();
-            logic.NextTurnAsync().Wait();
+            logic.NextTurn(1.0f);
+            logic.NextTurn(1.0f);
 
             // assert
             bot.X.Should().Be(500.0f);
@@ -102,7 +102,7 @@ namespace Test.LambdaRobots.Server {
             };
 
             // act
-            logic.NextTurnAsync().Wait();
+            logic.NextTurn(1.0f);
 
             // assert
             bot.X.Should().Be(505.0f);
@@ -124,7 +124,7 @@ namespace Test.LambdaRobots.Server {
             var logic = NewLogic(bot);
 
             // act
-            logic.NextTurnAsync().Wait();
+            logic.NextTurn(1.0f);
 
             // assert
             bot.X.Should().BeLessThan(1000.0f);
@@ -145,7 +145,7 @@ namespace Test.LambdaRobots.Server {
             var logic = NewLogic(bob, dave);
 
             // act
-            logic.NextTurnAsync().Wait();
+            logic.NextTurn(1.0f);
 
             // assert
             bob.Damage.Should().Be(bob.CollisionDamage);
@@ -169,7 +169,7 @@ namespace Test.LambdaRobots.Server {
             };
 
             // act
-            logic.NextTurnAsync().Wait();
+            logic.NextTurn(1.0f);
 
             // assert
             bot.Status.Should().Be(BotStatus.Dead);

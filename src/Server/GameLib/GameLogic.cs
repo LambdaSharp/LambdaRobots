@@ -104,17 +104,7 @@ namespace LambdaRobots.Server {
             }
         }
 
-        public async Task NextTurnAsync() {
-
-            // make sure turns are not too fast
-            var timeSinceLastTurn = Game.LastStatusUpdate - _provider.UtcNow;
-            var minimumTurnTimespan = TimeSpan.FromSeconds(Game.MinimumSecondsPerTurn);
-            if(timeSinceLastTurn < minimumTurnTimespan) {
-                await Task.Delay(minimumTurnTimespan - timeSinceLastTurn);
-            }
-            var now = _provider.UtcNow;
-            var timelapseSeconds = (float)(now - Game.LastStatusUpdate).TotalSeconds;
-            Game.LastStatusUpdate = now;
+        public void NextTurn(float timelapseSeconds) {
 
             // allocate array for bot action responses
             if(_pendingGetActions is null) {
