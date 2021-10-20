@@ -1,72 +1,28 @@
 # λ-Robots
 
-In λ-Robots (pronounced _Lambda Robots_), you program a battle bot that participates on a square game field. Each turn, the server invokes your bot's Lambda function to get its action for the turn until either the bot wins or is destroyed.
+In λ-Robots (pronounced _Lambda Robots_), you program a battle bot that participates on a square game field. Each turn, the server invokes your bot's Lambda function to get its action for the next turn until either the bot wins or is destroyed.
 
-λ-Robots is a port of the 90s [P-Robots](https://corewar.co.uk/probots.htm) game to AWS Serverless .NET using [LambdaSharp](https://lambdasharp.net).
+λ-Robots is a port of the 80s [P-Robots](https://www.dosgames.com/game/p-robots/) game to AWS Serverless .NET using [LambdaSharp](https://lambdasharp.net).
 
-## Level 0: Prerequisites
+## Prerequisites
 
-### Install SDK & Tools
-Make sure the following tools are installed.
-* [Download and install the .NET Core SDK](https://dotnet.microsoft.com/download)
-* [Download and install the AWS Command Line Interface](https://aws.amazon.com/cli/)
-* [Download and install Git Command Line Interface](https://git-scm.com/downloads)
+To get started, you must complete the followings steps.
+1. [Create an AWS Account](https://aws.amazon.com)
+1. [Install .NET 5 or later](https://dotnet.microsoft.com/download)
+1. [Setup LambdaSharp](https://lambdasharp.net/#install-lambdasharp-cli)
 
-### Setup AWS Account and CLI
-The challenge requires an AWS account. AWS provides a [*Free Tier*](https://aws.amazon.com/free/), which is sufficient for most challenges.
-* [Create an AWS Account](https://aws.amazon.com)
-* [Configure your AWS profile with the AWS CLI for us-west-2 (Oregon)](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration)
+## Deploy the Game
 
-### Setup LambdaSharp Deployment Tier
-
-The following command uses the `dotnet` CLI to install the LambdaSharp CLI.
+The following command deploys the `LambdaRobots.Game` module from the `lambdasharp` repository into your AWS account using [CloudFormation](https://aws.amazon.com/cloudformation/).
 ```bash
-dotnet tool install --global LambdaSharp.Tool
-```
-**NOTE:** if you have installed LambdaSharp.Tool in the past, you will need to remove it first by running `dotnet tool uninstall -g LambdaSharp.Tool` first.
-
-The following command uses the LambdaSharp CLI to create a new deployment tier on the default AWS account. Specify another account using `--aws-profile ACCOUNT_NAME`.
-```bash
-lash init --quick-start
+lash deploy LambdaRobots.Game:2.0@lambdasharp
 ```
 
-### Clone Git Challenge Repository
+## Deploy the Battle Bots
 
-Open a command line and navigate to your projects folder. Run the following command to clone the λ-Robots challenge directory into a `LambdaRobots` sub-folder.
-```bash
-git clone https://github.com/LambdaSharp/LambdaRobots.git
-cd LambdaRobots
-```
+λ-Robots includes three predefined bots that can be deployed to try out the game or challenge your own bot.
 
-## Level 1: Run λ-Robots Server
-
-The following command deploys the `LambdaRobots.Server` module from the `lambdasharp` repository into the AWS account using [CloudFormation](https://aws.amazon.com/cloudformation/).
-```bash
-lash deploy LambdaRobots.Server:2.0@lambdasharp
-```
-
-Once the command has finished running, the output will show the website URL for the λ-Robots server.
-```
-Stack output values:
-=> LambdaRobotsServerUrl: URL for the Lambda-Robots web-server = http://lambdarobots-server-websitebucket-g54w2llfcjhq.s3-website-us-west-2.amazonaws.com
-```
-
-Finally, build and deploy the `BringYourOwnBot` module, which will be the project you will be working on
-The following command builds and deploys the AWS Lambda function for your bot:
-
-```bash
-lash deploy src/Bots/BringYourOwnBot
-```
-
-**NOTE:** Open `src/Bots/BringYourOwnBot/BotFunction/Function.cs` and customize the `Name` of your bot to distinguish it from other bots.
-
-You can add the bot lambda function ARN to the game board client in the browser.  You can add the ARN multiple times.
-
-![Game configuration](screenShotConfigure.png)
-
-Use the **Advance Configuration** to change any default settings.  Use **Clear Saved Config** to reset all settings to default.
-
-## Level 2: Create an Attack Strategy
+### Target Bot
 
 Deploy `TargetBbot` to your account and add its ARN three times to the λ-Robots server to create three targets.
 
@@ -76,23 +32,55 @@ lash deploy LambdaRobots.TargetBot:2.0@lambdasharp
 
 Now update the behavior of `BringYourOwnBot` to shoot down the target bots. For example, you can use luck, like `YosemiteSamBot`, which shoots in random directions, or targeting like `HotShotBot`. The latter uses the `ScanAsync()` method to find enemies and aim missiles at them. Remember that other bots may be out of radar range, requiring your bot to move periodically. Also, your bot can be damaged by its own missiles. Check `Game.FarHitRange` to make sure your target is beyond the damage range. If you don't mind a bit of self-inflicted pain, you can also use `Game.NearHitRange` or even `Game.DirectHitRange` instead.
 
-## Level 3: Create an Evasion Strategy
+### Yosemite Bot
 
 Deploy `YosemiteSamBot` to your account and its ARN twice to the λ-Robots server to create two attackers.
+
 ```bash
 lash deploy LambdaRobots.YosemiteSamBot:2.0@lambdasharp
 ```
 
 Now update the behavior of `BringYourOwnBot` to avoid getting shot. For example, you can continuous motion, like `YosemiteSamBot`, which zig-zags across the board, or reacting to damage like `HotShotBot`. Beware that a bot cannot change heading without suddenly stopping if its speed exceeds `Bot.MaxSpeed`.
 
-## Level 4: Take on the Champ
-
-Deploy `HotShotBot` to your account and its ARN once to the λ-Robots server to create one formidable foe.
 ```bash
 lash deploy LambdaRobots.HotShotBot:2.0@lambdasharp
 ```
 
+## Starting the Game
+
+You can add the bot lambda function ARN to the game board client in the browser.  You can add the ARN multiple times.
+
+![Game configuration](Docs/Configuration.png)
+
+Use the **Advance Configuration** to change any default settings.  Use **Clear Saved Config** to reset all settings to default.
+
+## Build Your Own Bot
+
+Open a command line and navigate to your projects folder. Run the following command to clone the λ-Robots challenge directory into a `LambdaRobots` sub-folder.
+```bash
+git clone https://github.com/LambdaSharp/LambdaRobots.git
+cd LambdaRobots
+```
+
+Finally, build and deploy the `BringYourOwnBot` module, which will be the project you will be working on
+The following command builds and deploys the AWS Lambda function for your bot:
+
+```bash
+lash deploy src/Bots/BringYourOwnBot
+```
+
 Consider modifying your bot build by tuning the engine, armor, missile, and radar to suit your attack and evasion strategies. Remember that your build cannot exceed 8 points, or your bot will be disqualified from the competition.
+
+**NOTE:** Open `src/Bots/BringYourOwnBot/BotFunction/Function.cs` and customize the `Name` of your bot to distinguish it from other bots.
+
+
+
+
+
+
+
+
+
 
 ## BOSS LEVEL: Enter the Multi-Team Deathmatch Competition
 
