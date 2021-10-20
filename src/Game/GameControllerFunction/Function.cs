@@ -27,11 +27,11 @@ using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
 using LambdaRobots.Game.DataAccess;
 using LambdaRobots.Game.DataAccess.Records;
-using LambdaRobots.Game.GameConnectionFunction.Model;
+using LambdaRobots.Game.GameControllerFunction.Model;
 using LambdaSharp;
 using LambdaSharp.ApiGateway;
 
-namespace LambdaRobots.Game.GameConnectionFunction {
+namespace LambdaRobots.Game.GameControllerFunction {
 
     public sealed class Function : ALambdaApiGatewayFunction {
 

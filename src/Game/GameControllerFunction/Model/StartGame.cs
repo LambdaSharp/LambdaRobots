@@ -22,16 +22,31 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Game.GameConnectionFunction.Model {
+using System.Collections.Generic;
 
-    public sealed class StopGameRequest {
+namespace LambdaRobots.Game.GameControllerFunction.Model {
+
+    public sealed class StartGameRequest {
 
         //--- Properties ---
         public string Action { get; set; }
-        public string GameId { get; set; }
+        public List<string> BotArns { get; set; } = new List<string>();
+
+        // optional board initialization settings
+        public float? BoardWidth { get; set; }
+        public float? BoardHeight { get; set; }
+        public int? MaxTurns { get; set; }
+        public int? MaxBuildPoints { get; set; }
+        public float? DirectHitRange { get; set; }
+        public float? NearHitRange { get; set; }
+        public float? FarHitRange { get; set; }
+        public float? CollisionRange { get; set; }
+        public float? MinBotStartDistance { get; set; }
+        public float? BotTimeoutSeconds { get; set; }
+        public float? MinimumSecondsPerTurn { get; set; }
     }
 
-    public sealed class StopGameResponse {
+    public sealed class StartGameResponse {
 
         //--- Properties ---
         public GameSession GameSession { get; set; }
