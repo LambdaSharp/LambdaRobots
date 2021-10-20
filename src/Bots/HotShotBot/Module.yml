@@ -1,9 +1,8 @@
-Module: LambdaRobots.BringYourOwnRobot
-Description: Build your own Lambda-Robot
-Version: 1.0-DEV
+Module: LambdaRobots.HotShotBot
+Description: Bot focused on taking its targets down as quickly as possible
 Items:
 
-  - Function: RobotFunction
+  - Function: BotFunction
     Memory: 256
     Timeout: 30
     Properties:
@@ -11,14 +10,14 @@ Items:
         Variables:
           DEBUG_LOGGING_ENABLED: true
 
-  - Resource: RobotInvocationPermission
+  - Resource: BotInvocationPermission
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !Ref RobotFunction
+      FunctionName: !Ref BotFunction
       Principal: "*"
 
-  - Variable: RobotArn
+  - Variable: BotArn
     Description: Lambda function ARN
     Scope: public
-    Value: !GetAtt RobotFunction.Arn
+    Value: !GetAtt BotFunction.Arn

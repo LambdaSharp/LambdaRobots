@@ -26,29 +26,63 @@ using System.Threading.Tasks;
 using LambdaRobots.Bot.Model;
 using LambdaRobots.Function;
 
-namespace LambdaRobots.TargetRobot.RobotFunction {
+namespace LambdaRobots.YosemiteSamBot.BotFunction {
 
     public sealed class BotState {
 
-        // NOTE: target robot has no internal state
+        // NOTE: Yosemite Sam bot has no internal state
     }
 
     public sealed class Function : ABotFunction<BotState> {
 
         //--- Methods ---
         public override async Task<GetBuildResponse> GetBuildAsync() {
+
+            // TODO: this method is always invoked at the beginning of a match
             return new GetBuildResponse {
-                Name = "Target",
-                Armor = BotArmorType.Medium,
-                Engine = BotEngineType.Economy,
-                Missile = BotMissileType.Dart,
-                Radar = BotRadarType.UltraShortRange
+                Name = "Yosemite Sam",
+                Engine = BotEngineType.ExtraLarge,
+                Missile = BotMissileType.Dart
             };
         }
 
         public override async Task GetActionAsync() {
 
-            // NOTE: target robot is stationary and doesn't do anything
+            // check if bot needs to accelerate
+            if(Speed == 0.0f) {
+                SetSpeed(Bot.MaxTurnSpeed);
+                SetHeading(RandomFloat() * 360.0f);
+            }
+
+            // check if bot needs to turn
+            if(X < 100.0f) {
+
+                // too close to left wall, go right
+                SetHeading(45.0f + RandomFloat() * 90.0f);
+            } else if(X > (Game.BoardWidth - 100.0f)) {
+
+                // too close to right wall, go left
+                SetHeading(-45.0f - RandomFloat() * 90.0f);
+            }
+            if(Y < 100.0f) {
+
+                // too close to bottom wall, go up
+                SetHeading(-45.0f + RandomFloat() * 90.0f);
+            } else if(Y > (Game.BoardHeight - 100.0f)) {
+
+                // too close to top wall, go down
+                SetHeading(135.0f + RandomFloat() * 90.0f);
+            }
+
+            // check if bot can fire a missile
+            if(ReloadCoolDown == 0.0f) {
+
+                // fire in a random direction
+                FireMissile(
+                    heading: RandomFloat() * 360.0f,
+                    distance: 50.0f + RandomFloat() * (Bot.MissileRange - 50.0f)
+                );
+            }
         }
     }
 }

@@ -35,12 +35,12 @@ namespace LambdaRobots {
         Undefined,
 
         /// <summary>
-        /// Robot is alive.
+        /// Bot is alive.
         /// </summary>
         Alive,
 
         /// <summary>
-        /// Robot is dead.
+        /// Bot is dead.
         /// </summary>
         Dead
     }

@@ -4,12 +4,10 @@
     <Deterministic>true</Deterministic>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <RootNamespace>LambdaRobots.BringYourOwnRobot.RobotFunction</RootNamespace>
+    <RootNamespace>LambdaRobots.HotShotBot.BotFunction</RootNamespace>
     <AWSProjectType>Lambda</AWSProjectType>
     <NoWarn>CS1998</NoWarn>
   </PropertyGroup>
-  <ItemGroup>
-  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="../../../LambdaRobots/LambdaRobots.csproj" />
   </ItemGroup>

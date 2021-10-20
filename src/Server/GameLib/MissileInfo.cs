@@ -28,7 +28,7 @@ namespace LambdaRobots.Server {
 
         //--- Fields ---
         public string Id { get; set; }
-        public string RobotId { get; set; }
+        public string BotId { get; set; }
 
         // current state
         public MissileStatus Status { get; set; }

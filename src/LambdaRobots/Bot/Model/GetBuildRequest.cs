@@ -34,8 +34,8 @@ namespace LambdaRobots.Bot.Model {
         public GameInfo GameInfo { get; set; }
 
         /// <summary>
-        /// Current robot state.
+        /// Current bot state.
         /// </summary>
-        public BotInfo Robot { get; set; }
+        public BotInfo Bot { get; set; }
     }
 }

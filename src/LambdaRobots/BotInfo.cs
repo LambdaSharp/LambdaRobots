@@ -31,83 +31,83 @@ namespace LambdaRobots {
         //--- Properties ---
 
         /// <summary>
-        /// Index position of robot. Starts at `0`.
+        /// Index position of bot. Starts at `0`.
         /// </summary>
         public int Index { get; set; }
 
         /// <summary>
-        /// Globally unique robot ID.
+        /// Globally unique bot ID.
         /// </summary>
         public string Id { get; set; }
 
         /// <summary>
-        /// Robot display name.
+        /// bot display name.
         /// </summary>
         public string Name { get; set; }
 
         // current state
 
         /// <summary>
-        /// Robot status. Either `Alive` or `Dead`.
+        /// Bot status. Either `Alive` or `Dead`.
         /// </summary>
         public BotStatus Status { get; set; }
 
         /// <summary>
-        /// Timestamp of when the robot status was last updated.
+        /// Timestamp of when the bot status was last updated.
         /// </summary>
         public DateTimeOffset LastStatusUpdate { get; set; }
 
         /// <summary>
-        /// Robot horizontal position.
+        /// Bot horizontal position.
         /// </summary>
         public float X { get; set; }
 
         /// <summary>
-        /// Robot vertical position.
+        /// Bot vertical position.
         /// </summary>
         public float Y { get; set; }
 
         /// <summary>
-        /// Robot speed. Between `0` and `MaxSpeed`. (m/s)
+        /// Bot speed. Between `0` and `MaxSpeed`. (m/s)
         /// </summary>
         public float Speed { get; set; }
 
         /// <summary>
-        /// Robot heading. Between `0` and `360`. (degrees)
+        /// Bot heading. Between `0` and `360`. (degrees)
         /// </summary>
         public float Heading { get; set; }
 
         /// <summary>
-        /// Accumulated robot damage. Between `0` and `MaxDamage`.
+        /// Accumulated bot damage. Between `0` and `MaxDamage`.
         /// </summary>
         public float Damage { get; set; }
 
         /// <summary>
-        /// Number of seconds before the robot can fire another missile. (s)
+        /// Number of seconds before the bot can fire another missile. (s)
         /// </summary>
         public float ReloadCoolDown { get; set; }
 
         // target state
 
         /// <summary>
-        /// Desired speed for robot. The current speed will be adjusted accordingly every turn. (m/s)
+        /// Desired speed for bot. The current speed will be adjusted accordingly every turn. (m/s)
         /// </summary>
         public float TargetSpeed { get; set; }
 
         /// <summary>
-        /// Desired heading for robot. The heading will be adjusted accordingly every turn. (degrees)
+        /// Desired heading for bot. The heading will be adjusted accordingly every turn. (degrees)
         /// </summary>
         public float TargetHeading { get; set; }
 
-        // robot stats
+        // bot stats
 
         /// <summary>
-        /// Total distance traveled by robot during the match. (m)
+        /// Total distance traveled by bot during the match. (m)
         /// </summary>
         public float TotalTravelDistance { get; set; }
 
         /// <summary>
-        /// Number of missiles fired by robot during match.
+        /// Number of missiles fired by bot during match.
         /// </summary>
         public int TotalMissileFiredCount { get; set; }
 
@@ -127,19 +127,19 @@ namespace LambdaRobots {
         public float TotalDamageDealt { get; set; }
 
         /// <summary>
-        /// Number of collisions with walls or other robots during match.
+        /// Number of collisions with walls or other bots during match.
         /// </summary>
         public int TotalCollisions { get; set; }
 
         /// <summary>
-        /// Game turn during which the robot died. `-1` if robot is alive.
+        /// Game turn during which the bot died. `-1` if bot is alive.
         /// </summary>
         public int TimeOfDeathGameTurn { get; set; }
 
-        // robot characteristics
+        // bot characteristics
 
         /// <summary>
-        /// Maximum speed for robot. (m/s)
+        /// Maximum speed for bot. (m/s)
         /// </summary>
         public float MaxSpeed { get; set; }
 
@@ -154,7 +154,7 @@ namespace LambdaRobots {
         public float Deceleration { get; set; }
 
         /// <summary>
-        /// Maximum speed at which the robot can change heading without a sudden stop. (m/s)
+        /// Maximum speed at which the bot can change heading without a sudden stop. (m/s)
         /// </summary>
         public float MaxTurnSpeed { get; set; }
 
@@ -169,27 +169,27 @@ namespace LambdaRobots {
         public float RadarMaxResolution { get; set; }
 
         /// <summary>
-        /// Maximum damage before the robot is destroyed.
+        /// Maximum damage before the bot is destroyed.
         /// </summary>
         public float MaxDamage { get; set; }
 
         /// <summary>
-        /// Amount of damage the robot receives from a collision.
+        /// Amount of damage the bot receives from a collision.
         /// </summary>
         public float CollisionDamage { get; set; }
 
         /// <summary>
-        /// Amount of damage the robot receives from a direct hit.
+        /// Amount of damage the bot receives from a direct hit.
         /// </summary>
         public float DirectHitDamage { get; set; }
 
         /// <summary>
-        /// Amount of damage the robot receives from a near hit.
+        /// Amount of damage the bot receives from a near hit.
         /// </summary>
         public float NearHitDamage { get; set; }
 
         /// <summary>
-        /// Amount of damage the robot receives from a far hit.
+        /// Amount of damage the bot receives from a far hit.
         /// </summary>
         public float FarHitDamage { get; set; }
 
@@ -226,7 +226,7 @@ namespace LambdaRobots {
         public float MissileFarHitDamageBonus { get; set; }
 
         /// <summary>
-        /// Internal robot state.
+        /// Internal state.
         /// </summary>
         public string InternalState { get; set; }
     }

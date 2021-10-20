@@ -29,7 +29,7 @@ export default class GameBoard {
     }
     clearTimeout(this._spinnerInterval);
     if (gameStat.Game.Status === "NextTurn") {
-      this._robots(gameStat.Game, gameStat.Game.Robots);
+      this._bots(gameStat.Game, gameStat.Game.Bots);
       this._missiles(gameStat.Game, gameStat.Game.Missiles);
       return;
     }
@@ -42,27 +42,27 @@ export default class GameBoard {
     this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
-  _robots(game, robots) {
+  _bots(game, bots) {
     this.context.save();
     this.context.font = "16px 'Press Start 2P'";
     this.context.fillStyle = "white";
     this.context.textAlign = "center";
     this.context.textBaseline = "middle";
-    for (let index = 0; index < robots.length; index++) {
-      const robot = robots[index];
-      if(robot.Status === "Alive") {
+    for (let index = 0; index < bots.length; index++) {
+      const bot = bots[index];
+      if(bot.Status === "Alive") {
         this.context.fillText(
-          robot.Index,
-          Math.round(robot.X),
-          Math.round(this.canvas.height - robot.Y)
+          bot.Index,
+          Math.round(bot.X),
+          Math.round(this.canvas.height - bot.Y)
         );
 
-        // draw circle around robot with collision radius
+        // draw circle around bot with collision radius
         // this.context.beginPath();
         // this.context.strokeStyle = "yellow";
         // this.context.arc(
-        //   Math.round(robot.X),
-        //   Math.round(robot.Y),
+        //   Math.round(bot.X),
+        //   Math.round(bot.Y),
         //   Math.round(game.CollisionRange),
         //   0,
         //   2 * Math.PI

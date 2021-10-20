@@ -13,6 +13,6 @@ lash deploy \
     --module-version $LAMBDAROBOTS_VERSION \
     --allow-data-loss \
     $FOLDER/src/Server \
-    $FOLDER/src/Robots/HotShotRobot/ \
-    $FOLDER/src/Robots/TargetRobot/ \
-    $FOLDER/src/Robots/YosemiteSamRobot/
+    $FOLDER/src/Bots/HotShotBot/ \
+    $FOLDER/src/Bots/TargetBot/ \
+    $FOLDER/src/Bots/YosemiteSamBot/

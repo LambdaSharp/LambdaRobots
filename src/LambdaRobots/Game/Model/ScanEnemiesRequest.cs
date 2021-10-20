@@ -27,7 +27,7 @@ namespace LambdaRobots.Game.Model {
     public sealed class ScanEnemiesRequest {
 
         //--- Properties ---
-        public string RobotId { get; set; }
+        public string BotId { get; set; }
         public float Heading { get; set; }
         public float Resolution { get; set; }
     }

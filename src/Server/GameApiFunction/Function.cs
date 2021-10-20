@@ -55,17 +55,17 @@ namespace LambdaRobots.Server.GameApiFunction {
             }
             var gameLogic = new GameLogic(gameRecord.Game, this);
 
-            // identify scanning robot
-            var robot = gameRecord.Game.Robots.FirstOrDefault(r => r.Id == request.RobotId);
-            if(robot is null) {
-                throw AbortNotFound($"could not find a robot: ID = {request.RobotId}");
+            // identify scanning bot
+            var bot = gameRecord.Game.Bots.FirstOrDefault(r => r.Id == request.BotId);
+            if(bot is null) {
+                throw AbortNotFound($"could not find a bot: ID = {request.BotId}");
             }
 
             // find nearest enemy within scan resolution
-            var found = gameLogic.ScanRobots(robot, request.Heading, request.Resolution);
+            var found = gameLogic.ScanBots(bot, request.Heading, request.Resolution);
             if(found != null) {
-                var distance = GameMath.Distance(robot.X, robot.Y, found.X, found.Y);
-                var angle = GameMath.NormalizeAngle(MathF.Atan2(found.X - robot.X, found.Y - robot.Y) * 180.0f / MathF.PI);
+                var distance = GameMath.Distance(bot.X, bot.Y, found.X, found.Y);
+                var angle = GameMath.NormalizeAngle(MathF.Atan2(found.X - bot.X, found.Y - bot.Y) * 180.0f / MathF.PI);
                 LogInfo($"Scanning: Heading = {GameMath.NormalizeAngle(request.Heading):N2}, Resolution = {request.Resolution:N2}, Found = R{found.Index}, Distance = {distance:N2}, Angle = {angle:N2}");
                 return new ScanResponse {
                     Found = true,
@@ -83,7 +83,7 @@ namespace LambdaRobots.Server.GameApiFunction {
         //--- IGameDependencyProvider Members ---
         DateTimeOffset IGameDependencyProvider.UtcNow => DateTimeOffset.UtcNow;
         float IGameDependencyProvider.NextRandomFloat() => throw new NotImplementedException();
-        Task<GetBuildResponse> IGameDependencyProvider.GetRobotBuild(BotInfo robot) => throw new NotImplementedException();
-        Task<GetActionResponse> IGameDependencyProvider.GetRobotAction(BotInfo robot) => throw new NotImplementedException();
+        Task<GetBuildResponse> IGameDependencyProvider.GetBotBuild(BotInfo bot) => throw new NotImplementedException();
+        Task<GetActionResponse> IGameDependencyProvider.GetBotAction(BotInfo bot) => throw new NotImplementedException();
     }
 }

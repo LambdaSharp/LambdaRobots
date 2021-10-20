@@ -38,7 +38,7 @@ namespace LambdaRobots.Game {
         /// <summary>
         /// Scan the game board in a given heading and resolution. The resolution
         /// specifies in the scan arc from `heading-resolution` to `heading+resolution`.
-        /// The max resolution is limited to `Robot.ScannerResolution`.
+        /// The max resolution is limited to `Bot.ScannerResolution`.
         /// </summary>
         /// <param name="heading">Scan heading in degrees</param>
         /// <param name="resolution">Scan resolution in degrees</param>
@@ -51,12 +51,12 @@ namespace LambdaRobots.Game {
         //--- Fields ---
         private readonly HttpClient _httpClient;
         private readonly string _gameApi;
-        private readonly string _robotId;
+        private readonly string _botId;
 
         //--- Constructors ---
-        public LambdaRobotsGameClient(string gameApi, string robotId, HttpClient httpClient = null) {
+        public LambdaRobotsGameClient(string gameApi, string botId, HttpClient httpClient = null) {
             _gameApi = gameApi ?? throw new ArgumentNullException(nameof(gameApi));
-            _robotId = robotId ?? throw new ArgumentNullException(nameof(robotId));
+            _botId = botId ?? throw new ArgumentNullException(nameof(botId));
             _httpClient = httpClient ?? new HttpClient();
         }
 
@@ -65,7 +65,7 @@ namespace LambdaRobots.Game {
 
             // issue scan request to game API
             var postTask = _httpClient.PostAsync($"{_gameApi}/scan", new StringContent(JsonSerializer.Serialize(new ScanEnemiesRequest {
-                RobotId = _robotId,
+                BotId = _botId,
                 Heading = heading,
                 Resolution = resolution
             }), Encoding.UTF8, "application/json"));

@@ -43,9 +43,9 @@ namespace LambdaRobots.Function {
         public BotCommand Command { get; set; }
 
         /// <summary>
-        /// Current robot state. Used only by `GetAction` command
+        /// Current bot state. Used only by `GetAction` command
         /// </summary>
-        public BotInfo Robot { get; set; }
+        public BotInfo Bot { get; set; }
 
         /// <summary>
         /// Current game state. Used only by `GetAction` command

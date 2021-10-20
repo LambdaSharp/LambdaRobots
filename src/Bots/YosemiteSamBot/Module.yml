@@ -1,8 +1,8 @@
-Module: LambdaRobots.YosemiteSamRobot
-Description: Robot that runs around randomly firing missiles in all directions
+Module: LambdaRobots.YosemiteSamBot
+Description: Bot that runs around randomly firing missiles in all directions
 Items:
 
-  - Function: RobotFunction
+  - Function: BotFunction
     Memory: 256
     Timeout: 30
     Properties:
@@ -10,14 +10,14 @@ Items:
         Variables:
           DEBUG_LOGGING_ENABLED: true
 
-  - Resource: RobotInvocationPermission
+  - Resource: BotInvocationPermission
     Type: AWS::Lambda::Permission
     Properties:
       Action: lambda:InvokeFunction
-      FunctionName: !Ref RobotFunction
+      FunctionName: !Ref BotFunction
       Principal: "*"
 
-  - Variable: RobotArn
+  - Variable: BotArn
     Description: Lambda function ARN
     Scope: public
-    Value: !GetAtt RobotFunction.Arn
+    Value: !GetAtt BotFunction.Arn

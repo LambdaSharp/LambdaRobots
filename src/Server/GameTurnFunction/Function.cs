@@ -91,23 +91,23 @@ namespace LambdaRobots.Server.GameTurnFunction {
                     // initialize game logic
                     var logic = new GameLogic(this.Game, this);
 
-                    // initialize robots
-                    LogInfo($"Start game: initializing {Game.Robots.Count(robot => robot.Status == BotStatus.Alive)} robots (total: {Game.Robots.Count})");
+                    // initialize bots
+                    LogInfo($"Start game: initializing {Game.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots (total: {Game.Bots.Count})");
                     await logic.StartAsync(GameRecord.BotArns.Count);
                     Game.Status = GameStatus.NextTurn;
-                    LogInfo($"Robots initialized: {Game.Robots.Count(robot => robot.Status == BotStatus.Alive)} robots ready");
+                    LogInfo($"Bots initialized: {Game.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots ready");
 
                     // loop until we're done
                     var messageCount = Game.Messages.Count;
                     while(Game.Status == GameStatus.NextTurn) {
 
                         // next turn
-                        LogInfo($"Start turn {Game.CurrentGameTurn} (max: {Game.MaxTurns}): invoking {Game.Robots.Count(robot => robot.Status == BotStatus.Alive)} robots (total: {Game.Robots.Count})");
+                        LogInfo($"Start turn {Game.CurrentGameTurn} (max: {Game.MaxTurns}): invoking {Game.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots (total: {Game.Bots.Count})");
                         await logic.NextTurnAsync();
                         for(var i = messageCount; i < Game.Messages.Count; ++i) {
                             LogInfo($"Game message {i + 1}: {Game.Messages[i].Text}");
                         }
-                        LogInfo($"End turn: {Game.Robots.Count(robot => robot.Status == BotStatus.Alive)} robots alive");
+                        LogInfo($"End turn: {Game.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots alive");
 
                         // attempt to update the game record
                         LogInfo($"Storing game: ID = {gameId}");
@@ -163,9 +163,9 @@ namespace LambdaRobots.Server.GameTurnFunction {
         DateTimeOffset IGameDependencyProvider.UtcNow => DateTimeOffset.UtcNow;
         float IGameDependencyProvider.NextRandomFloat() => (float)_random.NextDouble();
 
-        Task<GetBuildResponse> IGameDependencyProvider.GetRobotBuild(BotInfo robot) {
+        Task<GetBuildResponse> IGameDependencyProvider.GetBotBuild(BotInfo bot) {
             try {
-                var client = new LambdaRobotsBotClient(robot.Id, GameRecord.BotArns[robot.Index], TimeSpan.FromSeconds(Game.RobotTimeoutSeconds), _lambdaClient, this);
+                var client = new LambdaRobotsBotClient(bot.Id, GameRecord.BotArns[bot.Index], TimeSpan.FromSeconds(Game.BotTimeoutSeconds), _lambdaClient, this);
                 return client.GetBuild(new GetBuildRequest {
                     GameInfo = new GameInfo {
                         Id = Game.Id,
@@ -180,17 +180,17 @@ namespace LambdaRobots.Server.GameTurnFunction {
                         MaxBuildPoints = Game.MaxBuildPoints,
                         SecondsPerTurn = (float)GameInfo.MinimumTurnTimespan.TotalSeconds
                     },
-                    Robot = robot
+                    Bot = bot
                 });
             } catch(Exception e) {
-                LogErrorAsWarning(e, $"Robot R{robot.Index} is out of range");
+                LogErrorAsWarning(e, $"Bot R{bot.Index} is out of range");
                 return null;
             }
         }
 
-        Task<GetActionResponse> IGameDependencyProvider.GetRobotAction(BotInfo robot) {
+        Task<GetActionResponse> IGameDependencyProvider.GetBotAction(BotInfo bot) {
             try {
-                var client = new LambdaRobotsBotClient(robot.Id, GameRecord.BotArns[robot.Index], TimeSpan.FromSeconds(Game.RobotTimeoutSeconds), _lambdaClient, this);
+                var client = new LambdaRobotsBotClient(bot.Id, GameRecord.BotArns[bot.Index], TimeSpan.FromSeconds(Game.BotTimeoutSeconds), _lambdaClient, this);
                 return client.GetAction(new GetActionRequest {
                     GameInfo = new GameInfo {
                         Id = Game.Id,
@@ -203,13 +203,13 @@ namespace LambdaRobots.Server.GameTurnFunction {
                         CurrentGameTurn = Game.CurrentGameTurn,
                         MaxGameTurns = Game.MaxTurns,
                         MaxBuildPoints = Game.MaxBuildPoints,
-                        SecondsPerTurn = (float)(Game.LastStatusUpdate - robot.LastStatusUpdate).TotalSeconds,
+                        SecondsPerTurn = (float)(Game.LastStatusUpdate - bot.LastStatusUpdate).TotalSeconds,
                         ApiUrl = _gameApiUrl + $"/{Game.Id}"
                     },
-                    Robot = robot
+                    Bot = bot
                 });
             } catch(Exception e) {
-                LogErrorAsWarning(e, $"Robot R{robot.Index} is out of range");
+                LogErrorAsWarning(e, $"Bot R{bot.Index} is out of range");
                 return null;
             }
         }

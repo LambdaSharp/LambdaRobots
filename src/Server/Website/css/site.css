@@ -42,7 +42,7 @@ button {
   padding: 1%;
   background-color: white;
 }
-#robotsStats > div > table {
+#botsStats > div > table {
   font-size: 87%;
 }
 
@@ -98,7 +98,7 @@ table[xx] th {
   border-width: 0 !important;
 }
 
-.robot-dead {
+.bot-dead {
   background-color: lightgray;
 }
 h4 {

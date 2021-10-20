@@ -47,7 +47,7 @@ namespace LambdaRobots.Server {
         public DateTimeOffset LastStatusUpdate { get; set; }
         public int CurrentGameTurn { get; set; }
         public List<MissileInfo> Missiles { get; set; } = new List<MissileInfo>();
-        public List<BotInfo> Robots { get; set; } = new List<BotInfo>();
+        public List<BotInfo> Bots { get; set; } = new List<BotInfo>();
         public List<Message> Messages { get; set; } = new List<Message>();
 
         // game characteristics
@@ -58,8 +58,8 @@ namespace LambdaRobots.Server {
         public float NearHitRange { get; set; }
         public float FarHitRange { get; set; }
         public float CollisionRange { get; set; }
-        public float MinRobotStartDistance { get; set; }
-        public float RobotTimeoutSeconds { get; set; }
+        public float MinBotStartDistance { get; set; }
+        public float BotTimeoutSeconds { get; set; }
         public int MaxTurns { get; set; }
         public int MaxBuildPoints { get; set; }
     }

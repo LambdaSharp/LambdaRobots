@@ -36,7 +36,7 @@ namespace Test.LambdaRobots.Server {
 
         //--- Fields ---
         protected IGameDependencyProvider _provider;
-        protected Dictionary<string, List<Func<GetActionResponse>>> _robotActions = new Dictionary<string, List<Func<GetActionResponse>>>();
+        protected Dictionary<string, List<Func<GetActionResponse>>> _botActions = new Dictionary<string, List<Func<GetActionResponse>>>();
         protected readonly Random _random = new Random();
 
         //--- Methods ---
@@ -49,17 +49,17 @@ namespace Test.LambdaRobots.Server {
             NearHitRange = 20.0f,
             FarHitRange = 40.0f,
             CollisionRange = 5.0f,
-            MinRobotStartDistance = 100.0f,
-            RobotTimeoutSeconds = 10.0f,
+            MinBotStartDistance = 100.0f,
+            BotTimeoutSeconds = 10.0f,
             CurrentGameTurn = 0,
             MaxTurns = 1000,
             MaxBuildPoints = 8,
             LastStatusUpdate = DateTimeOffset.UtcNow
         };
 
-        protected BotInfo NewRobot(string id, float x, float y) => new BotInfo {
+        protected BotInfo NewBot(string id, float x, float y) => new BotInfo {
 
-            // robot state
+            // bot state
             Id = id,
             Name = id,
             Status = BotStatus.Alive,
@@ -72,7 +72,7 @@ namespace Test.LambdaRobots.Server {
             ReloadCoolDown = 0.0f,
             TotalMissileFiredCount = 0,
 
-            // robot characteristics
+            // bot characteristics
             MaxSpeed = 100.0f,
             Acceleration = 10.0f,
             Deceleration = 20.0f,
@@ -94,11 +94,11 @@ namespace Test.LambdaRobots.Server {
             MissileFarHitDamageBonus = 1.0f
         };
 
-        protected GameLogic NewLogic(params BotInfo[] robots) {
+        protected GameLogic NewLogic(params BotInfo[] bots) {
             var game = NewGame();
-            game.Robots.AddRange(robots);
-            for(var i = 0; i < game.Robots.Count; ++i) {
-                game.Robots[i].Index = i;
+            game.Bots.AddRange(bots);
+            for(var i = 0; i < game.Bots.Count; ++i) {
+                game.Bots[i].Index = i;
             }
             _provider = this;
             return new GameLogic(game, _provider);
@@ -108,14 +108,14 @@ namespace Test.LambdaRobots.Server {
         DateTimeOffset IGameDependencyProvider.UtcNow => DateTimeOffset.UtcNow;
         float IGameDependencyProvider.NextRandomFloat() => (float)_random.NextDouble();
 
-        async Task<GetBuildResponse> IGameDependencyProvider.GetRobotBuild(BotInfo robot) => new GetBuildResponse {
-            Name = robot.Id
+        async Task<GetBuildResponse> IGameDependencyProvider.GetBotBuild(BotInfo bot) => new GetBuildResponse {
+            Name = bot.Id
         };
 
-        async Task<GetActionResponse> IGameDependencyProvider.GetRobotAction(BotInfo robot) {
+        async Task<GetActionResponse> IGameDependencyProvider.GetBotAction(BotInfo bot) {
 
             // destructively fetch next action from dictionary or null if none exist
-            if(_robotActions.TryGetValue(robot.Id, out var actions) && (actions?.Any() ?? false)) {
+            if(_botActions.TryGetValue(bot.Id, out var actions) && (actions?.Any() ?? false)) {
                 var action = actions.First();
                 actions.RemoveAt(0);
                 return action();

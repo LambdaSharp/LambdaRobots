@@ -29,7 +29,7 @@ namespace LambdaRobots.Bot.Model {
         //--- Properties ---
 
         /// <summary>
-        /// Name of Lambda-Robot.
+        /// Name of bot.
         /// </summary>
         public string Name { get; set; }
 
@@ -54,7 +54,7 @@ namespace LambdaRobots.Bot.Model {
         public BotMissileType Missile { get; set; } = BotMissileType.Javelin;
 
         /// <summary>
-        /// Internal starting state for the robot.
+        /// Internal starting state for the bot.
         /// </summary>
         public string InternalStartState { get; set; }
     }

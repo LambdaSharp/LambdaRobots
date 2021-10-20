@@ -75,13 +75,13 @@ namespace LambdaRobots.Server.GameConnectionFunction {
                 NearHitRange = request.NearHitRange ?? 20.0f,
                 FarHitRange = request.FarHitRange ?? 40.0f,
                 CollisionRange = request.CollisionRange ?? 8.0f,
-                MinRobotStartDistance = request.MinRobotStartDistance ?? 50.0f,
-                RobotTimeoutSeconds = request.RobotTimeoutSeconds ?? 15.0f
+                MinBotStartDistance = request.MinBotStartDistance ?? 50.0f,
+                BotTimeoutSeconds = request.BotTimeoutSeconds ?? 15.0f
             };
             var gameRecord = new GameRecord {
                 GameId = game.Id,
                 Game = game,
-                BotArns = request.RobotArns,
+                BotArns = request.BotArns,
                 ConnectionId = CurrentRequest.RequestContext.ConnectionId,
                 Expire = DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeSeconds()
             };

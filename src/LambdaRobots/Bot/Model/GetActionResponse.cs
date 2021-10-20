@@ -31,6 +31,6 @@ namespace LambdaRobots.Bot.Model {
         public float? Heading { get; set; }
         public float? FireMissileHeading { get; set; }
         public float? FireMissileDistance { get; set; }
-        public string RobotState { get; set; }
+        public string BotState { get; set; }
     }
 }

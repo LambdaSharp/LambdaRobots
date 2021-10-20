@@ -28,60 +28,60 @@ using Xunit.Abstractions;
 
 namespace Test.LambdaRobots.Server {
 
-    public class ScanRobotsTests : _Init {
+    public class ScanBotsTests : _Init {
 
         //--- Fields ---
         private readonly ITestOutputHelper _output;
 
         //--- Constructors ---
-        public ScanRobotsTests(ITestOutputHelper output) => _output = output;
+        public ScanBotsTests(ITestOutputHelper output) => _output = output;
 
         //--- Methods ---
 
         [Fact]
-        public void ScanRobotInRange() {
+        public void ScanBotInRange() {
 
             // arrange
-            var bob = NewRobot("Bob", 500.0f, 500.0f);
-            var dave = NewRobot("Dave", 600.0f, 600.0f);
+            var bob = NewBot("Bob", 500.0f, 500.0f);
+            var dave = NewBot("Dave", 600.0f, 600.0f);
             var logic = NewLogic(bob, dave);
 
             // act
-            var robot = logic.ScanRobots(bob, 45.0f, 10.0f);
+            var bot = logic.ScanBots(bob, 45.0f, 10.0f);
 
             // assert
-            robot.Should().NotBe(null);
-            robot.Name.Should().Be(dave.Name);
+            bot.Should().NotBe(null);
+            bot.Name.Should().Be(dave.Name);
         }
 
         [Fact]
-        public void ScanRobotOutOfRange() {
+        public void ScanBotOutOfRange() {
 
             // arrange
-            var bob = NewRobot("Bob", 100.0f, 100.0f);
-            var dave = NewRobot("Dave", 800.0f, 800.0f);
+            var bob = NewBot("Bob", 100.0f, 100.0f);
+            var dave = NewBot("Dave", 800.0f, 800.0f);
             var logic = NewLogic(bob, dave);
 
             // act
-            var robot = logic.ScanRobots(bob, 45.0f, 10.0f);
+            var bot = logic.ScanBots(bob, 45.0f, 10.0f);
 
             // assert
-            robot.Should().Be(null);
+            bot.Should().Be(null);
         }
 
         [Fact]
-        public void ScanRobotOutOfResolution() {
+        public void ScanBotOutOfResolution() {
 
             // arrange
-            var bob = NewRobot("Bob", 500.0f, 500.0f);
-            var dave = NewRobot("Dave", 600.0f, 500.0f);
+            var bob = NewBot("Bob", 500.0f, 500.0f);
+            var dave = NewBot("Dave", 600.0f, 500.0f);
             var logic = NewLogic(bob, dave);
 
             // act
-            var robot = logic.ScanRobots(bob, 45.0f, 10.0f);
+            var bot = logic.ScanBots(bob, 45.0f, 10.0f);
 
             // assert
-            robot.Should().Be(null);
+            bot.Should().Be(null);
         }
     }
 }

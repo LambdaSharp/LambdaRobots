@@ -30,7 +30,7 @@ namespace LambdaRobots.Server.GameConnectionFunction.Model {
 
         //--- Properties ---
         public string Action { get; set; }
-        public List<string> RobotArns { get; set; } = new List<string>();
+        public List<string> BotArns { get; set; } = new List<string>();
 
         // optional board initialization settings
         public float? BoardWidth { get; set; }
@@ -42,8 +42,8 @@ namespace LambdaRobots.Server.GameConnectionFunction.Model {
         public float? NearHitRange { get; set; }
         public float? FarHitRange { get; set; }
         public float? CollisionRange { get; set; }
-        public float? MinRobotStartDistance { get; set; }
-        public float? RobotTimeoutSeconds { get; set; }
+        public float? MinBotStartDistance { get; set; }
+        public float? BotTimeoutSeconds { get; set; }
     }
 
     public class StartGameResponse {

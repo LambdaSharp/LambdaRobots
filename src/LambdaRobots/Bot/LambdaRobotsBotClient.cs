@@ -44,15 +44,15 @@ namespace LambdaRobots.Bot {
     public sealed class LambdaRobotsBotClient : ILambdaRobotsBot {
 
         //--- Fields ---
-        private readonly string _robotId;
+        private readonly string _botId;
         private readonly string _lambdaArn;
         private readonly TimeSpan _requestTimeout;
         private readonly ILambdaSharpLogger _logger;
         private IAmazonLambda _lambdaClient;
 
         //--- Constructors ---
-        public LambdaRobotsBotClient(string robotId, string lambdaArn, TimeSpan requestTimeout, IAmazonLambda lambdaClient = null, ILambdaSharpLogger logger = null) {
-            _robotId = robotId ?? throw new ArgumentNullException(nameof(robotId));
+        public LambdaRobotsBotClient(string botId, string lambdaArn, TimeSpan requestTimeout, IAmazonLambda lambdaClient = null, ILambdaSharpLogger logger = null) {
+            _botId = botId ?? throw new ArgumentNullException(nameof(botId));
             _lambdaArn = lambdaArn ?? throw new ArgumentNullException(nameof(lambdaArn));
             _requestTimeout = requestTimeout;
             _lambdaClient = lambdaClient ?? new AmazonLambdaClient();
@@ -67,7 +67,7 @@ namespace LambdaRobots.Bot {
                     Payload = JsonSerializer.Serialize(new BotRequest {
                         Command = BotCommand.GetBuild,
                         Game = request.GameInfo,
-                        Robot = request.Robot
+                        Bot = request.Bot
                     }),
                     FunctionName = _lambdaArn,
                     InvocationType = InvocationType.RequestResponse
@@ -75,15 +75,15 @@ namespace LambdaRobots.Bot {
 
                 // check if lambda responds within time limit
                 if(await Task.WhenAny(getBuildTask, Task.Delay(_requestTimeout)) != getBuildTask) {
-                    _logger?.LogInfo($"Robot {_robotId} GetBuild timed out after {stopwatch.Elapsed.TotalSeconds:N2}s");
+                    _logger?.LogInfo($"Bot {_botId} GetBuild timed out after {stopwatch.Elapsed.TotalSeconds:N2}s");
                     return null;
                 }
                 var response = Encoding.UTF8.GetString(getBuildTask.Result.Payload.ToArray());
                 var result = JsonSerializer.Deserialize<BotResponse>(response);
-                _logger?.LogInfo($"Robot {_robotId} GetBuild responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
-                return result.RobotBuild;
+                _logger?.LogInfo($"Bot {_botId} GetBuild responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
+                return result.BotBuild;
             } catch(Exception e) {
-                _logger?.LogErrorAsInfo(e, $"Robot {_robotId} GetBuild failed (arn: {_lambdaArn ?? "<NULL>"})");
+                _logger?.LogErrorAsInfo(e, $"Bot {_botId} GetBuild failed (arn: {_lambdaArn ?? "<NULL>"})");
                 return null;
             }
         }
@@ -95,7 +95,7 @@ namespace LambdaRobots.Bot {
                     Payload = JsonSerializer.Serialize(new BotRequest {
                         Command = BotCommand.GetAction,
                         Game = request.GameInfo,
-                        Robot = request.Robot
+                        Bot = request.Bot
                     }),
                     FunctionName = _lambdaArn,
                     InvocationType = InvocationType.RequestResponse
@@ -103,15 +103,15 @@ namespace LambdaRobots.Bot {
 
                 // check if lambda responds within time limit
                 if(await Task.WhenAny(getActionTask, Task.Delay(_requestTimeout)) != getActionTask) {
-                    _logger?.LogInfo($"Robot {_robotId} GetAction timed out after {stopwatch.Elapsed.TotalSeconds:N2}s");
+                    _logger?.LogInfo($"Bot {_botId} GetAction timed out after {stopwatch.Elapsed.TotalSeconds:N2}s");
                     return null;
                 }
                 var response = Encoding.UTF8.GetString(getActionTask.Result.Payload.ToArray());
                 var result = JsonSerializer.Deserialize<BotResponse>(response);
-                _logger?.LogInfo($"Robot {_robotId} GetAction responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
-                return result.RobotAction;
+                _logger?.LogInfo($"Bot {_botId} GetAction responded in {stopwatch.Elapsed.TotalSeconds:N2}s:\n{response}");
+                return result.BotAction;
             } catch(Exception e) {
-                _logger?.LogErrorAsInfo(e, $"Robot {_robotId} GetAction failed (arn: {_lambdaArn})");
+                _logger?.LogErrorAsInfo(e, $"Bot {_botId} GetAction failed (arn: {_lambdaArn})");
                 return null;
             }
         }

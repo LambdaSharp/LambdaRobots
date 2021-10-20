@@ -21,7 +21,7 @@ async function init() {
         return;
       }
       gameBoardClient.Repaint(data);
-      updateRobotStats(data.Game.Robots);
+      updateBotStats(data.Game.Bots);
       if (typeof data.Game.Messages !== "undefined") {
         messagesUi(data.Game.Messages);
       }
@@ -50,7 +50,7 @@ async function init() {
     stopGame();
     resetGameUi();
   });
-  restoreRobotArns();
+  restoreBotArns();
   restoreAdvanceConfig();
 }
 
@@ -65,11 +65,11 @@ async function getConfig() {
 }
 
 function startGame() {
-  const robotArns = getRobotArnsFromInputs();
-  localStorage.setItem("robotArns", JSON.stringify(robotArns));
+  const botArns = getBotArnsFromInputs();
+  localStorage.setItem("botArns", JSON.stringify(botArns));
   const request = {
     Action: "start",
-    RobotArns: robotArns
+    BotArns: botArns
   };
   const requestWithConfig = Object.assign(request, getAdvanceConfig());
   wsClient.doSend(JSON.stringify(requestWithConfig));
@@ -87,20 +87,20 @@ function stopGame() {
   }
 }
 
-function restoreRobotArns() {
-  const robotArns = JSON.parse(localStorage.getItem("robotArns")) || [];
-  const robotArnsElements = [].slice.call(document.getElementsByName("robots"));
-  for (let index = 0; index < robotArns.length; index++) {
-    robotArnsElements[index].value = robotArns[index];
+function restoreBotArns() {
+  const botArns = JSON.parse(localStorage.getItem("botArns")) || [];
+  const botArnsElements = [].slice.call(document.getElementsByName("bots"));
+  for (let index = 0; index < botArns.length; index++) {
+    botArnsElements[index].value = botArns[index];
   }
 }
 
-function getRobotArnsFromInputs() {
-  const robotArnsElements = [].slice.call(document.getElementsByName("robots"));
-  return robotArnsElements
-    .map(robotArn => robotArn.value)
-    .filter(robotArn => robotArn.length > 10)
-    .map(robotArn => robotArn.trim());
+function getBotArnsFromInputs() {
+  const botArnsElements = [].slice.call(document.getElementsByName("bots"));
+  return botArnsElements
+    .map(botArn => botArn.value)
+    .filter(botArn => botArn.length > 10 && botArn[0] != '#')
+    .map(botArn => botArn.trim());
 }
 
 function startGameUi() {
@@ -131,55 +131,55 @@ function messagesUi(messages) {
   });
 }
 
-function updateRobotStats(robots) {
+function updateBotStats(bots) {
   // https://lit-html.polymer-project.org/guide/template-reference
-  const robotsStats = document.getElementById("robotsStats");
-  let robotTemplates = [];
-  assignRobotMedals(robots);
-  robots
-    .forEach(robot => {
-      let robotTemplate = html`
-        <details ?open="${robot.Status === "Alive"}" class="${robot.Status !== "Alive" ? "robot-dead" : ""}">
+  const botsStats = document.getElementById("botsStats");
+  let botTemplates = [];
+  assignBotMedals(bots);
+  bots
+    .forEach(bot => {
+      let botTemplate = html`
+        <details ?open="${bot.Status === "Alive"}" class="${bot.Status !== "Alive" ? "bot-dead" : ""}">
           <summary>
             <h4>
-              ${robot.Medal} ${robot.Name} (R${robot.Index})
+              ${bot.Medal} ${bot.Name} (R${bot.Index})
               <span class="tooltip">
                 🛈
-                <pre class="tooltiptext">${JSON.stringify(robot, null, 2)}</pre>
+                <pre class="tooltiptext">${JSON.stringify(bot, null, 2)}</pre>
               </span>
             </h4>
           </summary>
           <table>
             <tr>
-              <td>Health: ${Math.round(robot.MaxDamage - robot.Damage)}</td>
-              <td>Collisions: ${robot.TotalCollisions}</td>
-              <td>Inflicted: ${Math.round(robot.TotalDamageDealt)}</td>
+              <td>Health: ${Math.round(bot.MaxDamage - bot.Damage)}</td>
+              <td>Collisions: ${bot.TotalCollisions}</td>
+              <td>Inflicted: ${Math.round(bot.TotalDamageDealt)}</td>
             </tr>
             <tr>
-              <td>Shots: ${robot.TotalMissileFiredCount}</td>
-              <td>Hits: ${robot.TotalMissileHitCount}</td>
-              <td>Kills: ${robot.TotalKills}</td>
+              <td>Shots: ${bot.TotalMissileFiredCount}</td>
+              <td>Hits: ${bot.TotalMissileHitCount}</td>
+              <td>Kills: ${bot.TotalKills}</td>
             </tr>
             <tr>
-              <td>Speed: ${Math.round(robot.Speed)}</td>
-              <td>Heading: ${Math.round(robot.Heading)}</td>
-              <td>Odometer: ${Math.round(robot.TotalTravelDistance)}</td>
+              <td>Speed: ${Math.round(bot.Speed)}</td>
+              <td>Heading: ${Math.round(bot.Heading)}</td>
+              <td>Odometer: ${Math.round(bot.TotalTravelDistance)}</td>
             </tr>
             <tr>
-              <td>X: ${Math.round(robot.X)}</td>
-              <td>Y: ${Math.round(robot.Y)}</td>
-              <td>Reload: ${robot.ReloadCoolDown}</td>
+              <td>X: ${Math.round(bot.X)}</td>
+              <td>Y: ${Math.round(bot.Y)}</td>
+              <td>Reload: ${bot.ReloadCoolDown}</td>
             </tr>
           </table>
         </details>
       `;
-      robotTemplates.push(robotTemplate);
+      botTemplates.push(botTemplate);
     });
   render(
     html`
-      ${robotTemplates}
+      ${botTemplates}
     `,
-    robotsStats
+    botsStats
   );
 }
 
@@ -193,8 +193,8 @@ function getAdvanceConfig() {
     NearHitRange: Number(document.getElementById("NearHitRange").value),
     FarHitRange: Number(document.getElementById("FarHitRange").value),
     CollisionRange: Number(document.getElementById("CollisionRange").value),
-    RobotTimeoutSeconds: Number(
-      document.getElementById("RobotTimeoutSeconds").value
+    BotTimeoutSeconds: Number(
+      document.getElementById("BotTimeoutSeconds").value
     )
   };
 
@@ -216,11 +216,11 @@ function restoreAdvanceConfig() {
   }
 }
 
-function assignRobotMedals(robots) {
-  robots.forEach(robot => {
-    robot.Score = robot.TotalKills * 1E6 + robot.TotalDamageDealt;
+function assignBotMedals(bots) {
+  bots.forEach(bot => {
+    bot.Score = bot.TotalKills * 1E6 + bot.TotalDamageDealt;
   });
-  robots.sort((a, b) => {
+  bots.sort((a, b) => {
 
     // the higher the score, the closer to the top of the leaderboard
     const deltaScore = b.Score - a.Score;
@@ -228,7 +228,7 @@ function assignRobotMedals(robots) {
       return deltaScore;
     }
 
-    // the longer alive the robot has been, the closer to the top of the leaderboard
+    // the longer alive the bot has been, the closer to the top of the leaderboard
     const timeOfDeathA = (a.TimeOfDeathGameTurn === -1) ? 1E9 : a.TimeOfDeathGameTurn;
     const timeOfDeathB = (b.TimeOfDeathGameTurn === -1) ? 1E9 : b.TimeOfDeathGameTurn;
     const deltaTimeOfDeath = timeOfDeathB - timeOfDeathA;
@@ -239,9 +239,9 @@ function assignRobotMedals(robots) {
     // if all fails, just sort by increasing index
     return a.Index - b.Index;
   });
-  for (let index = 0; index < robots.length; index++) {
-    const robot = robots[index];
-    robot.Medal = giveMedal(index, robot.Score);
+  for (let index = 0; index < bots.length; index++) {
+    const bot = bots[index];
+    bot.Medal = giveMedal(index, bot.Score);
   }
 }
 

@@ -55,9 +55,9 @@ namespace LambdaRobots.Function {
         //--- Properties ---
 
         /// <summary>
-        /// Robot data structure describing the state and characteristics of the robot.
+        /// Bot data structure describing the state and characteristics of the bot.
         /// </summary>
-        public LambdaRobots.BotInfo Robot { get; set; }
+        public LambdaRobots.BotInfo Bot { get; set; }
 
         /// <summary>
         /// Game data structure describing the state and characteristics of the game;
@@ -65,42 +65,42 @@ namespace LambdaRobots.Function {
         public LambdaRobots.GameInfo Game { get; set; }
 
         /// <summary>
-        /// Horizontal position of robot. Value is between `0` and `Game.BoardWidth`.
+        /// Horizontal position of bot. Value is between `0` and `Game.BoardWidth`.
         /// </summary>
-        public float X => Robot.X;
+        public float X => Bot.X;
 
         /// <summary>
-        /// Vertical position of robot. Value is between `0` and `Game.BoardHeight`.
+        /// Vertical position of bot. Value is between `0` and `Game.BoardHeight`.
         /// </summary>
-        public float Y => Robot.Y;
+        public float Y => Bot.Y;
 
         /// <summary>
-        /// Robot speed. Value is between `0` and `Robot.MaxSpeed`.
+        /// Bot speed. Value is between `0` and `Bot.MaxSpeed`.
         /// </summary>
-        public float Speed => Robot.Speed;
+        public float Speed => Bot.Speed;
 
         /// <summary>
-        /// Robot heading. Value is always between `-180` and `180`.
+        /// Bot heading. Value is always between `-180` and `180`.
         /// </summary>
-        public float Heading => Robot.Heading;
+        public float Heading => Bot.Heading;
 
         /// <summary>
-        /// Robot damage. Value is always between 0 and `Robot.MaxDamage`. When the value is equal to `Robot.MaxDamage` the robot is considered killed.
+        /// Bot damage. Value is always between 0 and `Bot.MaxDamage`. When the value is equal to `Bot.MaxDamage` the bot is considered killed.
         /// </summary>
-        public float Damage => Robot.Damage;
+        public float Damage => Bot.Damage;
 
         /// <summary>
         /// Number of seconds until the missile launcher is ready again.
         /// </summary>
-        public float ReloadCoolDown => Robot.ReloadCoolDown;
+        public float ReloadCoolDown => Bot.ReloadCoolDown;
 
         /// <summary>
-        /// How long it will take for the robot to stop.
+        /// How long it will take for the bot to stop.
         /// </summary>
-        public float BreakingDistance => (Speed * Speed) / (2.0f * Robot.Deceleration);
+        public float BreakingDistance => (Speed * Speed) / (2.0f * Bot.Deceleration);
 
         /// <summary>
-        /// Robot state is automatically saved and loaded for each invocation when available.
+        /// Bot state is automatically saved and loaded for each invocation when available.
         /// </summary>
         public TState State { get; set; }
 
@@ -116,8 +116,8 @@ namespace LambdaRobots.Function {
         public override sealed async Task<BotResponse> ProcessMessageAsync(BotRequest request) {
 
             // check if there is a state object to load
-            State = !string.IsNullOrEmpty(request.Robot?.InternalState)
-                ? LambdaSerializer.Deserialize<TState>(request.Robot.InternalState)
+            State = !string.IsNullOrEmpty(request.Bot?.InternalState)
+                ? LambdaSerializer.Deserialize<TState>(request.Bot.InternalState)
                 : new TState();
             LogInfo($"Starting State:\n{LambdaSerializer.Serialize(State)}");
 
@@ -126,34 +126,34 @@ namespace LambdaRobots.Function {
             switch(request.Command) {
             case BotCommand.GetBuild:
 
-                // robot configuration request
+                // bot configuration request
                 response = new BotResponse {
-                    RobotBuild = await GetBuildAsync()
+                    BotBuild = await GetBuildAsync()
                 };
                 break;
             case BotCommand.GetAction:
 
-                // robot action request
+                // bot action request
                 try {
 
                     // capture request fields for easy access
                     Game = request.Game;
-                    Robot = request.Robot;
-                    GameClient = new LambdaRobotsGameClient(Game.ApiUrl, Robot.Id, HttpClient);
+                    Bot = request.Bot;
+                    GameClient = new LambdaRobotsGameClient(Game.ApiUrl, Bot.Id, HttpClient);
 
                     // initialize a default empty action
                     _action = new GetActionResponse();
 
-                    // get robot action
+                    // get bot action
                     await GetActionAsync();
 
                     // generate response
-                    _action.RobotState = LambdaSerializer.Serialize(State);
+                    _action.BotState = LambdaSerializer.Serialize(State);
                     response = new BotResponse {
-                        RobotAction = _action,
+                        BotAction = _action,
                     };
                 } finally {
-                    Robot = null;
+                    Bot = null;
                     GameClient = null;
                 }
                 break;
@@ -170,7 +170,7 @@ namespace LambdaRobots.Function {
 
         /// <summary>
         /// Fire a missile in a given direction with impact at a given distance.
-        /// A missile can only be fired if `Robot.ReloadCoolDown` is `0`.
+        /// A missile can only be fired if `Bot.ReloadCoolDown` is `0`.
         /// </summary>
         /// <param name="heading">Heading in degrees where to fire the missile to</param>
         /// <param name="distance">Distance at which the missile impacts</param>
@@ -182,7 +182,7 @@ namespace LambdaRobots.Function {
 
         /// <summary>
         /// Fire a missile in at the given position.
-        /// A missile can only be fired if `Robot.ReloadCoolDown` is `0`.
+        /// A missile can only be fired if `Bot.ReloadCoolDown` is `0`.
         /// </summary>
         /// <param name="x">Target horizontal coordinate</param>
         /// <param name="y">Target vertical coordinate</param>
@@ -193,20 +193,20 @@ namespace LambdaRobots.Function {
         }
 
         /// <summary>
-        /// Set heading in which the robot is moving. Current speed must be below `Robot.MaxTurnSpeed`
+        /// Set heading in which the bot is moving. Current speed must be below `Bot.MaxTurnSpeed`
         /// to avoid a sudden stop.
         /// </summary>
-        /// <param name="heading">Target robot heading in degrees</param>
+        /// <param name="heading">Target bot heading in degrees</param>
         public void SetHeading(float heading) {
             LogInfo($"Set Heading = {NormalizeAngle(heading):N0}");
             _action.Heading = heading;
         }
 
         /// <summary>
-        /// Set the speed for the robot. Speed is adjusted according to `Robot.Acceleration`
-        /// and `Robot.Deceleration` characteristics.
+        /// Set the speed for the bot. Speed is adjusted according to `Bot.Acceleration`
+        /// and `Bot.Deceleration` characteristics.
         /// </summary>
-        /// <param name="speed">Target robot speed</param>
+        /// <param name="speed">Target bot speed</param>
         public void SetSpeed(float speed) {
             LogInfo($"Set Speed = {speed:N2}");
             _action.Speed = speed;
@@ -215,7 +215,7 @@ namespace LambdaRobots.Function {
         /// <summary>
         /// Scan the game board in a given heading and resolution.
         /// The resolution specifies in the scan arc centered on `heading` with +/- `resolution` tolerance.
-        /// The max resolution is limited to `Robot.RadarMaxResolution`.
+        /// The max resolution is limited to `Bot.RadarMaxResolution`.
         /// </summary>
         /// <param name="heading">Scan heading in degrees</param>
         /// <param name="resolution">Scan +/- arc in degrees</param>
@@ -230,7 +230,7 @@ namespace LambdaRobots.Function {
         }
 
         /// <summary>
-        /// Determine angle in degrees relative to current robot position.
+        /// Determine angle in degrees relative to current bot position.
         /// Return value range from `-180` to `180` degrees.
         /// </summary>
         /// <param name="x">Target horizontal coordinate</param>
@@ -239,7 +239,7 @@ namespace LambdaRobots.Function {
         public float AngleToXY(float x, float y) => NormalizeAngle(MathF.Atan2(x - X, y - Y) * 180.0f / MathF.PI);
 
         /// <summary>
-        /// Determine distance relative to current robot position.
+        /// Determine distance relative to current bot position.
         /// </summary>
         /// <param name="x">Target horizontal coordinate</param>
         /// <param name="y">Target vertical coordinate</param>
@@ -263,7 +263,7 @@ namespace LambdaRobots.Function {
         }
 
         /// <summary>
-        /// Adjust speed and heading to move robot to specified coordinates.
+        /// Adjust speed and heading to move bot to specified coordinates.
         /// Call this method on every turn to keep adjusting the speed and heading until the destination is reached.
         /// </summary>
         /// <param name="x">Target horizontal coordinate</param>
@@ -274,7 +274,7 @@ namespace LambdaRobots.Function {
             var distance = DistanceToXY(x, y);
             LogInfo($"Move To: X = {x:N2}, Y = {y:N2}, Heading = {heading:N2}, Distance = {distance:N2}");
 
-            // check if robot is close enough to target location
+            // check if bot is close enough to target location
             if(distance <= Game.CollisionRange) {
 
                 // close enough; stop moving
@@ -282,23 +282,23 @@ namespace LambdaRobots.Function {
                 return true;
             }
 
-            // NOTE: the distance required to stop the robot from moving is obtained with the following formula:
+            // NOTE: the distance required to stop the bot from moving is obtained with the following formula:
             //      Distance = Speed^2 / 2*Deceleration
             //  solving for Speed, gives us the maximum travel speed to avoid overshooting our target
-            var speed = MathF.Sqrt(distance * 2.0f * Robot.Deceleration) * Game.SecondsPerTurn;
+            var speed = MathF.Sqrt(distance * 2.0f * Bot.Deceleration) * Game.SecondsPerTurn;
 
             // check if heading needs to be adjusted
             if(MathF.Abs(NormalizeAngle(Heading - heading)) > 0.1) {
 
-                // check if robot is moving slow enough to turn
-                if(Speed <= Robot.MaxTurnSpeed) {
+                // check if bot is moving slow enough to turn
+                if(Speed <= Bot.MaxTurnSpeed) {
 
                     // adjust heading towards target
                     SetHeading(heading);
                 }
 
                 // adjust speed to either max-turn-speed or max-travel-speed, whichever is lower
-                SetSpeed(MathF.Min(Robot.MaxTurnSpeed, speed));
+                SetSpeed(MathF.Min(Bot.MaxTurnSpeed, speed));
             } else {
 
                 // adjust speed to max-travel-speed

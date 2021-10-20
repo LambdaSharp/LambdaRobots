@@ -29,7 +29,7 @@ namespace LambdaRobots.Function {
     public class BotResponse {
 
         //--- Properties ---
-        public GetBuildResponse RobotBuild { get; set; }
-        public GetActionResponse RobotAction { get; set; }
+        public GetBuildResponse BotBuild { get; set; }
+        public GetActionResponse BotAction { get; set; }
     }
 }

@@ -70,7 +70,7 @@ namespace LambdaRobots {
         public float FarHitRange { get; set; }
 
         /// <summary>
-        /// Distance between robots to count as a collision.
+        /// Distance between bots to count as a collision.
         /// </summary>
         public float CollisionRange { get; set; }
 
@@ -85,7 +85,7 @@ namespace LambdaRobots {
         public int MaxGameTurns { get; set; }
 
         /// <summary>
-        /// Maximum number of build points a robot can use.
+        /// Maximum number of build points a bot can use.
         /// </summary>
         public int MaxBuildPoints { get; set; }
 

@@ -26,11 +26,11 @@ using System.Threading.Tasks;
 using LambdaRobots.Bot.Model;
 using LambdaRobots.Function;
 
-namespace LambdaRobots.BringYourOwnRobot.RobotFunction {
+namespace LambdaRobots.TargetBot.BotFunction {
 
     public sealed class BotState {
 
-        // TODO: use this to define the internal state of the bot
+        // NOTE: target bot has no internal state
     }
 
     public sealed class Function : ABotFunction<BotState> {
@@ -38,10 +38,7 @@ namespace LambdaRobots.BringYourOwnRobot.RobotFunction {
         //--- Methods ---
         public override async Task<GetBuildResponse> GetBuildAsync() {
             return new GetBuildResponse {
-
-                // TODO: give your robot a name!
-                Name = "BringYourOwnRobot",
-
+                Name = "Target",
                 Armor = BotArmorType.Medium,
                 Engine = BotEngineType.Economy,
                 Missile = BotMissileType.Dart,
@@ -51,10 +48,7 @@ namespace LambdaRobots.BringYourOwnRobot.RobotFunction {
 
         public override async Task GetActionAsync() {
 
-            // TODO: breath life into your robots behavior
-
-            // NOTE: you can use the `State` property to fetch and store state across invocation.
-            //  The `State` property is of type `BotState`.
+            // NOTE: target bot is stationary and doesn't do anything
         }
     }
 }

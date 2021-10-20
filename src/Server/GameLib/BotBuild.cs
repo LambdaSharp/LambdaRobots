@@ -24,13 +24,13 @@
 
 namespace LambdaRobots.Server {
 
-    public static class RobotBuild {
+    public static class BotBuild {
 
         //--- Class Methods ---
         public static BotInfo GetDefaultBuild(string gameId, int index)
             => new BotInfo {
 
-                // robot state
+                // bot state
                 Index = index,
                 Id = $"{gameId}:R{index}",
                 Status = BotStatus.Alive,
@@ -52,7 +52,7 @@ namespace LambdaRobots.Server {
                 TargetHeading = 0.0f,
                 TargetSpeed = 0.0f,
 
-                // robot characteristics
+                // bot characteristics
                 MaxSpeed = 100.0f,
                 Acceleration = 10.0f,
                 Deceleration = 20.0f,
@@ -74,27 +74,27 @@ namespace LambdaRobots.Server {
                 MissileFarHitDamageBonus = 1.0f
             };
 
-        public static bool TrySetRadar(BotRadarType radar, BotInfo robot) {
+        public static bool TrySetRadar(BotRadarType radar, BotInfo bot) {
             switch(radar) {
             case BotRadarType.UltraShortRange:
-                robot.RadarRange = 200.0f;
-                robot.RadarMaxResolution = 45.0f;
+                bot.RadarRange = 200.0f;
+                bot.RadarMaxResolution = 45.0f;
                 break;
             case BotRadarType.ShortRange:
-                robot.RadarRange = 400.0f;
-                robot.RadarMaxResolution = 20.0f;
+                bot.RadarRange = 400.0f;
+                bot.RadarMaxResolution = 20.0f;
                 break;
             case BotRadarType.MidRange:
-                robot.RadarRange = 600.0f;
-                robot.RadarMaxResolution = 10.0f;
+                bot.RadarRange = 600.0f;
+                bot.RadarMaxResolution = 10.0f;
                 break;
             case BotRadarType.LongRange:
-                robot.RadarRange = 800.0f;
-                robot.RadarMaxResolution = 8.0f;
+                bot.RadarRange = 800.0f;
+                bot.RadarMaxResolution = 8.0f;
                 break;
             case BotRadarType.UltraLongRange:
-                robot.RadarRange = 1000.0f;
-                robot.RadarMaxResolution = 5.0f;
+                bot.RadarRange = 1000.0f;
+                bot.RadarMaxResolution = 5.0f;
                 break;
             default:
                 return false;
@@ -102,27 +102,27 @@ namespace LambdaRobots.Server {
             return true;
         }
 
-        public static bool TrySetEngine(BotEngineType engine, BotInfo robot) {
+        public static bool TrySetEngine(BotEngineType engine, BotInfo bot) {
             switch(engine) {
             case BotEngineType.Economy:
-                robot.MaxSpeed = 60.0f;
-                robot.Acceleration = 7.0f;
+                bot.MaxSpeed = 60.0f;
+                bot.Acceleration = 7.0f;
                 break;
             case BotEngineType.Compact:
-                robot.MaxSpeed = 80.0f;
-                robot.Acceleration = 8.0f;
+                bot.MaxSpeed = 80.0f;
+                bot.Acceleration = 8.0f;
                 break;
             case BotEngineType.Standard:
-                robot.MaxSpeed = 100.0f;
-                robot.Acceleration = 10.0f;
+                bot.MaxSpeed = 100.0f;
+                bot.Acceleration = 10.0f;
                 break;
             case BotEngineType.Large:
-                robot.MaxSpeed = 120.0f;
-                robot.Acceleration = 12.0f;
+                bot.MaxSpeed = 120.0f;
+                bot.Acceleration = 12.0f;
                 break;
             case BotEngineType.ExtraLarge:
-                robot.MaxSpeed = 140.0f;
-                robot.Acceleration = 13.0f;
+                bot.MaxSpeed = 140.0f;
+                bot.Acceleration = 13.0f;
                 break;
             default:
                 return false;
@@ -130,47 +130,47 @@ namespace LambdaRobots.Server {
             return true;
         }
 
-        public static bool TrySetArmor(BotArmorType armor, BotInfo robot) {
+        public static bool TrySetArmor(BotArmorType armor, BotInfo bot) {
             switch(armor) {
             case BotArmorType.UltraLight:
-                robot.DirectHitDamage = 50.0f;
-                robot.NearHitDamage = 25.0f;
-                robot.FarHitDamage = 12.0f;
-                robot.CollisionDamage = 10.0f;
-                robot.MaxSpeed += 35.0f;
-                robot.Deceleration = 30.0f;
+                bot.DirectHitDamage = 50.0f;
+                bot.NearHitDamage = 25.0f;
+                bot.FarHitDamage = 12.0f;
+                bot.CollisionDamage = 10.0f;
+                bot.MaxSpeed += 35.0f;
+                bot.Deceleration = 30.0f;
                 break;
             case BotArmorType.Light:
-                robot.DirectHitDamage = 16.0f;
-                robot.NearHitDamage = 8.0f;
-                robot.FarHitDamage = 4.0f;
-                robot.CollisionDamage = 3.0f;
-                robot.MaxSpeed += 25.0f;
-                robot.Deceleration = 25.0f;
+                bot.DirectHitDamage = 16.0f;
+                bot.NearHitDamage = 8.0f;
+                bot.FarHitDamage = 4.0f;
+                bot.CollisionDamage = 3.0f;
+                bot.MaxSpeed += 25.0f;
+                bot.Deceleration = 25.0f;
                 break;
             case BotArmorType.Medium:
-                robot.DirectHitDamage = 8.0f;
-                robot.NearHitDamage = 4.0f;
-                robot.FarHitDamage = 2.0f;
-                robot.CollisionDamage = 2.0f;
-                robot.MaxSpeed += 0.0f;
-                robot.Deceleration = 20.0f;
+                bot.DirectHitDamage = 8.0f;
+                bot.NearHitDamage = 4.0f;
+                bot.FarHitDamage = 2.0f;
+                bot.CollisionDamage = 2.0f;
+                bot.MaxSpeed += 0.0f;
+                bot.Deceleration = 20.0f;
                 break;
             case BotArmorType.Heavy:
-                robot.DirectHitDamage = 4.0f;
-                robot.NearHitDamage = 2.0f;
-                robot.FarHitDamage = 1.0f;
-                robot.CollisionDamage = 1.0f;
-                robot.MaxSpeed += -25.0f;
-                robot.Deceleration = 15.0f;
+                bot.DirectHitDamage = 4.0f;
+                bot.NearHitDamage = 2.0f;
+                bot.FarHitDamage = 1.0f;
+                bot.CollisionDamage = 1.0f;
+                bot.MaxSpeed += -25.0f;
+                bot.Deceleration = 15.0f;
                 break;
             case BotArmorType.UltraHeavy:
-                robot.DirectHitDamage = 2.0f;
-                robot.NearHitDamage = 1.0f;
-                robot.FarHitDamage = 0.0f;
-                robot.CollisionDamage = 1.0f;
-                robot.MaxSpeed += -45.0f;
-                robot.Deceleration = 10.0f;
+                bot.DirectHitDamage = 2.0f;
+                bot.NearHitDamage = 1.0f;
+                bot.FarHitDamage = 0.0f;
+                bot.CollisionDamage = 1.0f;
+                bot.MaxSpeed += -45.0f;
+                bot.Deceleration = 10.0f;
                 break;
             default:
                 return false;
@@ -178,47 +178,47 @@ namespace LambdaRobots.Server {
             return true;
         }
 
-        public static bool TrySetMissile(BotMissileType missile, BotInfo robot) {
+        public static bool TrySetMissile(BotMissileType missile, BotInfo bot) {
             switch(missile) {
             case BotMissileType.Dart:
-                robot.MissileRange = 1200.0f;
-                robot.MissileVelocity = 250.0f;
-                robot.MissileDirectHitDamageBonus = 0.0f;
-                robot.MissileNearHitDamageBonus = 0.0f;
-                robot.MissileFarHitDamageBonus = 0.0f;
-                robot.MissileReloadCooldown = 0.0f;
+                bot.MissileRange = 1200.0f;
+                bot.MissileVelocity = 250.0f;
+                bot.MissileDirectHitDamageBonus = 0.0f;
+                bot.MissileNearHitDamageBonus = 0.0f;
+                bot.MissileFarHitDamageBonus = 0.0f;
+                bot.MissileReloadCooldown = 0.0f;
                 break;
             case BotMissileType.Arrow:
-                robot.MissileRange = 900.0f;
-                robot.MissileVelocity = 200.0f;
-                robot.MissileDirectHitDamageBonus = 1.0f;
-                robot.MissileNearHitDamageBonus = 1.0f;
-                robot.MissileFarHitDamageBonus = 0.0f;
-                robot.MissileReloadCooldown = 1.0f;
+                bot.MissileRange = 900.0f;
+                bot.MissileVelocity = 200.0f;
+                bot.MissileDirectHitDamageBonus = 1.0f;
+                bot.MissileNearHitDamageBonus = 1.0f;
+                bot.MissileFarHitDamageBonus = 0.0f;
+                bot.MissileReloadCooldown = 1.0f;
                 break;
             case BotMissileType.Javelin:
-                robot.MissileRange = 700.0f;
-                robot.MissileVelocity = 150.0f;
-                robot.MissileDirectHitDamageBonus = 3.0f;
-                robot.MissileNearHitDamageBonus = 2.0f;
-                robot.MissileFarHitDamageBonus = 1.0f;
-                robot.MissileReloadCooldown = 2.0f;
+                bot.MissileRange = 700.0f;
+                bot.MissileVelocity = 150.0f;
+                bot.MissileDirectHitDamageBonus = 3.0f;
+                bot.MissileNearHitDamageBonus = 2.0f;
+                bot.MissileFarHitDamageBonus = 1.0f;
+                bot.MissileReloadCooldown = 2.0f;
                 break;
             case BotMissileType.Cannon:
-                robot.MissileRange = 500.0f;
-                robot.MissileVelocity = 100.0f;
-                robot.MissileDirectHitDamageBonus = 6.0f;
-                robot.MissileNearHitDamageBonus = 4.0f;
-                robot.MissileFarHitDamageBonus = 2.0f;
-                robot.MissileReloadCooldown = 3.0f;
+                bot.MissileRange = 500.0f;
+                bot.MissileVelocity = 100.0f;
+                bot.MissileDirectHitDamageBonus = 6.0f;
+                bot.MissileNearHitDamageBonus = 4.0f;
+                bot.MissileFarHitDamageBonus = 2.0f;
+                bot.MissileReloadCooldown = 3.0f;
                 break;
             case BotMissileType.BFG:
-                robot.MissileRange = 350.0f;
-                robot.MissileVelocity = 75.0f;
-                robot.MissileDirectHitDamageBonus = 12.0f;
-                robot.MissileNearHitDamageBonus = 8.0f;
-                robot.MissileFarHitDamageBonus = 4.0f;
-                robot.MissileReloadCooldown = 5.0f;
+                bot.MissileRange = 350.0f;
+                bot.MissileVelocity = 75.0f;
+                bot.MissileDirectHitDamageBonus = 12.0f;
+                bot.MissileNearHitDamageBonus = 8.0f;
+                bot.MissileFarHitDamageBonus = 4.0f;
+                bot.MissileReloadCooldown = 5.0f;
                 break;
             default:
                 return false;

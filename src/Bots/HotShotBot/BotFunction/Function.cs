@@ -27,7 +27,7 @@ using System.Threading.Tasks;
 using LambdaRobots.Bot.Model;
 using LambdaRobots.Function;
 
-namespace LambdaRobots.HotShotRobot.RobotFunction {
+namespace LambdaRobots.HotShotBot.BotFunction {
 
     public sealed class BotState {
 
@@ -66,7 +66,7 @@ namespace LambdaRobots.HotShotRobot.RobotFunction {
 
                 // initialize state
                 State.NoHitSweep = 0.0f;
-                State.ScanResolution = Robot.RadarMaxResolution;
+                State.ScanResolution = Bot.RadarMaxResolution;
 
                 // initialize aim to point to middle of the game board
                 State.ScanHeading = AngleToXY(Game.BoardWidth / 2, Game.BoardHeight / 2);
@@ -79,7 +79,7 @@ namespace LambdaRobots.HotShotRobot.RobotFunction {
             // check if target is found in left scan area
             float scanHeading = State.ScanHeading - State.ScanResolution;
             State.TargetRange = await ScanAsync(scanHeading, State.ScanResolution);
-            if((State.TargetRange != null) && (State.TargetRange > Game.FarHitRange) && (State.TargetRange <= Robot.MissileRange)) {
+            if((State.TargetRange != null) && (State.TargetRange > Game.FarHitRange) && (State.TargetRange <= Bot.MissileRange)) {
                 LogInfo($"Target found: ScanHeading = {scanHeading:N2}, Range = {State.TargetRange:N2}");
 
                 // update scan heading
@@ -92,7 +92,7 @@ namespace LambdaRobots.HotShotRobot.RobotFunction {
                 // check if target is found in right scan area
                 scanHeading = State.ScanHeading + State.ScanResolution;
                 State.TargetRange = await ScanAsync(scanHeading, State.ScanResolution);
-                if((State.TargetRange != null) && (State.TargetRange > Game.FarHitRange) && (State.TargetRange <= Robot.MissileRange)) {
+                if((State.TargetRange != null) && (State.TargetRange > Game.FarHitRange) && (State.TargetRange <= Bot.MissileRange)) {
                     LogInfo($"Target found: ScanHeading = {scanHeading:N2}, Range = {State.TargetRange:N2}");
 
                     // update scan heading
@@ -105,13 +105,13 @@ namespace LambdaRobots.HotShotRobot.RobotFunction {
                     LogInfo($"No target found: ScanHeading = {State.ScanHeading:N2} +/- {State.ScanResolution:N2}");
 
                     // look in adjacent area
-                    State.ScanHeading += 3.0f * Robot.RadarMaxResolution;
+                    State.ScanHeading += 3.0f * Bot.RadarMaxResolution;
 
                     // reset resolution to max resolution
-                    State.ScanResolution = Robot.RadarMaxResolution;
+                    State.ScanResolution = Bot.RadarMaxResolution;
 
                     // increase our no-hit sweep tracker so we know when to move
-                    State.NoHitSweep += 2.0f * Robot.RadarMaxResolution;
+                    State.NoHitSweep += 2.0f * Bot.RadarMaxResolution;
                 }
             }
             State.ScanHeading = NormalizeAngle(State.ScanHeading);
