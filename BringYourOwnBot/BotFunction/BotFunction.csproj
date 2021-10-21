@@ -11,7 +11,7 @@
   <ItemGroup>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="../../../LambdaRobots/LambdaRobots.csproj" />
+    <ProjectReference Include="../../src/LambdaRobots/LambdaRobots.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp" Version="0.8.3.*"/>

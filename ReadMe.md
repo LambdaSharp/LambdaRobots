@@ -115,3 +115,24 @@ In this screenshot, the game is configured to initialize with 3 Target bots and 
 Click `Start Game` to initialize the bots and see the match unfold.
 
 ![Game Play](Docs/GamePlay.png)
+
+## Build Your Own Bot
+
+To build your own battle bots, you need to complete the followings steps.
+1. [Install .NET Core 3.1 for AWS Lambda Development](https://dotnet.microsoft.com/download)
+1. [Clone the LambdaRobots GitHub repository](https://github.com/LambdaSharp/LambdaRobots)
+
+To start, build and deploy the `BringYourOwnBot` module. Once deployed, verify that it initializes by pitting it against the HotShot bot. It shouldn't last long since it doesn't move or shoot.
+
+Run the deploy command from the LambdaRobots checkout folder.
+```bash
+lash deploy BringYourOwnBot
+```
+
+Start by editing `BringYourOwnBot/BotFunction/Function.cs` and customize the `Name` of your bot.
+
+Check out the [LambdaRobots SDK documentation](Docs/SDK.md) to learn about configuration options for your bot, actions it can respond with, and queries it can perform to find other bots.
+
+Now update the behavior of `BringYourOwnBot` to shoot down the target bots. For example, you can use luck, like `YosemiteSamBot`, which shoots in random directions, or targeting like `HotShotBot`. The latter uses the `ScanAsync()` method to find enemies and aim missiles at them. Remember that other bots may be out of radar range, requiring your bot to move periodically. Also, your bot can be damaged by its own missiles. Check `GameSession.FarHitRange` to make sure your target is beyond the damage range. If you don't mind a bit of self-inflicted pain, you can also use `GameSession.NearHitRange` or even `GameSession.DirectHitRange` instead.
+
+Next update the behavior of `BringYourOwnBot` to avoid getting shot. For example, you can continuous motion, like `YosemiteSamBot`, which zig-zags across the board, or reacting to damage like `HotShotBot`. Beware that a bot cannot change heading without suddenly stopping if its speed exceeds `Bot.MaxSpeed`.
