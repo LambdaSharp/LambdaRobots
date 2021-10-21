@@ -37,12 +37,12 @@ namespace LambdaRobots.YosemiteSamBot.BotFunction {
 
         //--- Methods ---
         public override async Task<GetBuildResponse> GetBuildAsync() {
-
-            // TODO: this method is always invoked at the beginning of a match
             return new GetBuildResponse {
                 Name = "Yosemite Sam",
+                Armor = BotArmorType.Medium,
                 Engine = BotEngineType.ExtraLarge,
-                Missile = BotMissileType.Dart
+                Missile = BotMissileType.Dart,
+                Radar = BotRadarType.MidRange
             };
         }
 

@@ -51,10 +51,10 @@ namespace LambdaRobots.HotShotBot.BotFunction {
         public override async Task<GetBuildResponse> GetBuildAsync() {
             return new GetBuildResponse {
                 Name = "HotShot",
-                Radar = BotRadarType.LongRange,
                 Armor = BotArmorType.Medium,
                 Engine = BotEngineType.Compact,
-                Missile = BotMissileType.Javelin
+                Missile = BotMissileType.Javelin,
+                Radar = BotRadarType.LongRange
             };
         }
 
