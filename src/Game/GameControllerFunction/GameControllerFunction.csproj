@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <Deterministic>true</Deterministic>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+    <RootNamespace>LambdaRobots.Game.GameControllerFunction</RootNamespace>
+    <AWSProjectType>Lambda</AWSProjectType>
+    <NoWarn>CS1998</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.ApiGatewayManagementApi" Version="3.7.0.75"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../GameLib/GameLib.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp.ApiGateway" Version="0.8.3.*"/>
+    <ProjectReference Condition="'$(LAMBDASHARP)'!=''" Include="$(LAMBDASHARP)/src/LambdaSharp.ApiGateway/LambdaSharp.ApiGateway.csproj"/>
+    <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp.DynamoDB.Native" Version="0.8.3.*"/>
+    <ProjectReference Condition="'$(LAMBDASHARP)'!=''" Include="$(LAMBDASHARP)/src/LambdaSharp.DynamoDB.Native/LambdaSharp.DynamoDB.Native.csproj"/>
+  </ItemGroup>
+</Project>

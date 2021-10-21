@@ -1,14 +1,14 @@
 #!/bin/bash
 
-LAMBDAROBOTS_VERSION=1.2
+LAMBDAROBOTS_VERSION=2.0
 FOLDER=`pwd`
 
 lash publish \
     --aws-profile lambdasharp \
-    --tier Public \
+    --tier Release \
     --force-build \
     --module-version $LAMBDAROBOTS_VERSION \
-    $FOLDER/src/Server \
-    $FOLDER/src/Robots/HotShotRobot/ \
-    $FOLDER/src/Robots/TargetRobot/ \
-    $FOLDER/src/Robots/YosemiteSamRobot/
+    $FOLDER/src/Game \
+    $FOLDER/src/Bots/HotShotBot/ \
+    $FOLDER/src/Bots/TargetBot/ \
+    $FOLDER/src/Bots/YosemiteSamBot/

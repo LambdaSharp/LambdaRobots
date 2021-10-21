@@ -4,11 +4,14 @@
     <Deterministic>true</Deterministic>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
-    <RootNamespace>LambdaRobots</RootNamespace>
+    <RootNamespace>LambdaRobots.BringYourOwnBot.BotFunction</RootNamespace>
+    <AWSProjectType>Lambda</AWSProjectType>
     <NoWarn>CS1998</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="AWSSDK.Lambda" Version="3.7.4.2"/>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../src/LambdaRobots/LambdaRobots.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Condition="'$(LAMBDASHARP)'==''" Include="LambdaSharp" Version="0.8.3.*"/>

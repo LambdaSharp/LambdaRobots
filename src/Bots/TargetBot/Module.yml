@@ -1,0 +1,23 @@
+Module: LambdaRobots.TargetBot
+Description: Stationary target bot
+Items:
+
+  - Function: BotFunction
+    Memory: 256
+    Timeout: 30
+    Properties:
+      Environment:
+        Variables:
+          DEBUG_LOGGING_ENABLED: true
+
+  - Resource: BotInvocationPermission
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName: !Ref BotFunction
+      Principal: "*"
+
+  - Variable: BotArn
+    Description: Lambda function ARN
+    Scope: public
+    Value: !GetAtt BotFunction.Arn
