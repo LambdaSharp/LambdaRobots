@@ -17,19 +17,19 @@ async function init() {
     document.getElementById("output"),
     5000,
     data => {
-      if (data.GameBoard === null) {
+      if (data.GameSession === null) {
         return;
       }
       gameBoardClient.Repaint(data);
-      updateBotStats(data.GameBoard.Bots);
-      if (typeof data.GameBoard.Messages !== "undefined") {
-        messagesUi(data.GameBoard.Messages);
+      updateBotStats(data.GameSession.Bots);
+      if (typeof data.GameSession.Messages !== "undefined") {
+        messagesUi(data.GameSession.Messages);
       }
-      if (data.GameBoard.Status === "Start") {
-        sessionStorage.setItem("gameId", data.GameBoard.Id);
+      if (data.GameSession.Status === "Start") {
+        sessionStorage.setItem("gameId", data.GameSession.Id);
         startGameUi();
       }
-      if (data.GameBoard.Status === "Finished") {
+      if (data.GameSession.Status === "Finished") {
         stopGameUi();
       }
     }

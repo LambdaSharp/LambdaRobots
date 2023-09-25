@@ -27,11 +27,11 @@ using System.Threading.Tasks;
 using Amazon.Lambda.APIGatewayEvents;
 using LambdaRobots.Game.DataAccess;
 using LambdaRobots.Game.DataAccess.Records;
-using LambdaRobots.Game.GameConnectionFunction.Model;
+using LambdaRobots.Game.GameControllerFunction.Model;
 using LambdaSharp;
 using LambdaSharp.ApiGateway;
 
-namespace LambdaRobots.Game.GameConnectionFunction {
+namespace LambdaRobots.Game.GameControllerFunction {
 
     public sealed class Function : ALambdaApiGatewayFunction {
 
@@ -40,7 +40,7 @@ namespace LambdaRobots.Game.GameConnectionFunction {
 
         //--- Fields ---
         private DataAccessClient _dataClient;
-        private string _gameTurnFunctionArn;
+        private string _gameLoopFunctionArn;
 
         //--- Constructors ---
         public Function() : base(new LambdaSharp.Serialization.LambdaSystemTextJsonSerializer()) { }
@@ -48,7 +48,7 @@ namespace LambdaRobots.Game.GameConnectionFunction {
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
             _dataClient = new DataAccessClient(config.ReadDynamoDBTableName("GameTable"));
-            _gameTurnFunctionArn = config.ReadText("GameTurnFunction");
+            _gameLoopFunctionArn = config.ReadText("GameLoopFunction");
         }
 
         public async Task OpenConnectionAsync(APIGatewayProxyRequest request, string username = null) {
@@ -63,7 +63,7 @@ namespace LambdaRobots.Game.GameConnectionFunction {
             LogInfo($"Starting a new game: ConnectionId = {CurrentRequest.RequestContext.ConnectionId}");
 
             // create a new game
-            var gameBoard = new GameBoard {
+            var gameSession = new GameSession {
                 Id = Guid.NewGuid().ToString("N"),
                 Status = GameStatus.Start,
                 BoardWidth = request.BoardWidth ?? 1000.0f,
@@ -79,8 +79,7 @@ namespace LambdaRobots.Game.GameConnectionFunction {
                 MinimumSecondsPerTurn = request.MinimumSecondsPerTurn ?? 0.033f
             };
             var gameRecord = new GameRecord {
-                GameId = gameBoard.Id,
-                GameBoard = gameBoard,
+                GameSession = gameSession,
                 BotArns = request.BotArns,
                 ConnectionId = CurrentRequest.RequestContext.ConnectionId,
                 Expire = DateTimeOffset.UtcNow.AddDays(1).ToUnixTimeSeconds()
@@ -90,15 +89,15 @@ namespace LambdaRobots.Game.GameConnectionFunction {
             await _dataClient.CreateGameRecordAsync(gameRecord);
 
             // dispatch game loop
-            LogInfo($"Kicking off game: ID = {gameBoard.Id}");
+            LogInfo($"Kicking off game: ID = {gameSession.Id}");
             LogEvent(new GameKickOffEvent {
-                GameId = gameBoard.Id,
-                Status = gameBoard.Status
+                GameSessionId = gameSession.Id,
+                Status = gameSession.Status
             });
 
             // return with kicked off game
             return new StartGameResponse {
-                GameBoard = gameBoard
+                GameSession = gameSession
             };
         }
 
@@ -119,16 +118,16 @@ namespace LambdaRobots.Game.GameConnectionFunction {
             await _dataClient.DeleteGameRecordAsync(request.GameId);
 
             // update game state to indicated it was stopped
-            gameRecord.GameBoard.Status = GameStatus.Finished;
-            ++gameRecord.GameBoard.CurrentGameTurn;
-            gameRecord.GameBoard.Messages.Add(new Message {
-                GameTurn = gameRecord.GameBoard.CurrentGameTurn,
+            gameRecord.GameSession.Status = GameStatus.Finished;
+            ++gameRecord.GameSession.CurrentGameTurn;
+            gameRecord.GameSession.Messages.Add(new Message {
+                GameTurn = gameRecord.GameSession.CurrentGameTurn,
                 Text = "Game stopped."
             });
 
             // return final game state
             return new StopGameResponse {
-                GameBoard = gameRecord.GameBoard
+                GameSession = gameRecord.GameSession
             };
         }
     }

@@ -53,10 +53,10 @@ namespace LambdaRobots.Game.GameApiFunction {
             if(gameRecord is null) {
                 throw AbortNotFound($"could not find a game session: ID = {gameId ?? "<NULL>"}");
             }
-            var gameLogic = new GameLogic(gameRecord.GameBoard, this);
+            var gameLogic = new GameLogic(gameRecord.GameSession, this);
 
             // identify scanning bot
-            var bot = gameRecord.GameBoard.Bots.FirstOrDefault(r => r.Id == request.BotId);
+            var bot = gameRecord.GameSession.Bots.FirstOrDefault(r => r.Id == request.BotId);
             if(bot is null) {
                 throw AbortNotFound($"could not find a bot: ID = {request.BotId}");
             }

@@ -37,7 +37,7 @@ namespace LambdaRobots.Game {
         Error
     }
 
-    public sealed class GameBoard {
+    public sealed class GameSession {
 
         //--- Properties ---
         public string Id { get; set; }

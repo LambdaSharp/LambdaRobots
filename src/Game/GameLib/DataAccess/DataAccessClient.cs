@@ -82,14 +82,14 @@ namespace LambdaRobots.Game.DataAccess {
         public Task<GameRecord> GetGameRecordAsync(string gameId, CancellationToken cancellationToken = default)
             => Table.GetItemAsync(DataModel.GetPrimaryKeyForGameRecord(gameId), consistentRead: true, cancellationToken);
 
-        public Task<bool> UpdateGameRecordAsync(string gameId, GameBoard gameBoard, CancellationToken cancellationToken = default)
+        public Task<bool> UpdateGameRecordAsync(string gameId, GameSession gameSession, CancellationToken cancellationToken = default)
             => Table.UpdateItem(DataModel.GetPrimaryKeyForGameRecord(gameId))
 
                 // game record must exist
                 .WithCondition(record => DynamoCondition.Exists(record))
 
                 // update Game attribute
-                .Set(record => record.GameBoard, gameBoard)
+                .Set(record => record.GameSession, gameSession)
 
                 // execute UpdateItem operation
                 .ExecuteAsync(cancellationToken);

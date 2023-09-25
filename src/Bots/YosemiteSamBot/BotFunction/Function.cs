@@ -37,12 +37,12 @@ namespace LambdaRobots.YosemiteSamBot.BotFunction {
 
         //--- Methods ---
         public override async Task<GetBuildResponse> GetBuildAsync() {
-
-            // TODO: this method is always invoked at the beginning of a match
             return new GetBuildResponse {
                 Name = "Yosemite Sam",
+                Armor = BotArmorType.Medium,
                 Engine = BotEngineType.ExtraLarge,
-                Missile = BotMissileType.Dart
+                Missile = BotMissileType.Dart,
+                Radar = BotRadarType.MidRange
             };
         }
 
@@ -59,7 +59,7 @@ namespace LambdaRobots.YosemiteSamBot.BotFunction {
 
                 // too close to left wall, go right
                 SetHeading(45.0f + RandomFloat() * 90.0f);
-            } else if(X > (GameBoard.BoardWidth - 100.0f)) {
+            } else if(X > (GameSession.BoardWidth - 100.0f)) {
 
                 // too close to right wall, go left
                 SetHeading(-45.0f - RandomFloat() * 90.0f);
@@ -68,7 +68,7 @@ namespace LambdaRobots.YosemiteSamBot.BotFunction {
 
                 // too close to bottom wall, go up
                 SetHeading(-45.0f + RandomFloat() * 90.0f);
-            } else if(Y > (GameBoard.BoardHeight - 100.0f)) {
+            } else if(Y > (GameSession.BoardHeight - 100.0f)) {
 
                 // too close to top wall, go down
                 SetHeading(135.0f + RandomFloat() * 90.0f);

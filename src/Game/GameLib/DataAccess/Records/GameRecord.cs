@@ -29,8 +29,7 @@ namespace LambdaRobots.Game.DataAccess.Records {
     public sealed class GameRecord {
 
         //--- Properties ---
-        public string GameId { get; set; }
-        public GameBoard GameBoard { get; set; }
+        public GameSession GameSession { get; set; }
         public List<string> BotArns { get; set; }
         public string ConnectionId { get; set; }
         public long Expire { get; set; }

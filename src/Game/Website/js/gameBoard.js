@@ -22,18 +22,21 @@ export default class GameBoard {
       return;
     }
     this._clear();
-    if (gameStat.GameBoard.Status === "Start") {
-      this.canvas.width = gameStat.GameBoard.BoardWidth;
-      this.canvas.height = gameStat.GameBoard.BoardHeight;
+    if (gameStat.GameSession.Status === "Start") {
+      this.canvas.width = gameStat.GameSession.BoardWidth;
+      this.canvas.height = gameStat.GameSession.BoardHeight;
       return;
     }
     clearTimeout(this._spinnerInterval);
-    if (gameStat.GameBoard.Status === "NextTurn") {
-      this._bots(gameStat.Game, gameStat.GameBoard.Bots);
-      this._missiles(gameStat.Game, gameStat.GameBoard.Missiles);
+    if (gameStat.GameSession.Status === "NextTurn") {
+      this._bots(gameStat.GameSession, gameStat.GameSession.Bots);
+      this._missiles(gameStat.GameSession, gameStat.GameSession.Missiles);
       return;
     }
-    if (gameStat.GameBoard.Status === "Finished") {
+    if (gameStat.GameSession.Status === "Finished") {
+      this._gameOver();
+    }
+    if (gameStat.GameSession.Status === "Error") {
       this._gameOver();
     }
   }

@@ -8,7 +8,7 @@ Using:
 Items:
 
   # Game Connection
-  - Function: GameConnectionFunction
+  - Function: GameControllerFunction
     Description: Function for UI websocket interactions
     Memory: 1769
     Timeout: 30
@@ -23,8 +23,8 @@ Items:
         Invoke: StopGame
 
   # Game Loop
-  - Function: GameTurnFunction
-    Scope: GameConnectionFunction
+  - Function: GameLoopFunction
+    Scope: GameControllerFunction
     Description: Function for computing the next game turn
     Memory: 1769
     Timeout: 900
@@ -36,7 +36,7 @@ Items:
 
   - Variable: RestApiUrl
     Description: URL for REST API
-    Scope: GameTurnFunction
+    Scope: GameLoopFunction
     Value: !Ref Module::RestApi::Url
 
   # Game API

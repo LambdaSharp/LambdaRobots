@@ -27,7 +27,7 @@ namespace LambdaRobots.Game {
     public sealed class GameKickOffEvent {
 
         //--- Properties ---
-        public string GameId { get; set; }
+        public string GameSessionId { get; set; }
         public GameStatus Status { get; set; }
     }
 }

@@ -22,11 +22,11 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Game.GameTurnFunction {
+namespace LambdaRobots.Game.GameLoopFunction {
 
     public sealed class GameTurnNotification {
 
         //--- Properties ---
-        public GameBoard GameBoard { get; set; }
+        public GameSession GameSession { get; set; }
     }
 }

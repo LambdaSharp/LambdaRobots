@@ -24,7 +24,7 @@
 
 using System.Collections.Generic;
 
-namespace LambdaRobots.Game.GameConnectionFunction.Model {
+namespace LambdaRobots.Game.GameControllerFunction.Model {
 
     public sealed class StartGameRequest {
 
@@ -49,6 +49,6 @@ namespace LambdaRobots.Game.GameConnectionFunction.Model {
     public sealed class StartGameResponse {
 
         //--- Properties ---
-        public GameBoard GameBoard { get; set; }
+        public GameSession GameSession { get; set; }
     }
 }

@@ -38,7 +38,7 @@ using LambdaRobots.Game.DataAccess.Records;
 using LambdaSharp;
 using LambdaSharp.EventBridge;
 
-namespace LambdaRobots.Game.GameTurnFunction {
+namespace LambdaRobots.Game.GameLoopFunction {
 
     public sealed class Function : ALambdaEventFunction<GameKickOffEvent>, IGameDependencyProvider {
 
@@ -61,7 +61,7 @@ namespace LambdaRobots.Game.GameTurnFunction {
             set => _gameRecord = value;
         }
 
-        public GameBoard GameBoard => GameRecord.GameBoard;
+        public GameSession GameSession => GameRecord.GameSession;
 
         //--- Methods ---
         public override async Task InitializeAsync(LambdaConfig config) {
@@ -76,57 +76,57 @@ namespace LambdaRobots.Game.GameTurnFunction {
         }
 
         public override async Task ProcessEventAsync(GameKickOffEvent message) {
-            var gameId = message.GameId;
+            var gameId = message.GameSessionId;
 
             // get game state from DynamoDB table
             LogInfo($"Loading game state: ID = {gameId}");
             GameRecord = await _dataClient.GetGameRecordAsync(gameId);
             try {
-                if(GameRecord?.GameBoard?.Status != GameStatus.Start) {
+                if(GameRecord?.GameSession?.Status != GameStatus.Start) {
                     LogWarn($"Game state is invalid: ID = {gameId}");
                     return;
                 }
                 try {
 
                     // initialize game logic
-                    var logic = new GameLogic(this.GameBoard, this);
+                    var logic = new GameLogic(this.GameSession, this);
 
                     // initialize bots
-                    LogInfo($"Start game: initializing {GameBoard.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots (total: {GameBoard.Bots.Count})");
+                    LogInfo($"Start game: initializing {GameSession.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots (total: {GameSession.Bots.Count})");
                     await logic.StartAsync(GameRecord.BotArns.Count);
-                    GameBoard.Status = GameStatus.NextTurn;
-                    LogInfo($"Bots initialized: {GameBoard.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots ready");
+                    GameSession.Status = GameStatus.NextTurn;
+                    LogInfo($"Bots initialized: {GameSession.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots ready");
 
                     // loop until we're done
-                    var messageCount = GameBoard.Messages.Count;
-                    while(GameBoard.Status == GameStatus.NextTurn) {
+                    var messageCount = GameSession.Messages.Count;
+                    while(GameSession.Status == GameStatus.NextTurn) {
                         var now = ((IGameDependencyProvider)this).UtcNow;
 
                         // make sure turns are not too fast
-                        var timeSinceLastTurn = now - GameBoard.LastStatusUpdate;
-                        var minimumTurnTimespan = TimeSpan.FromSeconds(GameBoard.MinimumSecondsPerTurn);
+                        var timeSinceLastTurn = now - GameSession.LastStatusUpdate;
+                        var minimumTurnTimespan = TimeSpan.FromSeconds(GameSession.MinimumSecondsPerTurn);
                         if(timeSinceLastTurn < minimumTurnTimespan) {
                             await Task.Delay(minimumTurnTimespan - timeSinceLastTurn);
                         }
                         var timelapseSeconds = (float)timeSinceLastTurn.TotalSeconds;
-                        GameBoard.LastStatusUpdate = now;
+                        GameSession.LastStatusUpdate = now;
 
                         // next turn
-                        LogInfo($"Start turn {GameBoard.CurrentGameTurn} (max: {GameBoard.MaxTurns}): invoking {GameBoard.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots (total: {GameBoard.Bots.Count})");
+                        LogInfo($"Start turn {GameSession.CurrentGameTurn} (max: {GameSession.MaxTurns}): invoking {GameSession.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots (total: {GameSession.Bots.Count})");
                         logic.NextTurn(timelapseSeconds);
-                        for(var i = messageCount; i < GameBoard.Messages.Count; ++i) {
-                            LogInfo($"Game message {i + 1}: {GameBoard.Messages[i].Text}");
+                        for(var i = messageCount; i < GameSession.Messages.Count; ++i) {
+                            LogInfo($"Game message {i + 1}: {GameSession.Messages[i].Text}");
                         }
-                        LogInfo($"End turn {GameBoard.CurrentGameTurn}: {GameBoard.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots alive");
+                        LogInfo($"End turn {GameSession.CurrentGameTurn}: {GameSession.Bots.Count(bot => bot.Status == BotStatus.Alive)} bots alive");
 
                         // attempt to update the game record
                         LogInfo($"Storing game: ID = {gameId}");
-                        if(!await _dataClient.UpdateGameRecordAsync(gameId, GameBoard)) {
+                        if(!await _dataClient.UpdateGameRecordAsync(gameId, GameSession)) {
                             throw new ApplicationException("unable to update game record");
                         }
 
                         // notify WebSocket of new game state
-                        if(!await TryPostGameUpdateAsync(GameRecord.ConnectionId, GameBoard)) {
+                        if(!await TryPostGameUpdateAsync(GameRecord.ConnectionId, GameSession)) {
                             return;
                         }
                     }
@@ -134,8 +134,8 @@ namespace LambdaRobots.Game.GameTurnFunction {
                     LogError(e, "Error during game loop");
 
                     // notify frontend that the game is over
-                    GameBoard.Status = GameStatus.Error;
-                    await TryPostGameUpdateAsync(GameRecord.ConnectionId, GameBoard);
+                    GameSession.Status = GameStatus.Error;
+                    await TryPostGameUpdateAsync(GameRecord.ConnectionId, GameSession);
                 } finally {
 
                     // delete game from table
@@ -147,11 +147,11 @@ namespace LambdaRobots.Game.GameTurnFunction {
             }
         }
 
-        private async Task<bool> TryPostGameUpdateAsync(string connectionId, GameBoard gameBoard) {
-            LogInfo($"Posting game update to connection: {gameBoard.Id}");
+        private async Task<bool> TryPostGameUpdateAsync(string connectionId, GameSession gameSession) {
+            LogInfo($"Posting game update to connection: {gameSession.Id}");
             try {
                 var json = LambdaSerializer.Serialize(new GameTurnNotification {
-                    GameBoard = gameBoard
+                    GameSession = gameSession
                 });
                 await _amaClient.PostToConnectionAsync(new PostToConnectionRequest {
                     ConnectionId = connectionId,
@@ -161,7 +161,7 @@ namespace LambdaRobots.Game.GameTurnFunction {
 
                 // connection has been closed, stop the game
                 LogInfo($"Connection is gone");
-                gameBoard.Status = GameStatus.Finished;
+                gameSession.Status = GameStatus.Finished;
                 return false;
             } catch(Exception e) {
                 LogErrorAsWarning(e, "Failed posting game update");
@@ -175,20 +175,20 @@ namespace LambdaRobots.Game.GameTurnFunction {
 
         Task<GetBuildResponse> IGameDependencyProvider.GetBotBuild(BotInfo bot) {
             try {
-                var client = new LambdaRobotsBotClient(bot.Id, GameRecord.BotArns[bot.Index], TimeSpan.FromSeconds(GameBoard.BotTimeoutSeconds), _lambdaClient, this);
+                var client = new LambdaRobotsBotClient(bot.Id, GameRecord.BotArns[bot.Index], TimeSpan.FromSeconds(GameSession.BotTimeoutSeconds), _lambdaClient, this);
                 return client.GetBuild(new GetBuildRequest {
-                    GameBoard = new GameBoardInfo {
-                        Id = GameBoard.Id,
-                        BoardWidth = GameBoard.BoardWidth,
-                        BoardHeight = GameBoard.BoardHeight,
-                        DirectHitRange = GameBoard.DirectHitRange,
-                        NearHitRange = GameBoard.NearHitRange,
-                        FarHitRange = GameBoard.FarHitRange,
-                        CollisionRange = GameBoard.CollisionRange,
-                        CurrentGameTurn = GameBoard.CurrentGameTurn,
-                        MaxGameTurns = GameBoard.MaxTurns,
-                        MaxBuildPoints = GameBoard.MaxBuildPoints,
-                        SecondsSinceLastTurn = GameBoard.MinimumSecondsPerTurn
+                    Session = new SessionInfo {
+                        Id = GameSession.Id,
+                        BoardWidth = GameSession.BoardWidth,
+                        BoardHeight = GameSession.BoardHeight,
+                        DirectHitRange = GameSession.DirectHitRange,
+                        NearHitRange = GameSession.NearHitRange,
+                        FarHitRange = GameSession.FarHitRange,
+                        CollisionRange = GameSession.CollisionRange,
+                        CurrentGameTurn = GameSession.CurrentGameTurn,
+                        MaxGameTurns = GameSession.MaxTurns,
+                        MaxBuildPoints = GameSession.MaxBuildPoints,
+                        SecondsSinceLastTurn = GameSession.MinimumSecondsPerTurn
                     },
                     Bot = bot
                 });
@@ -200,21 +200,21 @@ namespace LambdaRobots.Game.GameTurnFunction {
 
         Task<GetActionResponse> IGameDependencyProvider.GetBotAction(BotInfo bot) {
             try {
-                var client = new LambdaRobotsBotClient(bot.Id, GameRecord.BotArns[bot.Index], TimeSpan.FromSeconds(GameBoard.BotTimeoutSeconds), _lambdaClient, this);
+                var client = new LambdaRobotsBotClient(bot.Id, GameRecord.BotArns[bot.Index], TimeSpan.FromSeconds(GameSession.BotTimeoutSeconds), _lambdaClient, this);
                 return client.GetAction(new GetActionRequest {
-                    GameBoard = new GameBoardInfo {
-                        Id = GameBoard.Id,
-                        BoardWidth = GameBoard.BoardWidth,
-                        BoardHeight = GameBoard.BoardHeight,
-                        DirectHitRange = GameBoard.DirectHitRange,
-                        NearHitRange = GameBoard.NearHitRange,
-                        FarHitRange = GameBoard.FarHitRange,
-                        CollisionRange = GameBoard.CollisionRange,
-                        CurrentGameTurn = GameBoard.CurrentGameTurn,
-                        MaxGameTurns = GameBoard.MaxTurns,
-                        MaxBuildPoints = GameBoard.MaxBuildPoints,
-                        SecondsSinceLastTurn = (float)(GameBoard.LastStatusUpdate - bot.LastStatusUpdate).TotalSeconds,
-                        ApiUrl = _gameApiUrl + $"/{GameBoard.Id}"
+                    Session = new SessionInfo {
+                        Id = GameSession.Id,
+                        BoardWidth = GameSession.BoardWidth,
+                        BoardHeight = GameSession.BoardHeight,
+                        DirectHitRange = GameSession.DirectHitRange,
+                        NearHitRange = GameSession.NearHitRange,
+                        FarHitRange = GameSession.FarHitRange,
+                        CollisionRange = GameSession.CollisionRange,
+                        CurrentGameTurn = GameSession.CurrentGameTurn,
+                        MaxGameTurns = GameSession.MaxTurns,
+                        MaxBuildPoints = GameSession.MaxBuildPoints,
+                        SecondsSinceLastTurn = (float)(GameSession.LastStatusUpdate - bot.LastStatusUpdate).TotalSeconds,
+                        ApiUrl = _gameApiUrl + $"/{GameSession.Id}"
                     },
                     Bot = bot
                 });

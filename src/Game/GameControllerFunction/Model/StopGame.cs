@@ -22,7 +22,7 @@
  * SOFTWARE.
  */
 
-namespace LambdaRobots.Game.GameConnectionFunction.Model {
+namespace LambdaRobots.Game.GameControllerFunction.Model {
 
     public sealed class StopGameRequest {
 
@@ -34,6 +34,6 @@ namespace LambdaRobots.Game.GameConnectionFunction.Model {
     public sealed class StopGameResponse {
 
         //--- Properties ---
-        public GameBoard GameBoard { get; set; }
+        public GameSession GameSession { get; set; }
     }
 }
